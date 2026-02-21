@@ -1,0 +1,103 @@
+{
+  "app": {
+    "name": "Zeiterfassung",
+    "tagline": "Time Tracking System"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "time_tracking": "Time Tracking",
+    "vacation": "Vacation",
+    "admin": "Administration",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email Address",
+    "password": "Password",
+    "login_button": "Sign In",
+    "login_error": "Invalid credentials",
+    "account_locked": "Account locked. Please try again later.",
+    "session_expired": "Session expired. Please log in again."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "today_hours": "Today's Work Hours",
+    "week_hours": "Weekly Hours",
+    "vacation_remaining": "Remaining Vacation",
+    "team_present": "Team Present",
+    "pending_requests": "Pending Requests",
+    "overtime_balance": "Overtime Balance"
+  },
+  "time_tracking": {
+    "title": "Time Tracking",
+    "clock_in": "Clock In",
+    "clock_out": "Clock Out",
+    "break_start": "Start Break",
+    "break_end": "End Break",
+    "current_status": "Current Status",
+    "today_summary": "Today's Summary",
+    "work_time": "Work Time",
+    "break_time": "Break Time",
+    "entries": "Entries"
+  },
+  "vacation": {
+    "title": "Vacation",
+    "request": "Request Vacation",
+    "remaining_days": "Remaining Vacation Days",
+    "used_days": "Used Vacation Days",
+    "total_days": "Total Vacation Days",
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "half_day": "Half Day",
+    "notes": "Notes",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    }
+  },
+  "admin": {
+    "title": "Administration",
+    "users": "User Management",
+    "settings": "Settings",
+    "reports": "Reports"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "from": "From",
+    "to": "To",
+    "actions": "Actions",
+    "status": "Status",
+    "date": "Date",
+    "time": "Time",
+    "duration": "Duration",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "required": "Required"
+  },
+  "errors": {
+    "not_found": "Not Found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Access Denied",
+    "server_error": "Server Error",
+    "network_error": "Network Error",
+    "validation_error": "Validation Error"
+  }
+}

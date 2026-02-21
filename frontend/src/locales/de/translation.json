@@ -1,0 +1,103 @@
+{
+  "app": {
+    "name": "Zeiterfassung",
+    "tagline": "Zeiterfassungssystem"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "time_tracking": "Zeiterfassung",
+    "vacation": "Urlaub",
+    "admin": "Administration",
+    "profile": "Profil",
+    "logout": "Abmelden"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "login_button": "Anmelden",
+    "login_error": "Ungültige Anmeldedaten",
+    "account_locked": "Konto gesperrt. Bitte versuchen Sie es später erneut.",
+    "session_expired": "Sitzung abgelaufen. Bitte melden Sie sich erneut an."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "today_hours": "Heutige Arbeitsstunden",
+    "week_hours": "Wochenstunden",
+    "vacation_remaining": "Verbleibender Urlaub",
+    "team_present": "Team anwesend",
+    "pending_requests": "Ausstehende Anfragen",
+    "overtime_balance": "Überstundenkonto"
+  },
+  "time_tracking": {
+    "title": "Zeiterfassung",
+    "clock_in": "Einstempeln",
+    "clock_out": "Ausstempeln",
+    "break_start": "Pause beginnen",
+    "break_end": "Pause beenden",
+    "current_status": "Aktueller Status",
+    "today_summary": "Heutige Zusammenfassung",
+    "work_time": "Arbeitszeit",
+    "break_time": "Pausenzeit",
+    "entries": "Einträge"
+  },
+  "vacation": {
+    "title": "Urlaub",
+    "request": "Urlaub beantragen",
+    "remaining_days": "Verbleibende Urlaubstage",
+    "used_days": "Genommene Urlaubstage",
+    "total_days": "Urlaubstage gesamt",
+    "start_date": "Startdatum",
+    "end_date": "Enddatum",
+    "half_day": "Halber Tag",
+    "notes": "Anmerkungen",
+    "status": {
+      "pending": "Ausstehend",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "cancelled": "Storniert"
+    }
+  },
+  "admin": {
+    "title": "Administration",
+    "users": "Benutzerverwaltung",
+    "settings": "Einstellungen",
+    "reports": "Berichte"
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolgreich",
+    "confirm": "Bestätigen",
+    "yes": "Ja",
+    "no": "Nein",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "from": "Von",
+    "to": "Bis",
+    "actions": "Aktionen",
+    "status": "Status",
+    "date": "Datum",
+    "time": "Zeit",
+    "duration": "Dauer",
+    "name": "Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "required": "Pflichtfeld"
+  },
+  "errors": {
+    "not_found": "Nicht gefunden",
+    "unauthorized": "Nicht autorisiert",
+    "forbidden": "Zugriff verweigert",
+    "server_error": "Serverfehler",
+    "network_error": "Netzwerkfehler",
+    "validation_error": "Validierungsfehler"
+  }
+}
