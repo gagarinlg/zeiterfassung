@@ -11,49 +11,62 @@ import java.net.URI
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
-
     private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
     @ExceptionHandler(ResourceNotFoundException::class)
-    fun handleNotFound(ex: ResourceNotFoundException): ProblemDetail {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message ?: "Not found").also {
+    fun handleNotFound(ex: ResourceNotFoundException): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message ?: "Not found").also {
             it.type = URI.create("about:not-found")
         }
-    }
 
     @ExceptionHandler(UnauthorizedException::class)
-    fun handleUnauthorized(ex: UnauthorizedException): ProblemDetail {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.message ?: "Unauthorized").also {
+    fun handleUnauthorized(ex: UnauthorizedException): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.message ?: "Unauthorized").also {
             it.type = URI.create("about:unauthorized")
         }
-    }
 
     @ExceptionHandler(ForbiddenException::class)
-    fun handleForbidden(ex: ForbiddenException): ProblemDetail {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.message ?: "Forbidden").also {
+    fun handleForbidden(ex: ForbiddenException): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.message ?: "Forbidden").also {
             it.type = URI.create("about:forbidden")
         }
-    }
 
-    @ExceptionHandler(ConflictException::class)
-    fun handleConflict(ex: ConflictException): ProblemDetail {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.message ?: "Conflict").also {
+    @ExceptionHandler(DuplicateResourceException::class)
+    fun handleDuplicate(ex: DuplicateResourceException): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.message ?: "Duplicate resource").also {
             it.type = URI.create("about:conflict")
         }
-    }
+
+    @ExceptionHandler(ConflictException::class)
+    fun handleConflict(ex: ConflictException): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.message ?: "Conflict").also {
+            it.type = URI.create("about:conflict")
+        }
 
     @ExceptionHandler(BadRequestException::class)
-    fun handleBadRequest(ex: BadRequestException): ProblemDetail {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.message ?: "Bad request").also {
+    fun handleBadRequest(ex: BadRequestException): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.message ?: "Bad request").also {
             it.type = URI.create("about:bad-request")
         }
-    }
+
+    @ExceptionHandler(AccountLockedException::class)
+    fun handleAccountLocked(ex: AccountLockedException): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.LOCKED, ex.message ?: "Account locked").also {
+            it.type = URI.create("about:account-locked")
+        }
+
+    @ExceptionHandler(RateLimitExceededException::class)
+    fun handleRateLimit(ex: RateLimitExceededException): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.message ?: "Rate limit exceeded").also {
+            it.type = URI.create("about:rate-limit-exceeded")
+        }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidation(ex: MethodArgumentNotValidException): ProblemDetail {
-        val errors = ex.bindingResult.fieldErrors.associate { field: FieldError ->
-            field.field to (field.defaultMessage ?: "Invalid value")
-        }
+        val errors =
+            ex.bindingResult.fieldErrors.associate { field: FieldError ->
+                field.field to (field.defaultMessage ?: "Invalid value")
+            }
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed").also {
             it.type = URI.create("about:validation-error")
             it.setProperty("errors", errors)

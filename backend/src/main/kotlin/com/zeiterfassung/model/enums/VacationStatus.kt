@@ -4,5 +4,5 @@ enum class VacationStatus {
     PENDING,
     APPROVED,
     REJECTED,
-    CANCELLED
+    CANCELLED,
 }
