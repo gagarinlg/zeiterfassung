@@ -172,7 +172,9 @@ class TimeTrackingService(
         val todayEnd = today.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant()
         val todayEntries = timeEntryRepository.findByUserIdAndDateRange(userId, todayStart, todayEnd)
 
-        val (workMin, breakMin) = calculateMinutes(todayEntries, Instant.now())
+        val calc = calculateWorkTime(todayEntries, Instant.now())
+        val workMin = calc.effectiveWorkMinutes
+        val breakMin = calc.effectiveBreakMinutes
 
         val status =
             when (lastEntry?.entryType) {
@@ -228,20 +230,20 @@ class TimeTrackingService(
         val endOfDay = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant()
         val entries = timeEntryRepository.findByUserIdAndDateRange(userId, startOfDay, endOfDay)
 
-        val (workMin, breakMin) = calculateMinutes(entries, null)
+        val calc = calculateWorkTime(entries, null)
 
         val config = employeeConfigRepository.findByUserId(userId)
         val targetMinutes = config?.dailyWorkHours?.multiply(BigDecimal(60))?.toInt() ?: 480
-        val overtimeMin = maxOf(0, workMin - targetMinutes)
+        val overtimeMin = maxOf(0, calc.effectiveWorkMinutes - targetMinutes)
 
-        val compliance = complianceService.checkCompliance(workMin, breakMin)
+        val compliance = complianceService.checkCompliance(calc.effectiveWorkMinutes, calc.effectiveQualifyingBreakMinutes)
 
         val summary =
             dailySummaryRepository.findByUserIdAndDate(userId, date)
                 ?: DailySummaryEntity(user = user, date = date)
 
-        summary.totalWorkMinutes = workMin
-        summary.totalBreakMinutes = breakMin
+        summary.totalWorkMinutes = calc.effectiveWorkMinutes
+        summary.totalBreakMinutes = calc.effectiveBreakMinutes
         summary.overtimeMinutes = overtimeMin
         summary.isCompliant = compliance.isCompliant
         summary.complianceNotes = if (compliance.notes.isEmpty()) null else compliance.notes.joinToString("; ")
@@ -382,15 +384,62 @@ class TimeTrackingService(
     }
 
     /**
-     * Calculates work and break minutes from a list of time entries ordered by timestamp ascending.
-     * @param openEndTime if not null, use this as the end time for open (unclosed) clock-in periods (for live status).
+     * Breaks shorter than this threshold don't count toward ArbZG mandatory break requirements,
+     * but still reduce work time (they are neither work nor qualifying break).
      */
-    private fun calculateMinutes(
+    private val minQualifyingBreak = ArbZGComplianceService.MIN_QUALIFYING_BREAK_MINUTES
+
+    /**
+     * Breakdown of a day's work and break time as derived from raw time entries.
+     *
+     * @property rawWorkMinutes              Actual work periods (excluding ALL break time).
+     * @property qualifyingBreakMinutes      Sum of breaks >= [minQualifyingBreak] min — count toward ArbZG.
+     * @property shortBreakMinutes           Sum of breaks < [minQualifyingBreak] min — reduce work time but
+     *                                       do NOT satisfy mandatory break requirements.
+     * @property autoDeductedMinutes         Minutes auto-deducted because mandatory breaks were not taken.
+     * @property effectiveWorkMinutes        Final work time (rawWork – autoDeducted).
+     * @property effectiveBreakMinutes       Total time not counted as work (all breaks + auto-deducted).
+     * @property effectiveQualifyingBreakMinutes Qualifying breaks + auto-deducted, used for compliance check.
+     */
+    private data class WorkTimeCalculation(
+        val rawWorkMinutes: Int,
+        val qualifyingBreakMinutes: Int,
+        val shortBreakMinutes: Int,
+        val autoDeductedMinutes: Int,
+    ) {
+        val effectiveWorkMinutes: Int get() = rawWorkMinutes - autoDeductedMinutes
+        val effectiveBreakMinutes: Int get() = qualifyingBreakMinutes + shortBreakMinutes + autoDeductedMinutes
+
+        /**
+         * Qualifying breaks actually taken plus auto-deducted minutes.
+         * Auto-deducted time is treated as if it were a qualifying break for ArbZG
+         * compliance purposes: the system enforces the mandatory rest by subtracting it
+         * from work time, so it counts toward the required break total.
+         */
+        val effectiveQualifyingBreakMinutes: Int get() = qualifyingBreakMinutes + autoDeductedMinutes
+    }
+
+    /**
+     * Calculates work and break minutes from a list of time entries ordered ascending by timestamp.
+     *
+     * Break classification (§4 ArbZG):
+     * - Breaks >= [minQualifyingBreak] min count toward the mandatory rest requirement.
+     * - Breaks < [minQualifyingBreak] min reduce logged time but do NOT satisfy the requirement.
+     *
+     * If the employee did not take sufficient qualifying breaks, the missing amount is
+     * automatically deducted from raw work time. The deduction is capped so that
+     * effective work never falls below the ArbZG threshold that triggered the requirement
+     * (e.g. 6:25h worked with no breaks → 6:00h effective work, not 5:55h).
+     *
+     * @param openEndTime If not null, use this as the end time for open clock-in periods (live status).
+     */
+    private fun calculateWorkTime(
         entries: List<TimeEntryEntity>,
         openEndTime: Instant?,
-    ): Pair<Int, Int> {
-        var workMinutes = 0L
-        var breakMinutes = 0L
+    ): WorkTimeCalculation {
+        var rawWorkMinutes = 0L
+        var qualifyingBreakMinutes = 0L
+        var shortBreakMinutes = 0L
         var clockInTime: Instant? = null
         var breakStartTime: Instant? = null
 
@@ -399,28 +448,41 @@ class TimeTrackingService(
                 TimeEntryType.CLOCK_IN -> clockInTime = entry.timestamp
                 TimeEntryType.CLOCK_OUT -> {
                     if (clockInTime != null) {
-                        workMinutes += ChronoUnit.MINUTES.between(clockInTime, entry.timestamp)
+                        rawWorkMinutes += ChronoUnit.MINUTES.between(clockInTime, entry.timestamp)
                         clockInTime = null
                     }
                 }
                 TimeEntryType.BREAK_START -> breakStartTime = entry.timestamp
                 TimeEntryType.BREAK_END -> {
                     if (breakStartTime != null) {
-                        breakMinutes += ChronoUnit.MINUTES.between(breakStartTime, entry.timestamp)
+                        val breakLen = ChronoUnit.MINUTES.between(breakStartTime, entry.timestamp)
+                        if (breakLen >= minQualifyingBreak) {
+                            qualifyingBreakMinutes += breakLen
+                        } else {
+                            shortBreakMinutes += breakLen
+                        }
                         breakStartTime = null
                     }
                 }
             }
         }
 
-        // Handle open clock-in (no clock-out yet) for live status.
-        // If currently on break, work only counts up to when the break started.
+        // Handle open clock-in for live status. If currently on break, work only counts
+        // up to when the break started (the in-progress break is not yet classified).
         if (clockInTime != null && openEndTime != null) {
             val workEnd = breakStartTime ?: openEndTime
-            workMinutes += ChronoUnit.MINUTES.between(clockInTime, workEnd)
+            rawWorkMinutes += ChronoUnit.MINUTES.between(clockInTime, workEnd)
         }
 
-        return Pair(workMinutes.toInt(), breakMinutes.toInt())
+        val autoDeducted =
+            complianceService.computeAutoDeduction(rawWorkMinutes.toInt(), qualifyingBreakMinutes.toInt())
+
+        return WorkTimeCalculation(
+            rawWorkMinutes = rawWorkMinutes.toInt(),
+            qualifyingBreakMinutes = qualifyingBreakMinutes.toInt(),
+            shortBreakMinutes = shortBreakMinutes.toInt(),
+            autoDeductedMinutes = autoDeducted,
+        )
     }
 
     private fun TimeEntryEntity.toResponse() =

@@ -263,14 +263,24 @@ zeiterfassung/
 Implement time tracking that complies with the **Arbeitszeitgesetz (ArbZG)**:
 
 - Maximum 8 hours of work per day (extendable to 10 hours if averaged to 8 over 6 months)
-- Mandatory breaks: 30 min after 6 hours, 45 min after 9 hours
-- Minimum 11 hours of rest between work days
+- Mandatory breaks: 30 min after 6 hours of work, 45 min after 9 hours of work (§4 ArbZG)
+- Minimum 11 hours of rest between work days (§5 ArbZG)
 - No work on Sundays and public holidays (with configurable exceptions)
 - Track and warn about overtime
 - Calculate and display daily, weekly, and monthly summaries
 - Support flexible working hours (Gleitzeit)
 - Configurable work hours per employee (full-time, part-time, custom)
 - Configurable work days per employee
+
+#### Break Time Rules (§4 ArbZG — precise implementation)
+
+- **Qualifying break**: Only breaks of **≥ 15 minutes** count toward the mandatory break requirement. Breaks shorter than 15 minutes reduce logged time but do NOT satisfy §4 ArbZG.
+- **Auto-deduction of missing breaks**: If an employee did not take the required qualifying break(s), the missing time is automatically deducted from their work time and recorded as break time.
+- **Threshold-aware deduction**: The 6-hour and 9-hour thresholds are based on **effective work time** (after deduction). Deducting the required break must never push effective work time below the threshold that triggered the requirement. Examples:
+  - Employee logged **6h 25m** with no breaks → effective work = **6h 00m** (only 25 min deducted, not 30, because 6h 25m − 30 min = 5h 55m < 6h which would contradict the requirement).
+  - Employee logged **6h 45m** with no breaks → effective work = **6h 15m** (full 30 min deducted; 6h 45m − 30 min = 6h 15m ≥ 6h, consistent).
+  - Employee logged **9h 25m** with no breaks → effective work = **8h 55m** (deduct 30 min, not 45, because 9h 25m − 45 min = 8h 40m < 9h, so only 30 min is required for the resulting work band).
+- **Non-compliance flag**: If the required deduction is capped (employee still took fewer breaks than legally required), `is_compliant = false` and a `§4 ArbZG` note is stored in `compliance_notes`.
 
 ### Vacation Management
 
