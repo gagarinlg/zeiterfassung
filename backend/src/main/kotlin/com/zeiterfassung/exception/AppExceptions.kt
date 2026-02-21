@@ -4,25 +4,41 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-class ResourceNotFoundException(message: String) : RuntimeException(message)
+class ResourceNotFoundException(
+    message: String,
+) : RuntimeException(message)
 
 @ResponseStatus(HttpStatus.UNAUTHORIZED)
-class UnauthorizedException(message: String) : RuntimeException(message)
+class UnauthorizedException(
+    message: String,
+) : RuntimeException(message)
 
 @ResponseStatus(HttpStatus.FORBIDDEN)
-class ForbiddenException(message: String) : RuntimeException(message)
+class ForbiddenException(
+    message: String,
+) : RuntimeException(message)
 
 @ResponseStatus(HttpStatus.CONFLICT)
-class DuplicateResourceException(message: String) : RuntimeException(message)
+class DuplicateResourceException(
+    message: String,
+) : RuntimeException(message)
 
 @ResponseStatus(HttpStatus.CONFLICT)
-class ConflictException(message: String) : RuntimeException(message)
+class ConflictException(
+    message: String,
+) : RuntimeException(message)
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-class BadRequestException(message: String) : RuntimeException(message)
+class BadRequestException(
+    message: String,
+) : RuntimeException(message)
 
 @ResponseStatus(HttpStatus.LOCKED)
-class AccountLockedException(message: String) : RuntimeException(message)
+class AccountLockedException(
+    message: String,
+) : RuntimeException(message)
 
 @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
-class RateLimitExceededException(message: String) : RuntimeException(message)
+class RateLimitExceededException(
+    message: String,
+) : RuntimeException(message)

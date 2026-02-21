@@ -31,7 +31,8 @@ class TerminalController(
         @RequestBody request: TerminalScanRequest,
     ): ResponseEntity<TerminalScanResponse> {
         val user =
-            userRepository.findByRfidTagId(request.rfidTagId)
+            userRepository
+                .findByRfidTagId(request.rfidTagId)
                 .orElseThrow { ResourceNotFoundException("No employee found for RFID tag: ${request.rfidTagId}") }
 
         val status = timeTrackingService.getCurrentStatus(user.id)

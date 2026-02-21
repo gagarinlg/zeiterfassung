@@ -144,7 +144,9 @@ class TimeTrackingController(
         @RequestParam userId: UUID,
         @RequestParam start: Instant,
         @RequestParam end: Instant,
-    ): ResponseEntity<List<TimeEntryResponse>> = ResponseEntity.ok(timeTrackingService.getEntriesForUser(userId, start, end))
+        @AuthenticationPrincipal actorId: String,
+    ): ResponseEntity<List<TimeEntryResponse>> =
+        ResponseEntity.ok(timeTrackingService.getTeamMemberEntries(UUID.fromString(actorId), userId, start, end))
 
     @PostMapping("/manage/entry")
     @PreAuthorize("hasAuthority('time.edit.team')")

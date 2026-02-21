@@ -28,8 +28,8 @@ class AuthService(
     private val jwtService: JwtService,
     private val passwordEncoder: PasswordEncoder,
     private val auditService: AuditService,
-    @Value("\${app.jwt.refresh-token-expiration-ms}") private val refreshTokenExpMs: Long,
-    @Value("\${app.jwt.access-token-expiration-ms}") private val accessTokenExpMs: Long,
+    @param:Value("\${app.jwt.refresh-token-expiration-ms}") private val refreshTokenExpMs: Long,
+    @param:Value("\${app.jwt.access-token-expiration-ms}") private val accessTokenExpMs: Long,
 ) {
     companion object {
         private const val MAX_FAILED_ATTEMPTS = 5
@@ -42,7 +42,8 @@ class AuthService(
         httpRequest: HttpServletRequest,
     ): AuthResponse {
         val user =
-            userRepository.findByEmail(request.email)
+            userRepository
+                .findByEmail(request.email)
                 .orElseThrow { UnauthorizedException("Invalid credentials") }
 
         if (user.lockedUntil != null && user.lockedUntil!!.isAfter(Instant.now())) {
@@ -91,7 +92,8 @@ class AuthService(
     fun refreshToken(request: RefreshRequest): AuthResponse {
         val tokenHash = jwtService.hashToken(request.refreshToken)
         val storedToken =
-            refreshTokenRepository.findByTokenHash(tokenHash)
+            refreshTokenRepository
+                .findByTokenHash(tokenHash)
                 .orElseThrow { UnauthorizedException("Invalid refresh token") }
 
         if (storedToken.isRevoked) {
@@ -160,7 +162,8 @@ class AuthService(
 
     fun getCurrentUser(userId: UUID): UserResponse {
         val user =
-            userRepository.findById(userId)
+            userRepository
+                .findById(userId)
                 .orElseThrow { ResourceNotFoundException("User not found") }
         return user.toUserResponse()
     }

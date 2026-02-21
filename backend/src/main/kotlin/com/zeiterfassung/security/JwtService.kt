@@ -15,9 +15,9 @@ import javax.crypto.SecretKey
 
 @Service
 class JwtService(
-    @Value("\${app.jwt.secret}") private val jwtSecret: String,
-    @Value("\${app.jwt.access-token-expiration-ms}") private val accessTokenExpMs: Long,
-    @Value("\${app.jwt.refresh-token-expiration-ms}") private val refreshTokenExpMs: Long,
+    @param:Value("\${app.jwt.secret}") private val jwtSecret: String,
+    @param:Value("\${app.jwt.access-token-expiration-ms}") private val accessTokenExpMs: Long,
+    @param:Value("\${app.jwt.refresh-token-expiration-ms}") private val refreshTokenExpMs: Long,
 ) {
     private val logger = LoggerFactory.getLogger(JwtService::class.java)
 
@@ -33,7 +33,8 @@ class JwtService(
     ): String {
         val now = Date()
         val expiry = Date(now.time + accessTokenExpMs)
-        return Jwts.builder()
+        return Jwts
+            .builder()
             .subject(userId)
             .claim("email", email)
             .claim("roles", roles)
@@ -52,8 +53,8 @@ class JwtService(
         return Base64.getEncoder().encodeToString(hashBytes)
     }
 
-    fun validateToken(token: String): Boolean {
-        return try {
+    fun validateToken(token: String): Boolean =
+        try {
             getClaims(token)
             true
         } catch (e: JwtException) {
@@ -63,7 +64,6 @@ class JwtService(
             logger.debug("JWT token is empty: {}", e.message)
             false
         }
-    }
 
     fun extractUserId(token: String): String = getClaims(token).subject
 
@@ -78,7 +78,8 @@ class JwtService(
     fun getRefreshTokenExpirationMs(): Long = refreshTokenExpMs
 
     private fun getClaims(token: String): Claims =
-        Jwts.parser()
+        Jwts
+            .parser()
             .verifyWith(signingKey)
             .build()
             .parseSignedClaims(token)

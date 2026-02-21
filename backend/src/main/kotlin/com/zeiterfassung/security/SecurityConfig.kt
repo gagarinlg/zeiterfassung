@@ -22,7 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
-    @Value("\${app.cors.allowed-origins}") private val allowedOrigins: String,
+    @param:Value("\${app.cors.allowed-origins}") private val allowedOrigins: String,
 ) {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -32,13 +32,17 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/auth/login", "/auth/refresh").permitAll()
-                    .requestMatchers("/terminal/**").permitAll()
-                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                    .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                    .anyRequest().authenticated()
-            }
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+                    .requestMatchers("/auth/login", "/auth/refresh")
+                    .permitAll()
+                    .requestMatchers("/terminal/**")
+                    .permitAll()
+                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                    .permitAll()
+                    .requestMatchers("/actuator/health", "/actuator/info")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
+            }.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .headers { headers ->
                 headers
                     .contentSecurityPolicy { it.policyDirectives("default-src 'self'") }

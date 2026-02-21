@@ -7,6 +7,7 @@
     "dashboard": "Dashboard",
     "time_tracking": "Time Tracking",
     "vacation": "Vacation",
+    "vacation_approvals": "Vacation Approvals",
     "admin": "Administration",
     "profile": "Profile",
     "logout": "Logout"
@@ -64,6 +65,84 @@
       "approved": "Approved",
       "rejected": "Rejected",
       "cancelled": "Cancelled"
+    },
+    "balance": {
+      "total": "Total Days",
+      "used": "Used Days",
+      "pending": "Pending Days",
+      "remaining": "Remaining Days",
+      "carried_over": "Carried Over"
+    },
+    "tabs": {
+      "requests": "My Requests",
+      "new_request": "New Request",
+      "calendar": "Calendar"
+    },
+    "request": {
+      "new": "New Vacation Request",
+      "edit": "Edit Request",
+      "cancel": "Cancel",
+      "cancel_confirm": "Are you sure you want to cancel this request?",
+      "submit": "Submit Request",
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "half_day_start": "Half day on start date",
+      "half_day_end": "Half day on end date",
+      "notes": "Notes",
+      "total_days": "Total Days",
+      "actions": "Actions",
+      "calculated_days": "Calculated working days",
+      "no_requests": "No vacation requests found",
+      "see_reason": "See reason",
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
+      }
+    },
+    "approval": {
+      "title": "Vacation Approvals",
+      "approve": "Approve",
+      "reject": "Reject",
+      "reject_title": "Reject Vacation Request",
+      "rejection_reason": "Reason for rejection (required)",
+      "no_pending": "No pending vacation requests",
+      "employee": "Employee",
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "total_days": "Days",
+      "status": "Status",
+      "notes": "Notes",
+      "actions": "Actions"
+    },
+    "calendar": {
+      "title": "Team Calendar",
+      "own_requests": "My Vacations",
+      "team_requests": "Team Vacations",
+      "no_events": "No events this month"
+    },
+    "holidays": {
+      "title": "Public Holidays",
+      "no_holidays": "No public holidays found"
+    },
+    "errors": {
+      "load_failed": "Failed to load vacation data",
+      "cancel_failed": "Failed to cancel the request",
+      "create_failed": "Failed to create vacation request",
+      "approve_failed": "Failed to approve the request",
+      "reject_failed": "Failed to reject the request",
+      "overlap": "This vacation overlaps with an existing request",
+      "past_date": "Vacation cannot start in the past",
+      "insufficient_balance": "Insufficient vacation balance",
+      "cannot_approve_own": "You cannot approve your own vacation request"
+    },
+    "success": {
+      "created": "Vacation request submitted successfully",
+      "updated": "Vacation request updated successfully",
+      "cancelled": "Vacation request cancelled",
+      "approved": "Vacation request approved",
+      "rejected": "Vacation request rejected"
     }
   },
   "admin": {
@@ -98,7 +177,8 @@
     "email": "Email",
     "phone": "Phone",
     "required": "Required",
-    "back_to_dashboard": "Back to Dashboard"
+    "back_to_dashboard": "Back to Dashboard",
+    "unknown": "Unknown"
   },
   "errors": {
     "not_found": "Not Found",

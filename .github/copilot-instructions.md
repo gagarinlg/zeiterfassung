@@ -519,7 +519,9 @@ Maintain comprehensive documentation in the `docs/` directory:
 7. **CI/CD** — Automate everything via GitHub Actions
 8. **Permission enforcement** — Frontend, middleware, AND backend must all enforce access control
 9. **Configurable terminal** — Display resolution, theme, orientation, and all terminal settings must be configurable without code changes
----
+10. **Fix all issues** — Fix every build error, test failure, lint violation, and pre-existing bug encountered during development — even if unrelated to the current task. Leave the codebase in a better state than you found it.
+11. **DSGVO / GDPR** — Employees must never be able to access other employees' personal time or vacation data. Every service method and endpoint that returns data about a user must verify that the requesting user is either the owner of that data, a manager of that user, or an admin.
+12. **Email notifications** — Notify relevant users on all important events (vacation requests, approvals, rejections, cancellations). Send monthly hours and vacation balance reports to all active employees and team summaries to managers.
 
 ## Project Phase Tracking (MANDATORY)
 

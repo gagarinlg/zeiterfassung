@@ -21,7 +21,8 @@ class EmployeeConfigService(
     private val objectMapper: ObjectMapper,
 ) {
     fun getConfig(userId: UUID): EmployeeConfigResponse {
-        userRepository.findById(userId)
+        userRepository
+            .findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found: $userId") }
         val config =
             employeeConfigRepository.findByUserId(userId)
@@ -36,7 +37,8 @@ class EmployeeConfigService(
         request: EmployeeConfigRequest,
     ): EmployeeConfigResponse {
         val user =
-            userRepository.findById(userId)
+            userRepository
+                .findById(userId)
                 .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
         val existingConfig = employeeConfigRepository.findByUserId(userId)
@@ -61,7 +63,8 @@ class EmployeeConfigService(
     @Transactional
     private fun createDefaultConfig(userId: UUID): EmployeeConfigResponse {
         val user =
-            userRepository.findById(userId)
+            userRepository
+                .findById(userId)
                 .orElseThrow { ResourceNotFoundException("User not found: $userId") }
         val config = EmployeeConfigEntity(user = user)
         val saved = employeeConfigRepository.save(config)

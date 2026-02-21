@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import TimeTrackingPage from './pages/TimeTrackingPage'
 import VacationPage from './pages/VacationPage'
+import VacationApprovalPage from './pages/VacationApprovalPage'
 import AdminPage from './pages/AdminPage'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -23,6 +24,14 @@ function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/time-tracking" element={<TimeTrackingPage />} />
           <Route path="/vacation" element={<VacationPage />} />
+          <Route
+            path="/vacation/approvals"
+            element={
+              <ProtectedRoute requiredPermission="vacation.approve">
+                <VacationApprovalPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/admin"
             element={
