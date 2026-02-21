@@ -2,7 +2,9 @@ import apiClient from './apiClient'
 import type { LoginRequest, AuthTokens, User } from '../types'
 
 interface LoginResponse {
-  tokens: AuthTokens
+  accessToken: string
+  refreshToken: string
+  expiresIn: number
   user: User
 }
 
@@ -12,8 +14,8 @@ export const authService = {
     return response.data
   },
 
-  async logout(): Promise<void> {
-    await apiClient.post('/auth/logout')
+  async logout(refreshToken?: string): Promise<void> {
+    await apiClient.post('/auth/logout', refreshToken ? { refreshToken } : {})
   },
 
   async refreshToken(refreshToken: string): Promise<AuthTokens> {
