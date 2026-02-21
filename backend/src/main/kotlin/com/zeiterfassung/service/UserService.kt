@@ -75,7 +75,8 @@ class UserService(
 
     fun getUserById(id: UUID): UserResponse {
         val user =
-            userRepository.findById(id)
+            userRepository
+                .findById(id)
                 .orElseThrow { ResourceNotFoundException("User not found: $id") }
         if (user.isDeleted) throw ResourceNotFoundException("User not found: $id")
         return user.toUserResponse()
@@ -88,7 +89,8 @@ class UserService(
         actorId: UUID,
     ): UserResponse {
         val user =
-            userRepository.findById(id)
+            userRepository
+                .findById(id)
                 .orElseThrow { ResourceNotFoundException("User not found: $id") }
         if (user.isDeleted) throw ResourceNotFoundException("User not found: $id")
 
@@ -100,7 +102,8 @@ class UserService(
         request.isActive?.let { user.isActive = it }
         request.managerId?.let { managerIdStr ->
             val manager =
-                userRepository.findById(UUID.fromString(managerIdStr))
+                userRepository
+                    .findById(UUID.fromString(managerIdStr))
                     .orElseThrow { ResourceNotFoundException("Manager not found: $managerIdStr") }
             user.manager = manager
         }
@@ -116,7 +119,8 @@ class UserService(
         actorId: UUID,
     ) {
         val user =
-            userRepository.findById(id)
+            userRepository
+                .findById(id)
                 .orElseThrow { ResourceNotFoundException("User not found: $id") }
         val oldResponse = user.toUserResponse()
         user.isDeleted = true
@@ -132,7 +136,8 @@ class UserService(
         actorId: UUID,
     ): UserResponse {
         val user =
-            userRepository.findById(id)
+            userRepository
+                .findById(id)
                 .orElseThrow { ResourceNotFoundException("User not found: $id") }
         val oldRoles = user.roles.map { it.name }
 
@@ -152,7 +157,8 @@ class UserService(
         actorId: UUID,
     ): UserResponse {
         val user =
-            userRepository.findById(id)
+            userRepository
+                .findById(id)
                 .orElseThrow { ResourceNotFoundException("User not found: $id") }
         user.rfidTagId = request.rfidTagId
         val saved = userRepository.save(user)
@@ -167,7 +173,8 @@ class UserService(
         actorId: UUID,
     ) {
         val user =
-            userRepository.findById(id)
+            userRepository
+                .findById(id)
                 .orElseThrow { ResourceNotFoundException("User not found: $id") }
         if (!passwordEncoder.matches(request.currentPassword, user.passwordHash)) {
             throw UnauthorizedException("Current password is incorrect")
@@ -183,7 +190,8 @@ class UserService(
         actorId: UUID,
     ) {
         val user =
-            userRepository.findById(id)
+            userRepository
+                .findById(id)
                 .orElseThrow { ResourceNotFoundException("User not found: $id") }
         user.passwordHash = passwordEncoder.encode(request.newPassword)
         userRepository.save(user)

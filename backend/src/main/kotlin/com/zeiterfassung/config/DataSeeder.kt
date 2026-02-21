@@ -18,7 +18,7 @@ class DataSeeder(
     private val userRepository: UserRepository,
     private val roleRepository: RoleRepository,
     private val passwordEncoder: PasswordEncoder,
-    @Value("\${app.seed.admin-password:Admin@123!}") private val adminPassword: String,
+    @param:Value("\${app.seed.admin-password:Admin@123!}") private val adminPassword: String,
 ) : ApplicationRunner {
     private val logger = LoggerFactory.getLogger(DataSeeder::class.java)
 

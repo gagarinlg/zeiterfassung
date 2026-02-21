@@ -27,7 +27,7 @@ function StatusBadge({ status }: { status: VacationRequest['status'] }) {
 
 export default function VacationPage() {
   const { t } = useTranslation()
-  const { user } = useAuth()
+  const { user, hasPermission } = useAuth()
   const currentYear = new Date().getFullYear()
 
   const [activeTab, setActiveTab] = useState<Tab>('requests')
@@ -84,15 +84,20 @@ export default function VacationPage() {
 
   useEffect(() => {
     if (activeTab === 'calendar') {
-      vacationService
-        .getTeamCalendar(calendarYear, calendarMonth)
-        .then((data) => setCalendarData(data))
-        .catch(() => {
-          // Fallback: show own requests without team data
-          setCalendarData({ ownRequests: requests, teamRequests: [], publicHolidays: holidays })
-        })
+      const canViewTeam = hasPermission('vacation.view.team')
+      if (canViewTeam) {
+        vacationService
+          .getTeamCalendar(calendarYear, calendarMonth)
+          .then((data) => setCalendarData(data))
+          .catch(() => {
+            setCalendarData({ ownRequests: requests, teamRequests: [], publicHolidays: holidays })
+          })
+      } else {
+        // DSGVO: employees only see their own data
+        setCalendarData({ ownRequests: requests, teamRequests: [], publicHolidays: holidays })
+      }
     }
-  }, [activeTab, calendarYear, calendarMonth, requests, holidays])
+  }, [activeTab, calendarYear, calendarMonth, requests, holidays, hasPermission])
 
   // Auto-calculate days when dates change
   useEffect(() => {
@@ -444,7 +449,7 @@ export default function VacationPage() {
                   <ul className="space-y-1">
                     {calendarData.teamRequests.map((r) => (
                       <li key={r.id} className="text-sm text-purple-700">
-                        {(r as VacationRequest & { userName?: string }).userName ?? user?.firstName} —{' '}
+                        {(r as VacationRequest & { userName?: string }).userName ?? t('common.unknown')} —{' '}
                         {r.startDate} — {r.endDate}
                       </li>
                     ))}

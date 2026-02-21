@@ -18,9 +18,11 @@ interface PublicHolidayRepository : JpaRepository<PublicHolidayEntity, UUID> {
     @Query(
         """
         SELECT p FROM PublicHolidayEntity p
-        WHERE FUNCTION('EXTRACT', 'YEAR' FROM p.date) = :year
+        WHERE EXTRACT(YEAR FROM p.date) = :year
            OR p.isRecurring = true
         """,
     )
-    fun findApplicableForYear(@Param("year") year: Int): List<PublicHolidayEntity>
+    fun findApplicableForYear(
+        @Param("year") year: Int,
+    ): List<PublicHolidayEntity>
 }

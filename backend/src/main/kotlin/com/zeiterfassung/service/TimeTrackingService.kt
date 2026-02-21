@@ -47,7 +47,8 @@ class TimeTrackingService(
         terminalId: String? = null,
     ): TimeEntryResponse {
         val user =
-            userRepository.findById(userId)
+            userRepository
+                .findById(userId)
                 .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
         val lastEntry = timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)
@@ -80,7 +81,8 @@ class TimeTrackingService(
         terminalId: String? = null,
     ): TimeEntryResponse {
         val user =
-            userRepository.findById(userId)
+            userRepository
+                .findById(userId)
                 .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
         val lastEntry = timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)
@@ -113,7 +115,8 @@ class TimeTrackingService(
         notes: String? = null,
     ): TimeEntryResponse {
         val user =
-            userRepository.findById(userId)
+            userRepository
+                .findById(userId)
                 .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
         val lastEntry = timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)
@@ -141,7 +144,8 @@ class TimeTrackingService(
         notes: String? = null,
     ): TimeEntryResponse {
         val user =
-            userRepository.findById(userId)
+            userRepository
+                .findById(userId)
                 .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
         val lastEntry = timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)
@@ -163,7 +167,8 @@ class TimeTrackingService(
     }
 
     fun getCurrentStatus(userId: UUID): TrackingStatusResponse {
-        userRepository.findById(userId)
+        userRepository
+            .findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
         val lastEntry = timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)
@@ -223,7 +228,8 @@ class TimeTrackingService(
         date: LocalDate,
     ): DailySummaryResponse {
         val user =
-            userRepository.findById(userId)
+            userRepository
+                .findById(userId)
                 .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
         val startOfDay = date.atStartOfDay(ZoneOffset.UTC).toInstant()
@@ -267,7 +273,8 @@ class TimeTrackingService(
         startDate: LocalDate,
         endDate: LocalDate,
     ): TimeSheetResponse {
-        userRepository.findById(userId)
+        userRepository
+            .findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
         val summaries = dailySummaryRepository.findByUserIdAndDateBetweenOrderByDateAsc(userId, startDate, endDate)
@@ -292,10 +299,33 @@ class TimeTrackingService(
         start: Instant,
         end: Instant,
     ): List<TimeEntryResponse> {
-        userRepository.findById(userId)
+        userRepository
+            .findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found: $userId") }
-        return timeEntryRepository.findByUserIdAndTimestampBetweenOrderByTimestampAsc(userId, start, end)
+        return timeEntryRepository
+            .findByUserIdAndTimestampBetweenOrderByTimestampAsc(userId, start, end)
             .map { it.toResponse() }
+    }
+
+    /**
+     * DSGVO: Managers may only access time data of their direct subordinates.
+     * Admins (hasAuthority admin.users.manage) bypass this check at the controller level.
+     */
+    fun getTeamMemberEntries(
+        managerId: UUID,
+        userId: UUID,
+        start: Instant,
+        end: Instant,
+    ): List<TimeEntryResponse> {
+        val manager =
+            userRepository
+                .findById(managerId)
+                .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
+        val isAdmin = manager.roles.flatMap { it.permissions }.any { it.name == "admin.users.manage" }
+        if (!isAdmin && manager.subordinates.none { it.id == userId }) {
+            throw com.zeiterfassung.exception.ForbiddenException("Access denied: user $userId is not your subordinate")
+        }
+        return getEntriesForUser(userId, start, end)
     }
 
     @Transactional
@@ -305,10 +335,12 @@ class TimeTrackingService(
         request: ManualTimeEntryRequest,
     ): TimeEntryResponse {
         val manager =
-            userRepository.findById(managerId)
+            userRepository
+                .findById(managerId)
                 .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
         val user =
-            userRepository.findById(userId)
+            userRepository
+                .findById(userId)
                 .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
         val entry =
@@ -335,10 +367,12 @@ class TimeTrackingService(
         request: EditTimeEntryRequest,
     ): TimeEntryResponse {
         val manager =
-            userRepository.findById(managerId)
+            userRepository
+                .findById(managerId)
                 .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
         val entry =
-            timeEntryRepository.findById(entryId)
+            timeEntryRepository
+                .findById(entryId)
                 .orElseThrow { ResourceNotFoundException("TimeEntry not found: $entryId") }
 
         val oldResponse = entry.toResponse()
@@ -361,10 +395,12 @@ class TimeTrackingService(
         entryId: UUID,
         reason: String,
     ) {
-        userRepository.findById(managerId)
+        userRepository
+            .findById(managerId)
             .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
         val entry =
-            timeEntryRepository.findById(entryId)
+            timeEntryRepository
+                .findById(entryId)
                 .orElseThrow { ResourceNotFoundException("TimeEntry not found: $entryId") }
 
         val oldResponse = entry.toResponse()
@@ -378,7 +414,8 @@ class TimeTrackingService(
     @Transactional(readOnly = true)
     fun getTeamCurrentStatus(managerId: UUID): Map<UUID, TrackingStatusResponse> {
         val manager =
-            userRepository.findById(managerId)
+            userRepository
+                .findById(managerId)
                 .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
         return manager.subordinates.associate { it.id to getCurrentStatus(it.id) }
     }

@@ -41,7 +41,8 @@ class VacationController(
         @Valid @RequestBody dto: CreateVacationRequest,
         @AuthenticationPrincipal userId: String,
     ): ResponseEntity<VacationRequestResponse> =
-        ResponseEntity.status(HttpStatus.CREATED)
+        ResponseEntity
+            .status(HttpStatus.CREATED)
             .body(vacationService.createRequest(UUID.fromString(userId), dto))
 
     @GetMapping("/requests")
@@ -71,8 +72,7 @@ class VacationController(
     fun getRequest(
         @PathVariable id: UUID,
         @AuthenticationPrincipal userId: String,
-    ): ResponseEntity<VacationRequestResponse> =
-        ResponseEntity.ok(vacationService.getRequest(id, UUID.fromString(userId)))
+    ): ResponseEntity<VacationRequestResponse> = ResponseEntity.ok(vacationService.getRequest(id, UUID.fromString(userId)))
 
     @PutMapping("/requests/{id}")
     @PreAuthorize("hasAuthority('vacation.request.own')")
@@ -80,8 +80,7 @@ class VacationController(
         @PathVariable id: UUID,
         @Valid @RequestBody dto: UpdateVacationRequest,
         @AuthenticationPrincipal userId: String,
-    ): ResponseEntity<VacationRequestResponse> =
-        ResponseEntity.ok(vacationService.updateRequest(id, UUID.fromString(userId), dto))
+    ): ResponseEntity<VacationRequestResponse> = ResponseEntity.ok(vacationService.updateRequest(id, UUID.fromString(userId), dto))
 
     @DeleteMapping("/requests/{id}")
     @PreAuthorize("hasAuthority('vacation.request.own')")
@@ -108,8 +107,7 @@ class VacationController(
         @PathVariable id: UUID,
         @Valid @RequestBody dto: RejectVacationRequest,
         @AuthenticationPrincipal approverId: String,
-    ): ResponseEntity<VacationRequestResponse> =
-        ResponseEntity.ok(vacationService.rejectRequest(id, UUID.fromString(approverId), dto))
+    ): ResponseEntity<VacationRequestResponse> = ResponseEntity.ok(vacationService.rejectRequest(id, UUID.fromString(approverId), dto))
 
     @GetMapping("/pending")
     @PreAuthorize("hasAuthority('vacation.approve')")
@@ -152,9 +150,10 @@ class VacationController(
     fun getUserBalance(
         @PathVariable userId: UUID,
         @RequestParam(required = false) year: Int?,
+        @AuthenticationPrincipal requestingUserId: String,
     ): ResponseEntity<VacationBalanceResponse> {
         val targetYear = year ?: LocalDate.now().year
-        return ResponseEntity.ok(vacationService.getBalance(userId, targetYear))
+        return ResponseEntity.ok(vacationService.getBalanceForManager(UUID.fromString(requestingUserId), userId, targetYear))
     }
 
     @GetMapping("/holidays")

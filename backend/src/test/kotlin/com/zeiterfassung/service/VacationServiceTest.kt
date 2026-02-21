@@ -5,7 +5,6 @@ import com.zeiterfassung.audit.AuditService
 import com.zeiterfassung.exception.BadRequestException
 import com.zeiterfassung.exception.ConflictException
 import com.zeiterfassung.exception.ForbiddenException
-import com.zeiterfassung.exception.ResourceNotFoundException
 import com.zeiterfassung.model.dto.CreateVacationRequest
 import com.zeiterfassung.model.dto.RejectVacationRequest
 import com.zeiterfassung.model.entity.EmployeeConfigEntity
@@ -26,7 +25,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.any
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.anyInt
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import java.math.BigDecimal
@@ -37,11 +36,18 @@ import java.util.UUID
 @ExtendWith(MockitoExtension::class)
 class VacationServiceTest {
     @Mock private lateinit var vacationRequestRepository: VacationRequestRepository
+
     @Mock private lateinit var vacationBalanceRepository: VacationBalanceRepository
+
     @Mock private lateinit var publicHolidayRepository: PublicHolidayRepository
+
     @Mock private lateinit var employeeConfigRepository: EmployeeConfigRepository
+
     @Mock private lateinit var userRepository: UserRepository
+
     @Mock private lateinit var auditService: AuditService
+
+    @Mock private lateinit var notificationService: NotificationService
 
     private val objectMapper = ObjectMapper()
     private lateinit var service: VacationService
@@ -62,6 +68,7 @@ class VacationServiceTest {
                 userRepository,
                 auditService,
                 objectMapper,
+                notificationService,
             )
         user = UserEntity(id = userId, email = "user@test.com", passwordHash = "hash", firstName = "John", lastName = "Doe")
         manager = UserEntity(id = managerId, email = "manager@test.com", passwordHash = "hash", firstName = "Jane", lastName = "Smith")
@@ -72,18 +79,19 @@ class VacationServiceTest {
 
     @Test
     fun `createRequest success`() {
-        val dto = CreateVacationRequest(
-            startDate = LocalDate.now().plusDays(5),
-            endDate = LocalDate.now().plusDays(9),
-        )
+        val dto =
+            CreateVacationRequest(
+                startDate = LocalDate.now().plusDays(5),
+                endDate = LocalDate.now().plusDays(9),
+            )
         val balance = balanceWith(totalDays = 30, usedDays = 0, carriedOverDays = 0)
         val config = configWith(vacationDaysPerYear = 30)
 
         `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
-        `when`(vacationRequestRepository.findOverlapping(any(), any(), any(), any())).thenReturn(emptyList())
-        `when`(publicHolidayRepository.findApplicableForYear(any())).thenReturn(emptyList())
+        `when`(vacationRequestRepository.findOverlapping(userId, dto.startDate, dto.endDate, null)).thenReturn(emptyList())
+        `when`(publicHolidayRepository.findApplicableForYear(anyInt())).thenReturn(emptyList())
         `when`(employeeConfigRepository.findByUserId(userId)).thenReturn(config)
-        `when`(vacationBalanceRepository.findByUserIdAndYear(any(), any())).thenReturn(balance)
+        `when`(vacationBalanceRepository.findByUserIdAndYear(userId, dto.startDate.year)).thenReturn(balance)
         `when`(vacationRequestRepository.save(any())).thenAnswer { it.arguments[0] as VacationRequestEntity }
 
         val result = service.createRequest(userId, dto)
@@ -95,10 +103,11 @@ class VacationServiceTest {
 
     @Test
     fun `createRequest rejects past start date`() {
-        val dto = CreateVacationRequest(
-            startDate = LocalDate.now().minusDays(1),
-            endDate = LocalDate.now().plusDays(3),
-        )
+        val dto =
+            CreateVacationRequest(
+                startDate = LocalDate.now().minusDays(1),
+                endDate = LocalDate.now().plusDays(3),
+            )
         `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
 
         assertThrows<BadRequestException> { service.createRequest(userId, dto) }
@@ -106,31 +115,33 @@ class VacationServiceTest {
 
     @Test
     fun `createRequest rejects overlapping request`() {
-        val dto = CreateVacationRequest(
-            startDate = LocalDate.now().plusDays(5),
-            endDate = LocalDate.now().plusDays(9),
-        )
+        val dto =
+            CreateVacationRequest(
+                startDate = LocalDate.now().plusDays(5),
+                endDate = LocalDate.now().plusDays(9),
+            )
         val existingRequest = requestEntity(userId = userId, status = VacationStatus.PENDING)
         `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
-        `when`(vacationRequestRepository.findOverlapping(any(), any(), any(), any())).thenReturn(listOf(existingRequest))
+        `when`(vacationRequestRepository.findOverlapping(userId, dto.startDate, dto.endDate, null)).thenReturn(listOf(existingRequest))
 
         assertThrows<ConflictException> { service.createRequest(userId, dto) }
     }
 
     @Test
     fun `createRequest rejects insufficient balance`() {
-        val dto = CreateVacationRequest(
-            startDate = LocalDate.now().plusDays(5),
-            endDate = LocalDate.now().plusDays(10),
-        )
+        val dto =
+            CreateVacationRequest(
+                startDate = LocalDate.now().plusDays(5),
+                endDate = LocalDate.now().plusDays(10),
+            )
         val balance = balanceWith(totalDays = 1, usedDays = 1, carriedOverDays = 0)
         val config = configWith(vacationDaysPerYear = 1)
 
         `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
-        `when`(vacationRequestRepository.findOverlapping(any(), any(), any(), any())).thenReturn(emptyList())
-        `when`(publicHolidayRepository.findApplicableForYear(any())).thenReturn(emptyList())
+        `when`(vacationRequestRepository.findOverlapping(userId, dto.startDate, dto.endDate, null)).thenReturn(emptyList())
+        `when`(publicHolidayRepository.findApplicableForYear(anyInt())).thenReturn(emptyList())
         `when`(employeeConfigRepository.findByUserId(userId)).thenReturn(config)
-        `when`(vacationBalanceRepository.findByUserIdAndYear(any(), any())).thenReturn(balance)
+        `when`(vacationBalanceRepository.findByUserIdAndYear(userId, dto.startDate.year)).thenReturn(balance)
 
         assertThrows<BadRequestException> { service.createRequest(userId, dto) }
     }
@@ -192,7 +203,12 @@ class VacationServiceTest {
         `when`(vacationBalanceRepository.save(any())).thenAnswer { it.arguments[0] as VacationBalanceEntity }
         `when`(vacationRequestRepository.save(any())).thenAnswer { it.arguments[0] as VacationRequestEntity }
 
-        service.approveRequest(request.id, managerId, com.zeiterfassung.model.dto.ApproveVacationRequest())
+        service.approveRequest(
+            request.id,
+            managerId,
+            com.zeiterfassung.model.dto
+                .ApproveVacationRequest(),
+        )
 
         assertThat(request.status).isEqualTo(VacationStatus.APPROVED)
         assertThat(balance.usedDays).isEqualByComparingTo(BigDecimal("3"))
@@ -205,7 +221,12 @@ class VacationServiceTest {
         `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
 
         assertThrows<ForbiddenException> {
-            service.approveRequest(request.id, userId, com.zeiterfassung.model.dto.ApproveVacationRequest())
+            service.approveRequest(
+                request.id,
+                userId,
+                com.zeiterfassung.model.dto
+                    .ApproveVacationRequest(),
+            )
         }
     }
 
@@ -216,7 +237,12 @@ class VacationServiceTest {
         `when`(userRepository.findById(managerId)).thenReturn(Optional.of(manager))
 
         assertThrows<BadRequestException> {
-            service.approveRequest(request.id, managerId, com.zeiterfassung.model.dto.ApproveVacationRequest())
+            service.approveRequest(
+                request.id,
+                managerId,
+                com.zeiterfassung.model.dto
+                    .ApproveVacationRequest(),
+            )
         }
     }
 
@@ -331,12 +357,13 @@ class VacationServiceTest {
 
     @Test
     fun `getPublicHolidays returns adjusted dates for recurring holidays`() {
-        val holiday = PublicHolidayEntity(
-            date = LocalDate.of(2024, 1, 1),
-            name = "Neujahr",
-            stateCode = null,
-            isRecurring = true,
-        )
+        val holiday =
+            PublicHolidayEntity(
+                date = LocalDate.of(2024, 1, 1),
+                name = "Neujahr",
+                stateCode = null,
+                isRecurring = true,
+            )
         `when`(publicHolidayRepository.findApplicableForYear(2025)).thenReturn(listOf(holiday))
 
         val result = service.getPublicHolidays(2025, null)
@@ -349,7 +376,8 @@ class VacationServiceTest {
     fun `getPublicHolidays filters by state code`() {
         val federal = PublicHolidayEntity(date = LocalDate.of(2024, 1, 1), name = "Neujahr", stateCode = null, isRecurring = true)
         val stateOnly = PublicHolidayEntity(date = LocalDate.of(2024, 11, 1), name = "Allerheiligen", stateCode = "BY", isRecurring = true)
-        val otherState = PublicHolidayEntity(date = LocalDate.of(2024, 8, 15), name = "Maria Himmelfahrt", stateCode = "BY", isRecurring = true)
+        val otherState =
+            PublicHolidayEntity(date = LocalDate.of(2024, 8, 15), name = "Maria Himmelfahrt", stateCode = "BY", isRecurring = true)
 
         `when`(publicHolidayRepository.findApplicableForYear(2025)).thenReturn(listOf(federal, stateOnly, otherState))
 
@@ -388,13 +416,18 @@ class VacationServiceTest {
         status: VacationStatus,
         totalDays: BigDecimal = BigDecimal("5"),
     ): VacationRequestEntity {
-        val requestUser = if (userId == this.userId) user else UserEntity(
-            id = userId,
-            email = "other@test.com",
-            passwordHash = "hash",
-            firstName = "Other",
-            lastName = "User",
-        )
+        val requestUser =
+            if (userId == this.userId) {
+                user
+            } else {
+                UserEntity(
+                    id = userId,
+                    email = "other@test.com",
+                    passwordHash = "hash",
+                    firstName = "Other",
+                    lastName = "User",
+                )
+            }
         return VacationRequestEntity(
             user = requestUser,
             startDate = LocalDate.now().plusDays(10),

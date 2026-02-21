@@ -1,6 +1,8 @@
 package com.zeiterfassung.model.enums
 
-enum class Permission(val value: String) {
+enum class Permission(
+    val value: String,
+) {
     TIME_TRACK_OWN("time.track.own"),
     TIME_EDIT_OWN("time.edit.own"),
     TIME_EDIT_TEAM("time.edit.team"),

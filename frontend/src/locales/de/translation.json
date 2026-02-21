@@ -7,6 +7,7 @@
     "dashboard": "Dashboard",
     "time_tracking": "Zeiterfassung",
     "vacation": "Urlaub",
+    "vacation_approvals": "Urlaubsgenehmigungen",
     "admin": "Administration",
     "profile": "Profil",
     "logout": "Abmelden"
@@ -64,6 +65,84 @@
       "approved": "Genehmigt",
       "rejected": "Abgelehnt",
       "cancelled": "Storniert"
+    },
+    "balance": {
+      "total": "Urlaubstage gesamt",
+      "used": "Genommene Tage",
+      "pending": "Ausstehende Tage",
+      "remaining": "Verbleibende Tage",
+      "carried_over": "Übertragen"
+    },
+    "tabs": {
+      "requests": "Meine Anträge",
+      "new_request": "Neuer Antrag",
+      "calendar": "Kalender"
+    },
+    "request": {
+      "new": "Neuer Urlaubsantrag",
+      "edit": "Antrag bearbeiten",
+      "cancel": "Stornieren",
+      "cancel_confirm": "Möchten Sie diesen Antrag wirklich stornieren?",
+      "submit": "Antrag einreichen",
+      "start_date": "Startdatum",
+      "end_date": "Enddatum",
+      "half_day_start": "Halber Tag am Startdatum",
+      "half_day_end": "Halber Tag am Enddatum",
+      "notes": "Anmerkungen",
+      "total_days": "Tage gesamt",
+      "actions": "Aktionen",
+      "calculated_days": "Berechnete Arbeitstage",
+      "no_requests": "Keine Urlaubsanträge gefunden",
+      "see_reason": "Grund anzeigen",
+      "status": {
+        "pending": "Ausstehend",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt",
+        "cancelled": "Storniert"
+      }
+    },
+    "approval": {
+      "title": "Urlaubsgenehmigungen",
+      "approve": "Genehmigen",
+      "reject": "Ablehnen",
+      "reject_title": "Urlaubsantrag ablehnen",
+      "rejection_reason": "Ablehnungsgrund (Pflichtfeld)",
+      "no_pending": "Keine ausstehenden Urlaubsanträge",
+      "employee": "Mitarbeiter",
+      "start_date": "Startdatum",
+      "end_date": "Enddatum",
+      "total_days": "Tage",
+      "status": "Status",
+      "notes": "Anmerkungen",
+      "actions": "Aktionen"
+    },
+    "calendar": {
+      "title": "Teamkalender",
+      "own_requests": "Mein Urlaub",
+      "team_requests": "Teamurlaub",
+      "no_events": "Keine Ereignisse in diesem Monat"
+    },
+    "holidays": {
+      "title": "Feiertage",
+      "no_holidays": "Keine Feiertage gefunden"
+    },
+    "errors": {
+      "load_failed": "Urlaubsdaten konnten nicht geladen werden",
+      "cancel_failed": "Antrag konnte nicht storniert werden",
+      "create_failed": "Urlaubsantrag konnte nicht erstellt werden",
+      "approve_failed": "Antrag konnte nicht genehmigt werden",
+      "reject_failed": "Antrag konnte nicht abgelehnt werden",
+      "overlap": "Dieser Urlaub überschneidet sich mit einem vorhandenen Antrag",
+      "past_date": "Urlaub kann nicht in der Vergangenheit beginnen",
+      "insufficient_balance": "Nicht genügend Urlaubstage",
+      "cannot_approve_own": "Sie können Ihren eigenen Urlaubsantrag nicht genehmigen"
+    },
+    "success": {
+      "created": "Urlaubsantrag erfolgreich eingereicht",
+      "updated": "Urlaubsantrag erfolgreich aktualisiert",
+      "cancelled": "Urlaubsantrag storniert",
+      "approved": "Urlaubsantrag genehmigt",
+      "rejected": "Urlaubsantrag abgelehnt"
     }
   },
   "admin": {
@@ -98,7 +177,8 @@
     "email": "E-Mail",
     "phone": "Telefon",
     "required": "Pflichtfeld",
-    "back_to_dashboard": "Zurück zum Dashboard"
+    "back_to_dashboard": "Zurück zum Dashboard",
+    "unknown": "Unbekannt"
   },
   "errors": {
     "not_found": "Nicht gefunden",

@@ -41,6 +41,7 @@ class VacationService(
     private val userRepository: UserRepository,
     private val auditService: AuditService,
     private val objectMapper: ObjectMapper,
+    private val notificationService: NotificationService,
 ) {
     @Transactional
     fun createRequest(
@@ -48,7 +49,8 @@ class VacationService(
         dto: CreateVacationRequest,
     ): VacationRequestResponse {
         val user =
-            userRepository.findById(userId)
+            userRepository
+                .findById(userId)
                 .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
         if (dto.startDate.isAfter(dto.endDate)) {
@@ -93,6 +95,9 @@ class VacationService(
             )
         val saved = vacationRequestRepository.save(entity)
         auditService.logDataChange(userId, "VACATION_REQUEST_CREATED", "VacationRequest", saved.id, null, saved.toResponse())
+        // Notify manager(s) — collect direct manager + anyone with vacation.approve over this user
+        val managers = user.manager?.let { listOf(it) } ?: emptyList()
+        notificationService.notifyVacationRequestCreated(saved, managers)
         return saved.toResponse()
     }
 
@@ -182,6 +187,12 @@ class VacationService(
         }
 
         auditService.logDataChange(userId, "VACATION_REQUEST_CANCELLED", "VacationRequest", requestId, oldResponse, entity.toResponse())
+        // Notify the approver if the request was previously approved (team planning impact)
+        if (wasApproved) {
+            entity.approvedBy?.let { approver ->
+                notificationService.notifyVacationCancelledByEmployee(entity, approver)
+            }
+        }
     }
 
     @Transactional
@@ -192,7 +203,8 @@ class VacationService(
     ): VacationRequestResponse {
         val entity = findRequestOrThrow(requestId)
         val approver =
-            userRepository.findById(approverId)
+            userRepository
+                .findById(approverId)
                 .orElseThrow { ResourceNotFoundException("User not found: $approverId") }
 
         if (entity.user.id == approverId) {
@@ -212,6 +224,7 @@ class VacationService(
 
         val saved = vacationRequestRepository.save(entity)
         auditService.logDataChange(approverId, "VACATION_REQUEST_APPROVED", "VacationRequest", requestId, oldResponse, saved.toResponse())
+        notificationService.notifyVacationApproved(saved, "${approver.firstName} ${approver.lastName}")
         return saved.toResponse()
     }
 
@@ -236,6 +249,7 @@ class VacationService(
 
         val saved = vacationRequestRepository.save(entity)
         auditService.logDataChange(approverId, "VACATION_REQUEST_REJECTED", "VacationRequest", requestId, oldResponse, saved.toResponse())
+        notificationService.notifyVacationRejected(saved, dto.rejectionReason)
         return saved.toResponse()
     }
 
@@ -245,7 +259,8 @@ class VacationService(
     ): VacationRequestResponse {
         val entity = findRequestOrThrow(requestId)
         val requestingUser =
-            userRepository.findById(requestingUserId)
+            userRepository
+                .findById(requestingUserId)
                 .orElseThrow { ResourceNotFoundException("User not found: $requestingUserId") }
         val isOwner = entity.user.id == requestingUserId
         val isManagerOfOwner = requestingUser.subordinates.any { it.id == entity.user.id }
@@ -271,7 +286,8 @@ class VacationService(
                 val filtered = if (status != null) all.filter { it.status == status } else all
                 // Wrap into page manually
                 org.springframework.data.domain.PageImpl(
-                    filtered.sortedByDescending { it.createdAt }
+                    filtered
+                        .sortedByDescending { it.createdAt }
                         .drop(pageable.pageNumber * pageable.pageSize)
                         .take(pageable.pageSize),
                     pageable,
@@ -280,7 +296,8 @@ class VacationService(
             } else if (status != null) {
                 val all = vacationRequestRepository.findByUserIdAndStatus(userId, status)
                 org.springframework.data.domain.PageImpl(
-                    all.sortedByDescending { it.createdAt }
+                    all
+                        .sortedByDescending { it.createdAt }
                         .drop(pageable.pageNumber * pageable.pageSize)
                         .take(pageable.pageSize),
                     pageable,
@@ -297,11 +314,13 @@ class VacationService(
         pageable: Pageable,
     ): Page<VacationRequestResponse> {
         val manager =
-            userRepository.findById(managerId)
+            userRepository
+                .findById(managerId)
                 .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
         val subordinateIds = manager.subordinates.map { it.id }
         if (subordinateIds.isEmpty()) {
-            return org.springframework.data.domain.Page.empty(pageable)
+            return org.springframework.data.domain.Page
+                .empty(pageable)
         }
         return vacationRequestRepository
             .findByStatusAndUserIdIn(VacationStatus.PENDING, subordinateIds, pageable)
@@ -319,6 +338,26 @@ class VacationService(
         val balance = getOrCreateBalance(userId, year)
         val pendingDays = getPendingDays(userId, year)
         return balance.toResponse(pendingDays)
+    }
+
+    /**
+     * DSGVO: verify the requesting manager has access to the target user's vacation data.
+     */
+    @Transactional
+    fun getBalanceForManager(
+        managerId: UUID,
+        userId: UUID,
+        year: Int,
+    ): VacationBalanceResponse {
+        val manager =
+            userRepository
+                .findById(managerId)
+                .orElseThrow { ResourceNotFoundException("User not found: $managerId") }
+        val isAdmin = manager.roles.flatMap { it.permissions }.any { it.name == "admin.users.manage" }
+        if (!isAdmin && manager.subordinates.none { it.id == userId }) {
+            throw ForbiddenException("Access denied: user $userId is not your subordinate")
+        }
+        return getBalance(userId, year)
     }
 
     fun getPublicHolidays(
@@ -342,8 +381,7 @@ class VacationService(
                     stateCode = holiday.stateCode,
                     isRecurring = holiday.isRecurring,
                 )
-            }
-            .sortedBy { it.date }
+            }.sortedBy { it.date }
     }
 
     fun getTeamCalendar(
@@ -352,7 +390,8 @@ class VacationService(
         month: Int,
     ): VacationCalendarResponse {
         val manager =
-            userRepository.findById(managerId)
+            userRepository
+                .findById(managerId)
                 .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
         val startDate = LocalDate.of(year, month, 1)
         val endDate = startDate.withDayOfMonth(startDate.lengthOfMonth())
@@ -362,16 +401,19 @@ class VacationService(
             if (subordinateIds.isEmpty()) {
                 emptyList()
             } else {
-                vacationRequestRepository.findApprovedByUserIdsAndDateRange(subordinateIds, startDate, endDate)
+                vacationRequestRepository
+                    .findApprovedByUserIdsAndDateRange(subordinateIds, startDate, endDate)
                     .map { it.toResponse() }
             }
 
         val ownRequests =
-            vacationRequestRepository.findByUserIdAndStartDateBetween(managerId, startDate, endDate)
+            vacationRequestRepository
+                .findByUserIdAndStartDateBetween(managerId, startDate, endDate)
                 .map { it.toResponse() }
 
-        val holidays = getPublicHolidays(year, null)
-            .filter { !it.date.isBefore(startDate) && !it.date.isAfter(endDate) }
+        val holidays =
+            getPublicHolidays(year, null)
+                .filter { !it.date.isBefore(startDate) && !it.date.isAfter(endDate) }
 
         return VacationCalendarResponse(
             year = year,
@@ -391,7 +433,8 @@ class VacationService(
         if (existing != null) return existing
 
         val user =
-            userRepository.findById(userId)
+            userRepository
+                .findById(userId)
                 .orElseThrow { ResourceNotFoundException("User not found: $userId") }
         val config = employeeConfigRepository.findByUserId(userId)
         val totalDays = BigDecimal(config?.vacationDaysPerYear ?: 30)
@@ -422,7 +465,7 @@ class VacationService(
         var current = startDate
 
         while (!current.isAfter(endDate)) {
-            val dayOfWeek = current.dayOfWeek.value // 1=Mon .. 7=Sun
+            val dayOfWeek = current.dayOfWeek.value // 1=Mon, 2=Tue, ..., 7=Sun
             if (dayOfWeek in workDays && current !in holidays) {
                 val isFirst = current == startDate
                 val isLast = current == endDate
@@ -468,7 +511,8 @@ class VacationService(
     ): BigDecimal {
         val start = LocalDate.of(year, 1, 1)
         val end = LocalDate.of(year, 12, 31)
-        return vacationRequestRepository.findByUserIdAndStartDateBetween(userId, start, end)
+        return vacationRequestRepository
+            .findByUserIdAndStartDateBetween(userId, start, end)
             .filter { it.status == VacationStatus.PENDING }
             .fold(BigDecimal.ZERO) { acc, req -> acc + req.totalDays }
     }
@@ -492,7 +536,8 @@ class VacationService(
             .map { it.date }
 
     private fun findRequestOrThrow(requestId: UUID): VacationRequestEntity =
-        vacationRequestRepository.findById(requestId)
+        vacationRequestRepository
+            .findById(requestId)
             .orElseThrow { ResourceNotFoundException("Vacation request not found: $requestId") }
 
     private fun VacationRequestEntity.toResponse() =

@@ -7,6 +7,7 @@
     "dashboard": "Dashboard",
     "time_tracking": "Time Tracking",
     "vacation": "Vacation",
+    "vacation_approvals": "Vacation Approvals",
     "admin": "Administration",
     "profile": "Profile",
     "logout": "Logout"
@@ -176,7 +177,8 @@
     "email": "Email",
     "phone": "Phone",
     "required": "Required",
-    "back_to_dashboard": "Back to Dashboard"
+    "back_to_dashboard": "Back to Dashboard",
+    "unknown": "Unknown"
   },
   "errors": {
     "not_found": "Not Found",
