@@ -2,7 +2,6 @@
 
 [![CI](https://github.com/gagarinlg/zeiterfassung/actions/workflows/ci.yml/badge.svg)](https://github.com/gagarinlg/zeiterfassung/actions/workflows/ci.yml)
 [![Security](https://github.com/gagarinlg/zeiterfassung/actions/workflows/security.yml/badge.svg)](https://github.com/gagarinlg/zeiterfassung/actions/workflows/security.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A comprehensive time recording (time tracking) system for employees, built to comply with **German labor law** (Arbeitszeitgesetz – ArbZG).
 
@@ -123,5 +122,4 @@ The system enforces the following rules:
 Please read our [Contributing Guide](docs/development/setup.md) and follow the code style guidelines defined in `.editorconfig` and component-specific linting configs.
 
 ## License
-
-MIT License - see [LICENSE](LICENSE) for details.
+GPLv3 license
