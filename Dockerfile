@@ -36,3 +36,8 @@ ENTRYPOINT ["java", \
     "-XX:+UseContainerSupport", \
     "-XX:MaxRAMPercentage=75.0", \
     "-jar", "app.jar"]
+
+# Stage 4: Nginx frontend image
+FROM nginx:alpine AS frontend
+COPY --from=frontend-build /app/frontend/dist /usr/share/nginx/html
+EXPOSE 80 443

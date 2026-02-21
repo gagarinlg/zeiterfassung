@@ -54,7 +54,10 @@ services:
       - zeiterfassung-net
 
   frontend:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
     container_name: zeiterfassung-frontend
     restart: unless-stopped
     ports:
