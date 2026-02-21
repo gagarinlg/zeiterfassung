@@ -19,7 +19,14 @@
     "login_button": "Anmelden",
     "login_error": "Ungültige Anmeldedaten",
     "account_locked": "Konto gesperrt. Bitte versuchen Sie es später erneut.",
-    "session_expired": "Sitzung abgelaufen. Bitte melden Sie sich erneut an."
+    "session_expired": "Sitzung abgelaufen. Bitte melden Sie sich erneut an.",
+    "switch_language": "Sprache wechseln",
+    "rate_limit_exceeded": "Zu viele Anmeldeversuche. Bitte versuchen Sie es später erneut.",
+    "validation": {
+      "email_required": "E-Mail-Adresse ist erforderlich",
+      "email_invalid": "Ungültige E-Mail-Adresse",
+      "password_required": "Passwort ist erforderlich"
+    }
   },
   "dashboard": {
     "title": "Dashboard",
@@ -90,14 +97,35 @@
     "name": "Name",
     "email": "E-Mail",
     "phone": "Telefon",
-    "required": "Pflichtfeld"
+    "required": "Pflichtfeld",
+    "back_to_dashboard": "Zurück zum Dashboard"
   },
   "errors": {
     "not_found": "Nicht gefunden",
     "unauthorized": "Nicht autorisiert",
     "forbidden": "Zugriff verweigert",
+    "forbidden_description": "Sie haben keine Berechtigung, auf diese Seite zuzugreifen.",
     "server_error": "Serverfehler",
     "network_error": "Netzwerkfehler",
     "validation_error": "Validierungsfehler"
+  },
+  "users": {
+    "title": "Benutzerverwaltung",
+    "create": "Benutzer erstellen",
+    "edit": "Benutzer bearbeiten",
+    "delete_confirm": "Möchten Sie diesen Benutzer wirklich löschen?",
+    "first_name": "Vorname",
+    "last_name": "Nachname",
+    "employee_number": "Personalnummer",
+    "roles": "Rollen",
+    "rfid_tag": "RFID-Tag",
+    "manager": "Vorgesetzter",
+    "team": "Team",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "change_password": "Passwort ändern",
+    "reset_password": "Passwort zurücksetzen",
+    "current_password": "Aktuelles Passwort",
+    "new_password": "Neues Passwort"
   }
 }

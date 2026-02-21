@@ -13,7 +13,16 @@ class UnauthorizedException(message: String) : RuntimeException(message)
 class ForbiddenException(message: String) : RuntimeException(message)
 
 @ResponseStatus(HttpStatus.CONFLICT)
+class DuplicateResourceException(message: String) : RuntimeException(message)
+
+@ResponseStatus(HttpStatus.CONFLICT)
 class ConflictException(message: String) : RuntimeException(message)
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 class BadRequestException(message: String) : RuntimeException(message)
+
+@ResponseStatus(HttpStatus.LOCKED)
+class AccountLockedException(message: String) : RuntimeException(message)
+
+@ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+class RateLimitExceededException(message: String) : RuntimeException(message)

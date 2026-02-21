@@ -32,7 +32,11 @@ fn main() {
         "Starting Zeiterfassung Terminal v{}",
         env!("CARGO_PKG_VERSION")
     );
-    info!("Display: {}x{}", config.display.resolution_width(), config.display.resolution_height());
+    info!(
+        "Display: {}x{}",
+        config.display.resolution_width(),
+        config.display.resolution_height()
+    );
     info!("API endpoint: {}", config.api.base_url);
     info!("Language: {}", config.locale.language);
 

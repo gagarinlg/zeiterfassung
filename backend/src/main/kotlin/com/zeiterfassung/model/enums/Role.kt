@@ -4,5 +4,5 @@ enum class Role {
     SUPER_ADMIN,
     ADMIN,
     MANAGER,
-    EMPLOYEE
+    EMPLOYEE,
 }

@@ -1,10 +1,30 @@
 import { Navigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
   requiredPermission?: string
   requiredRole?: string
+}
+
+function ForbiddenPage() {
+  const { t } = useTranslation()
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="text-center p-8">
+        <h1 className="text-6xl font-bold text-red-500">403</h1>
+        <h2 className="mt-4 text-2xl font-semibold text-gray-800">{t('errors.forbidden')}</h2>
+        <p className="mt-2 text-gray-600">{t('errors.forbidden_description')}</p>
+        <a
+          href="/dashboard"
+          className="mt-6 inline-block px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+        >
+          {t('common.back_to_dashboard')}
+        </a>
+      </div>
+    </div>
+  )
 }
 
 export default function ProtectedRoute({
@@ -27,11 +47,11 @@ export default function ProtectedRoute({
   }
 
   if (requiredPermission && !hasPermission(requiredPermission)) {
-    return <Navigate to="/dashboard" replace />
+    return <ForbiddenPage />
   }
 
   if (requiredRole && !hasRole(requiredRole)) {
-    return <Navigate to="/dashboard" replace />
+    return <ForbiddenPage />
   }
 
   return <>{children}</>

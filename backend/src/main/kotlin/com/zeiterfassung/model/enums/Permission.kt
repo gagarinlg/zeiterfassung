@@ -15,5 +15,5 @@ enum class Permission(val value: String) {
     ADMIN_SETTINGS_MANAGE("admin.settings.manage"),
     ADMIN_REPORTS_VIEW("admin.reports.view"),
     CSV_IMPORT("csv.import"),
-    CSV_EXPORT("csv.export")
+    CSV_EXPORT("csv.export"),
 }
