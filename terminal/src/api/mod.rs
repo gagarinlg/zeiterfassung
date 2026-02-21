@@ -73,7 +73,11 @@ impl ApiClient {
         }
     }
 
-    pub async fn clock_in_out(&self, rfid_tag_id: &str, terminal_id: &str) -> Result<ClockResponse, ApiError> {
+    pub async fn clock_in_out(
+        &self,
+        rfid_tag_id: &str,
+        terminal_id: &str,
+    ) -> Result<ClockResponse, ApiError> {
         let url = format!("{}/terminal/clock", self.base_url);
         let request = ClockRequest {
             rfid_tag_id: rfid_tag_id.to_string(),
@@ -99,11 +103,17 @@ impl ApiClient {
                     }
                 }
                 Err(e) if e.is_timeout() => {
-                    warn!("Request timed out (attempt {}/{})", attempt, self.retry_attempts);
+                    warn!(
+                        "Request timed out (attempt {}/{})",
+                        attempt, self.retry_attempts
+                    );
                     last_error = ApiError::Timeout;
                 }
                 Err(e) => {
-                    warn!("Network error (attempt {}/{}): {}", attempt, self.retry_attempts, e);
+                    warn!(
+                        "Network error (attempt {}/{}): {}",
+                        attempt, self.retry_attempts, e
+                    );
                     last_error = ApiError::NetworkError(e.to_string());
                 }
             }

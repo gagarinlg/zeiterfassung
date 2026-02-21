@@ -48,6 +48,7 @@ class AuthServiceTest {
                 passwordEncoder,
                 auditService,
                 604800000L,
+                900000L,
             )
     }
 

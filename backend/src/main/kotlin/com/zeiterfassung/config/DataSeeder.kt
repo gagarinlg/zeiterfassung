@@ -4,6 +4,7 @@ import com.zeiterfassung.model.entity.UserEntity
 import com.zeiterfassung.repository.RoleRepository
 import com.zeiterfassung.repository.UserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Profile
@@ -17,6 +18,7 @@ class DataSeeder(
     private val userRepository: UserRepository,
     private val roleRepository: RoleRepository,
     private val passwordEncoder: PasswordEncoder,
+    @Value("\${app.seed.admin-password:Admin@123!}") private val adminPassword: String,
 ) : ApplicationRunner {
     private val logger = LoggerFactory.getLogger(DataSeeder::class.java)
 
@@ -41,7 +43,7 @@ class DataSeeder(
         val admin =
             UserEntity(
                 email = adminEmail,
-                passwordHash = passwordEncoder.encode("Admin@123!"),
+                passwordHash = passwordEncoder.encode(adminPassword),
                 firstName = "Super",
                 lastName = "Admin",
                 employeeNumber = "ADMIN-001",

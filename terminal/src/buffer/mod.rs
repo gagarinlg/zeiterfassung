@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use log::{info, warn};
-use rusqlite::{Connection, Result as SqliteResult, params};
+use rusqlite::{params, Connection, Result as SqliteResult};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
@@ -55,7 +55,10 @@ impl EventBuffer {
         )?;
 
         if count >= self.max_size {
-            warn!("Event buffer is full ({} events). Dropping oldest event.", self.max_size);
+            warn!(
+                "Event buffer is full ({} events). Dropping oldest event.",
+                self.max_size
+            );
             self.conn.execute(
                 "DELETE FROM buffered_events WHERE id = (SELECT MIN(id) FROM buffered_events WHERE synced = 0)",
                 [],
@@ -76,21 +79,22 @@ impl EventBuffer {
             "SELECT id, rfid_tag_id, terminal_id, timestamp, synced FROM buffered_events WHERE synced = 0 ORDER BY id ASC",
         )?;
 
-        let events = stmt.query_map([], |row| {
-            let ts_str: String = row.get(3)?;
-            let timestamp = DateTime::parse_from_rfc3339(&ts_str)
-                .map(|dt| dt.with_timezone(&Utc))
-                .unwrap_or_else(|_| Utc::now());
+        let events = stmt
+            .query_map([], |row| {
+                let ts_str: String = row.get(3)?;
+                let timestamp = DateTime::parse_from_rfc3339(&ts_str)
+                    .map(|dt| dt.with_timezone(&Utc))
+                    .unwrap_or_else(|_| Utc::now());
 
-            Ok(BufferedEvent {
-                id: Some(row.get(0)?),
-                rfid_tag_id: row.get(1)?,
-                terminal_id: row.get(2)?,
-                timestamp,
-                synced: row.get::<_, i32>(4)? != 0,
-            })
-        })?
-        .collect::<SqliteResult<Vec<_>>>()?;
+                Ok(BufferedEvent {
+                    id: Some(row.get(0)?),
+                    rfid_tag_id: row.get(1)?,
+                    terminal_id: row.get(2)?,
+                    timestamp,
+                    synced: row.get::<_, i32>(4)? != 0,
+                })
+            })?
+            .collect::<SqliteResult<Vec<_>>>()?;
 
         Ok(events)
     }
