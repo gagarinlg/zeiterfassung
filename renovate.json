@@ -1,0 +1,6 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "schedule": ["before 6am on monday"],
+  "$comment": "Alternative to .github/dependabot.yml — use one or the other, not both simultaneously."
+}
