@@ -523,8 +523,6 @@ Maintain comprehensive documentation in the `docs/` directory:
 11. **DSGVO / GDPR** — Employees must never be able to access other employees' personal time or vacation data. Every service method and endpoint that returns data about a user must verify that the requesting user is either the owner of that data, a manager of that user, or an admin.
 12. **Email notifications** — Notify relevant users on all important events (vacation requests, approvals, rejections, cancellations). Send monthly hours and vacation balance reports to all active employees and team summaries to managers.
 
----
-
 ## Project Phase Tracking (MANDATORY)
 
 Every PR that implements features or fixes bugs MUST update the project phase documentation:

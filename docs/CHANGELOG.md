@@ -10,8 +10,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - Phase 6: Terminal (Raspberry Pi) Full Integration
 - Phase 7: Mobile Apps Full Implementation
 
----
-
 ## [Phase 4] - 2026-02-21
 
 ### Added
@@ -47,7 +45,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - npm peer dependency: @vitest/coverage-v8 ^1 → ^4 (vitest@4 requirement)
 - TypeScript TS6133: removed unused `user` variable from VacationPage.tsx
 
----
 
 ## [Phase 3] - 2026-02-21
 

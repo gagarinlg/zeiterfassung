@@ -208,7 +208,6 @@
 - `frontend/src/services/vacationService.ts`
 - `frontend/src/pages/VacationPage.tsx`
 - `frontend/src/pages/VacationApprovalPage.tsx`
-
 ### Depends on
 - Phase 2 (auth/users) ✅
 - Phase 3 (time tracking — for work day calculations) ✅
