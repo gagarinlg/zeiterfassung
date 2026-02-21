@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import Layout from './components/Layout'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import TimeTrackingPage from './pages/TimeTrackingPage'
@@ -13,37 +14,24 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route
-          path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashboardPage />
+              <Layout />
             </ProtectedRoute>
           }
-        />
-        <Route
-          path="/time-tracking"
-          element={
-            <ProtectedRoute>
-              <TimeTrackingPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/vacation"
-          element={
-            <ProtectedRoute>
-              <VacationPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute requiredPermission="admin.users.manage">
-              <AdminPage />
-            </ProtectedRoute>
-          }
-        />
+        >
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/time-tracking" element={<TimeTrackingPage />} />
+          <Route path="/vacation" element={<VacationPage />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredPermission="admin.users.manage">
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </AuthProvider>
