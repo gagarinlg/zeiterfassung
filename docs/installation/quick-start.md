@@ -64,12 +64,14 @@ Wait until you see `Started ZeiterfassungApplication` in the backend logs.
 ## 5. First Login
 
 The system does not create a default admin user automatically for security reasons.
-Run the following command to create the initial super admin:
+Run the following SQL command against the database to seed the initial super admin
+(replace the bcrypt hash with the output of `htpasswd -bnBC 12 "" yourpassword | tr -d ':\n'`):
 
 ```bash
-docker compose exec backend java -jar app.jar --create-admin \
-  --email=admin@example.com \
-  --password=change-me-immediately
+docker compose exec db psql -U zeiterfassung -d zeiterfassung -c "
+  INSERT INTO users (id, email, password_hash, role, active)
+  VALUES (gen_random_uuid(), 'admin@example.com', '\$2a\$12\$...bcrypt-hash...', 'SUPER_ADMIN', true);
+"
 ```
 
 Then log in at `https://localhost` and **immediately change the password**.
