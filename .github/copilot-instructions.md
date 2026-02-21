@@ -6,7 +6,7 @@
 
 1. **Web Application** — Administration panel and employee self-service portal (with PostgreSQL database)
 2. **Mobile Apps** — Native cell phone apps for Android (Kotlin/Jetpack Compose) and iOS (Swift/SwiftUI) for employee time tracking and vacation requests
-3. **Raspberry Pi 5 Terminal** — A kiosk-style terminal application for clocking in/out via NFC/RFID tokens
+3. **Raspberry Pi 5 Terminal** — A kiosk-style terminal application with a display GUI for clocking in/out via NFC/RFID tokens, showing employee information, hours worked, and other useful data
 
 ---
 
@@ -29,9 +29,11 @@
 ### Raspberry Pi 5 Terminal
 
 - **Language:** Python 3.12+ or Rust (prefer Rust for reliability)
+- **GUI Framework:** `egui`, `iced`, or `slint` (prefer `slint` or `iced` for embedded-friendly UI)
 - **NFC/RFID:** The RFID reader acts as a USB keyboard device and sends the RFID tag ID followed by a newline character
-- **Display:** Minimal UI showing clock-in/clock-out status, employee name, and time
+- **Display:** GUI application running in fullscreen kiosk mode on an attached display with configurable resolution
 - **Communication:** REST API calls to the web application backend
+- **Configuration:** `terminal.toml` configuration file for display resolution, API endpoint, timeouts, locale, and other settings
 
 ---
 
@@ -221,6 +223,11 @@ zeiterfassung/
 │   ├── android/               # Android app (Kotlin/Jetpack Compose)
 │   └── ios/                   # iOS app (Swift/SwiftUI)
 ├── terminal/                  # Raspberry Pi 5 terminal app
+│   ├── src/
+│   ├── assets/                # Icons, fonts, images for the terminal GUI
+│   ├── locales/               # Translation files (fluent .ftl files)
+│   ├── terminal.toml          # Configuration file (display resolution, API endpoint, etc.)
+│   └── tests/
 ├── docs/
 │   ├── installation/
 │   ├── administration/
@@ -278,12 +285,117 @@ Implement time tracking that complies with the **Arbeitszeitgesetz (ArbZG)**:
 
 ### NFC Terminal (Raspberry Pi 5)
 
+#### RFID/NFC Input
+
 - The RFID reader behaves as a USB keyboard, sending the tag ID followed by a newline
 - Each user can have a configurable RFID tag ID stored in their profile
-- Terminal displays: current time, employee name (after scan), clock-in/clock-out confirmation
-- Offline mode: buffer clock events locally and sync when connection is restored
-- Visual and optional audible feedback for successful/failed scans
-- Auto-logout display after a few seconds
+- Support multiple RFID reader models (any USB HID keyboard-emulating reader)
+
+#### Display GUI
+
+The terminal runs a **fullscreen kiosk-mode GUI application** on an attached display. The display resolution MUST be configurable.
+
+##### Display Configuration
+
+- **Resolution:** Configurable via `terminal.toml` (e.g., `800x480`, `1024x600`, `1280x720`, `1920x1080`)
+- **Fullscreen kiosk mode:** No window decorations, no taskbar, no desktop access
+- **Font scaling:** Automatically adjust font sizes based on configured resolution
+- **Orientation:** Support landscape and portrait modes (configurable)
+- **Theme:** Support light and dark themes (configurable)
+
+##### GUI Screens
+
+1. **Idle / Welcome Screen (default)**
+   - Current date and time (large, prominent clock)
+   - Company logo (configurable via assets)
+   - "Please scan your badge" prompt (localized)
+   - Current number of employees clocked in (optional, configurable)
+   - Offline status indicator (if backend connection is lost)
+
+2. **Clock-In Confirmation Screen** (shown after successful clock-in scan)
+   - Employee name and photo (if available from backend)
+   - "Clocked In" status with timestamp — **green color scheme**
+   - Today's scheduled work hours
+   - Any messages or announcements from admin
+   - Auto-return to idle screen after configurable timeout (default: 8 seconds)
+
+3. **Clock-Out Confirmation Screen** (shown after successful clock-out scan)
+   - Employee name and photo (if available from backend)
+   - "Clocked Out" status with timestamp — **red color scheme**
+   - Today's hours worked (total)
+   - Break time taken vs. mandatory break requirement
+   - Weekly hours summary (worked / target)
+   - Overtime balance (positive or negative)
+   - Remaining vacation days
+   - Auto-return to idle screen after configurable timeout (default: 8 seconds)
+
+4. **Error Screen** (shown for unrecognized badges or backend errors)
+   - Clear error message (e.g., "Badge not recognized", "Server unavailable")
+   - **Yellow/orange warning color scheme**
+   - Instructions to contact admin if persistent
+   - Auto-return to idle screen after configurable timeout (default: 5 seconds)
+
+5. **Offline Mode Indicator**
+   - Persistent banner/icon when backend connection is lost
+   - Clock events are buffered locally and synced when connection is restored
+   - Show count of pending (unsynced) events
+   - Visual indication when sync is in progress and when sync completes
+
+##### Visual & Audio Feedback
+
+- **Color-coded status:** Green (clock-in), Red (clock-out), Yellow/Orange (warning/error)
+- **Optional audible feedback:** Configurable beep/sound for success and failure (can be disabled)
+- **Large, readable fonts:** Optimized for viewing from arm's length
+- **High contrast:** Ensure readability in various lighting conditions
+- **Animations:** Subtle transitions between screens (keep minimal for performance)
+
+##### Terminal Configuration (`terminal.toml`)
+
+```toml
+[display]
+resolution = "1024x600"       # Display resolution (width x height)
+fullscreen = true             # Run in fullscreen kiosk mode
+orientation = "landscape"     # "landscape" or "portrait"
+theme = "dark"                # "light" or "dark"
+font_scale = 1.0              # Font scaling factor (1.0 = auto based on resolution)
+idle_timeout_seconds = 8      # Seconds before returning to idle screen after scan
+error_timeout_seconds = 5     # Seconds before returning to idle screen after error
+
+[api]
+base_url = "https://zeiterfassung.example.com/api"
+timeout_seconds = 10          # API request timeout
+retry_attempts = 3            # Number of retries for failed requests
+
+[offline]
+buffer_path = "/var/lib/zeiterfassung/buffer.db"  # Local SQLite for offline buffering
+sync_interval_seconds = 30    # How often to attempt syncing buffered events
+max_buffer_size = 10000       # Maximum number of buffered events
+
+[rfid]
+input_device = "auto"         # "auto" to detect, or specific device path like "/dev/input/event0"
+debounce_ms = 500             # Minimum time between scans to prevent double reads
+
+[audio]
+enabled = true                # Enable/disable audible feedback
+success_sound = "assets/sounds/success.wav"
+error_sound = "assets/sounds/error.wav"
+volume = 0.7                  # Volume level (0.0 to 1.0)
+
+[locale]
+language = "de"               # Default language ("de" or "en")
+
+[company]
+name = "Firma GmbH"          # Company name displayed on idle screen
+logo_path = "assets/logo.png" # Path to company logo image
+```
+
+#### Offline Mode & Data Sync
+
+- Buffer all clock-in/clock-out events locally in a SQLite database when backend is unreachable
+- Automatically sync buffered events when connection is restored (FIFO order)
+- Show sync progress on the display
+- Handle conflict resolution (e.g., duplicate events)
+- Log all sync operations for debugging
 
 ### Dashboard
 
@@ -325,7 +437,7 @@ Maintain comprehensive documentation in the `docs/` directory:
 - Docker Compose setup for quick start
 - Database setup and migration
 - SSL/TLS certificate configuration
-- Raspberry Pi terminal setup (including RFID reader configuration)
+- Raspberry Pi terminal setup (including RFID reader configuration, display setup, and `terminal.toml` reference)
 - Environment variable reference
 
 ### Administration Guide (`docs/administration/`)
@@ -334,6 +446,7 @@ Maintain comprehensive documentation in the `docs/` directory:
 - System settings
 - Backup and restore
 - Monitoring and logging
+- Terminal management (configuring display resolution, managing offline buffers)
 - Troubleshooting guide
 
 ### User Guide (`docs/user-guide/`)
@@ -341,7 +454,7 @@ Maintain comprehensive documentation in the `docs/` directory:
 - Time tracking guide
 - Vacation request guide
 - Mobile app guide
-- NFC terminal usage
+- NFC terminal usage (with screenshots of all terminal GUI screens)
 
 ### Developer Guide (`docs/development/`)
 - Development environment setup
@@ -349,12 +462,14 @@ Maintain comprehensive documentation in the `docs/` directory:
 - API documentation
 - Adding new languages
 - Testing guide
+- Terminal GUI development guide (how to modify screens, add new display elements)
 - Contributing guidelines
 
 ### Screenshots
 
 - Capture screenshots automatically using Playwright during E2E tests
 - Include annotated screenshots in all user-facing documentation
+- Capture terminal GUI screenshots (all screens in both locales)
 - Organize by feature and language
 - Update automatically in CI when UI changes
 
@@ -379,6 +494,7 @@ Maintain comprehensive documentation in the `docs/` directory:
 - Support profiles: `development`, `test`, `production`
 - Docker Compose for local development with all dependencies
 - Separate configuration for each component
+- Terminal uses `terminal.toml` for all local configuration (display, API, RFID, audio, locale)
 
 ---
 
@@ -392,3 +508,4 @@ Maintain comprehensive documentation in the `docs/` directory:
 6. **Documentation** — Keep docs up to date with screenshots
 7. **CI/CD** — Automate everything via GitHub Actions
 8. **Permission enforcement** — Frontend, middleware, AND backend must all enforce access control
+9. **Configurable terminal** — Display resolution, theme, orientation, and all terminal settings must be configurable without code changes
