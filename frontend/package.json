@@ -38,7 +38,7 @@
     "@testing-library/user-event": "^14.5.2",
     "@playwright/test": "^1.43.0",
     "autoprefixer": "^10.4.19",
-    "eslint": "^8.57.0",
+    "eslint": "^10.0.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^7.0.1",
