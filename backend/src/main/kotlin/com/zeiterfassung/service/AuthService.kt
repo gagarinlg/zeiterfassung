@@ -29,6 +29,7 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val auditService: AuditService,
     @Value("\${app.jwt.refresh-token-expiration-ms}") private val refreshTokenExpMs: Long,
+    @Value("\${app.jwt.access-token-expiration-ms}") private val accessTokenExpMs: Long,
 ) {
     companion object {
         private const val MAX_FAILED_ATTEMPTS = 5
@@ -81,7 +82,7 @@ class AuthService(
         return AuthResponse(
             accessToken = accessToken,
             refreshToken = rawRefreshToken,
-            expiresIn = refreshTokenExpMs / 1000,
+            expiresIn = accessTokenExpMs / 1000,
             user = user.toUserResponse(),
         )
     }
@@ -127,7 +128,7 @@ class AuthService(
         return AuthResponse(
             accessToken = accessToken,
             refreshToken = rawRefreshToken,
-            expiresIn = refreshTokenExpMs / 1000,
+            expiresIn = accessTokenExpMs / 1000,
             user = user.toUserResponse(),
         )
     }
