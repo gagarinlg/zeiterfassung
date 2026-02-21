@@ -27,7 +27,7 @@ function StatusBadge({ status }: { status: VacationRequest['status'] }) {
 
 export default function VacationPage() {
   const { t } = useTranslation()
-  const { user, hasPermission } = useAuth()
+  const { hasPermission } = useAuth()
   const currentYear = new Date().getFullYear()
 
   const [activeTab, setActiveTab] = useState<Tab>('requests')
