@@ -103,6 +103,9 @@ cargo run
 
 ## Documentation
 
+- [**Project Phases & Roadmap**](docs/PHASES.md) ← current development status
+- [Current State](docs/CURRENT_STATE.md)
+- [Changelog](docs/CHANGELOG.md)
 - [Installation Guide](docs/installation/quick-start.md)
 - [Development Setup](docs/development/setup.md)
 - [Architecture](docs/development/architecture.md)
