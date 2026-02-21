@@ -46,10 +46,11 @@ class TimeTrackingService(
         notes: String? = null,
         terminalId: String? = null,
     ): TimeEntryResponse {
-        val user = userRepository.findById(userId)
-            .orElseThrow { ResourceNotFoundException("User not found: $userId") }
+        val user =
+            userRepository.findById(userId)
+                .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
-        val lastEntry = timeEntryRepository.findTopByUser_IdOrderByTimestampDesc(userId)
+        val lastEntry = timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)
         if (lastEntry != null && lastEntry.entryType == TimeEntryType.CLOCK_IN) {
             throw ConflictException("Already clocked in. Please clock out first.")
         }
@@ -57,14 +58,15 @@ class TimeTrackingService(
             throw ConflictException("Currently on break. Please end break first.")
         }
 
-        val entry = TimeEntryEntity(
-            user = user,
-            entryType = TimeEntryType.CLOCK_IN,
-            timestamp = Instant.now(),
-            source = source,
-            terminalId = terminalId,
-            notes = notes,
-        )
+        val entry =
+            TimeEntryEntity(
+                user = user,
+                entryType = TimeEntryType.CLOCK_IN,
+                timestamp = Instant.now(),
+                source = source,
+                terminalId = terminalId,
+                notes = notes,
+            )
         val saved = timeEntryRepository.save(entry)
         auditService.logDataChange(userId, "CLOCK_IN", "TimeEntry", saved.id, null, saved.toResponse())
         return saved.toResponse()
@@ -77,10 +79,11 @@ class TimeTrackingService(
         notes: String? = null,
         terminalId: String? = null,
     ): TimeEntryResponse {
-        val user = userRepository.findById(userId)
-            .orElseThrow { ResourceNotFoundException("User not found: $userId") }
+        val user =
+            userRepository.findById(userId)
+                .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
-        val lastEntry = timeEntryRepository.findTopByUser_IdOrderByTimestampDesc(userId)
+        val lastEntry = timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)
         if (lastEntry == null || lastEntry.entryType == TimeEntryType.CLOCK_OUT) {
             throw ConflictException("Not clocked in. Please clock in first.")
         }
@@ -88,14 +91,15 @@ class TimeTrackingService(
             throw ConflictException("Currently on break. Please end break before clocking out.")
         }
 
-        val entry = TimeEntryEntity(
-            user = user,
-            entryType = TimeEntryType.CLOCK_OUT,
-            timestamp = Instant.now(),
-            source = source,
-            terminalId = terminalId,
-            notes = notes,
-        )
+        val entry =
+            TimeEntryEntity(
+                user = user,
+                entryType = TimeEntryType.CLOCK_OUT,
+                timestamp = Instant.now(),
+                source = source,
+                terminalId = terminalId,
+                notes = notes,
+            )
         val saved = timeEntryRepository.save(entry)
         recalculateDailySummary(userId, LocalDate.now(ZoneOffset.UTC))
         auditService.logDataChange(userId, "CLOCK_OUT", "TimeEntry", saved.id, null, saved.toResponse())
@@ -108,21 +112,23 @@ class TimeTrackingService(
         source: TimeEntrySource,
         notes: String? = null,
     ): TimeEntryResponse {
-        val user = userRepository.findById(userId)
-            .orElseThrow { ResourceNotFoundException("User not found: $userId") }
+        val user =
+            userRepository.findById(userId)
+                .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
-        val lastEntry = timeEntryRepository.findTopByUser_IdOrderByTimestampDesc(userId)
+        val lastEntry = timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)
         if (lastEntry == null || lastEntry.entryType != TimeEntryType.CLOCK_IN) {
             throw ConflictException("Must be clocked in to start a break.")
         }
 
-        val entry = TimeEntryEntity(
-            user = user,
-            entryType = TimeEntryType.BREAK_START,
-            timestamp = Instant.now(),
-            source = source,
-            notes = notes,
-        )
+        val entry =
+            TimeEntryEntity(
+                user = user,
+                entryType = TimeEntryType.BREAK_START,
+                timestamp = Instant.now(),
+                source = source,
+                notes = notes,
+            )
         val saved = timeEntryRepository.save(entry)
         auditService.logDataChange(userId, "BREAK_START", "TimeEntry", saved.id, null, saved.toResponse())
         return saved.toResponse()
@@ -134,21 +140,23 @@ class TimeTrackingService(
         source: TimeEntrySource,
         notes: String? = null,
     ): TimeEntryResponse {
-        val user = userRepository.findById(userId)
-            .orElseThrow { ResourceNotFoundException("User not found: $userId") }
+        val user =
+            userRepository.findById(userId)
+                .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
-        val lastEntry = timeEntryRepository.findTopByUser_IdOrderByTimestampDesc(userId)
+        val lastEntry = timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)
         if (lastEntry == null || lastEntry.entryType != TimeEntryType.BREAK_START) {
             throw ConflictException("Not on break.")
         }
 
-        val entry = TimeEntryEntity(
-            user = user,
-            entryType = TimeEntryType.BREAK_END,
-            timestamp = Instant.now(),
-            source = source,
-            notes = notes,
-        )
+        val entry =
+            TimeEntryEntity(
+                user = user,
+                entryType = TimeEntryType.BREAK_END,
+                timestamp = Instant.now(),
+                source = source,
+                notes = notes,
+            )
         val saved = timeEntryRepository.save(entry)
         auditService.logDataChange(userId, "BREAK_END", "TimeEntry", saved.id, null, saved.toResponse())
         return saved.toResponse()
@@ -158,39 +166,43 @@ class TimeTrackingService(
         userRepository.findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
-        val lastEntry = timeEntryRepository.findTopByUser_IdOrderByTimestampDesc(userId)
+        val lastEntry = timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)
         val today = LocalDate.now(ZoneOffset.UTC)
         val todayStart = today.atStartOfDay(ZoneOffset.UTC).toInstant()
         val todayEnd = today.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant()
-        val todayEntries = timeEntryRepository.findByUser_IdAndDateRange(userId, todayStart, todayEnd)
+        val todayEntries = timeEntryRepository.findByUserIdAndDateRange(userId, todayStart, todayEnd)
 
         val (workMin, breakMin) = calculateMinutes(todayEntries, Instant.now())
 
-        val status = when (lastEntry?.entryType) {
-            TimeEntryType.CLOCK_IN -> TrackingStatus.CLOCKED_IN
-            TimeEntryType.BREAK_START -> TrackingStatus.ON_BREAK
-            else -> TrackingStatus.CLOCKED_OUT
-        }
+        val status =
+            when (lastEntry?.entryType) {
+                TimeEntryType.CLOCK_IN -> TrackingStatus.CLOCKED_IN
+                TimeEntryType.BREAK_START -> TrackingStatus.ON_BREAK
+                else -> TrackingStatus.CLOCKED_OUT
+            }
 
-        val clockedInSince = if (status == TrackingStatus.CLOCKED_IN || status == TrackingStatus.ON_BREAK) {
-            todayEntries.lastOrNull { it.entryType == TimeEntryType.CLOCK_IN }?.timestamp
-        } else {
-            null
-        }
+        val clockedInSince =
+            if (status == TrackingStatus.CLOCKED_IN || status == TrackingStatus.ON_BREAK) {
+                todayEntries.lastOrNull { it.entryType == TimeEntryType.CLOCK_IN }?.timestamp
+            } else {
+                null
+            }
 
         val breakStartedAt = if (status == TrackingStatus.ON_BREAK) lastEntry?.timestamp else null
 
-        val elapsedWork = if (status == TrackingStatus.CLOCKED_IN && clockedInSince != null) {
-            ChronoUnit.MINUTES.between(clockedInSince, Instant.now())
-        } else {
-            0L
-        }
+        val elapsedWork =
+            if (status == TrackingStatus.CLOCKED_IN && clockedInSince != null) {
+                ChronoUnit.MINUTES.between(clockedInSince, Instant.now())
+            } else {
+                0L
+            }
 
-        val elapsedBreak = if (status == TrackingStatus.ON_BREAK && breakStartedAt != null) {
-            ChronoUnit.MINUTES.between(breakStartedAt, Instant.now())
-        } else {
-            0L
-        }
+        val elapsedBreak =
+            if (status == TrackingStatus.ON_BREAK && breakStartedAt != null) {
+                ChronoUnit.MINUTES.between(breakStartedAt, Instant.now())
+            } else {
+                0L
+            }
 
         return TrackingStatusResponse(
             status = status,
@@ -204,24 +216,29 @@ class TimeTrackingService(
     }
 
     @Transactional
-    fun recalculateDailySummary(userId: UUID, date: LocalDate): DailySummaryResponse {
-        val user = userRepository.findById(userId)
-            .orElseThrow { ResourceNotFoundException("User not found: $userId") }
+    fun recalculateDailySummary(
+        userId: UUID,
+        date: LocalDate,
+    ): DailySummaryResponse {
+        val user =
+            userRepository.findById(userId)
+                .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
         val startOfDay = date.atStartOfDay(ZoneOffset.UTC).toInstant()
         val endOfDay = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant()
-        val entries = timeEntryRepository.findByUser_IdAndDateRange(userId, startOfDay, endOfDay)
+        val entries = timeEntryRepository.findByUserIdAndDateRange(userId, startOfDay, endOfDay)
 
         val (workMin, breakMin) = calculateMinutes(entries, null)
 
-        val config = employeeConfigRepository.findByUser_Id(userId)
+        val config = employeeConfigRepository.findByUserId(userId)
         val targetMinutes = config?.dailyWorkHours?.multiply(BigDecimal(60))?.toInt() ?: 480
         val overtimeMin = maxOf(0, workMin - targetMinutes)
 
         val compliance = complianceService.checkCompliance(workMin, breakMin)
 
-        val summary = dailySummaryRepository.findByUser_IdAndDate(userId, date)
-            ?: DailySummaryEntity(user = user, date = date)
+        val summary =
+            dailySummaryRepository.findByUserIdAndDate(userId, date)
+                ?: DailySummaryEntity(user = user, date = date)
 
         summary.totalWorkMinutes = workMin
         summary.totalBreakMinutes = breakMin
@@ -233,20 +250,28 @@ class TimeTrackingService(
         return saved.toResponse()
     }
 
-    fun getDailySummary(userId: UUID, date: LocalDate): DailySummaryResponse {
-        val summary = dailySummaryRepository.findByUser_IdAndDate(userId, date)
-            ?: return recalculateDailySummary(userId, date)
+    fun getDailySummary(
+        userId: UUID,
+        date: LocalDate,
+    ): DailySummaryResponse {
+        val summary =
+            dailySummaryRepository.findByUserIdAndDate(userId, date)
+                ?: return recalculateDailySummary(userId, date)
         return summary.toResponse()
     }
 
-    fun getTimeSheet(userId: UUID, startDate: LocalDate, endDate: LocalDate): TimeSheetResponse {
+    fun getTimeSheet(
+        userId: UUID,
+        startDate: LocalDate,
+        endDate: LocalDate,
+    ): TimeSheetResponse {
         userRepository.findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
-        val summaries = dailySummaryRepository.findByUser_IdAndDateBetweenOrderByDateAsc(userId, startDate, endDate)
+        val summaries = dailySummaryRepository.findByUserIdAndDateBetweenOrderByDateAsc(userId, startDate, endDate)
         val startInstant = startDate.atStartOfDay(ZoneOffset.UTC).toInstant()
         val endInstant = endDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant()
-        val entries = timeEntryRepository.findByUser_IdAndTimestampBetweenOrderByTimestampAsc(userId, startInstant, endInstant)
+        val entries = timeEntryRepository.findByUserIdAndTimestampBetweenOrderByTimestampAsc(userId, startInstant, endInstant)
 
         return TimeSheetResponse(
             userId = userId,
@@ -260,10 +285,14 @@ class TimeTrackingService(
         )
     }
 
-    fun getEntriesForUser(userId: UUID, start: Instant, end: Instant): List<TimeEntryResponse> {
+    fun getEntriesForUser(
+        userId: UUID,
+        start: Instant,
+        end: Instant,
+    ): List<TimeEntryResponse> {
         userRepository.findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found: $userId") }
-        return timeEntryRepository.findByUser_IdAndTimestampBetweenOrderByTimestampAsc(userId, start, end)
+        return timeEntryRepository.findByUserIdAndTimestampBetweenOrderByTimestampAsc(userId, start, end)
             .map { it.toResponse() }
     }
 
@@ -273,20 +302,23 @@ class TimeTrackingService(
         userId: UUID,
         request: ManualTimeEntryRequest,
     ): TimeEntryResponse {
-        val manager = userRepository.findById(managerId)
-            .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
-        val user = userRepository.findById(userId)
-            .orElseThrow { ResourceNotFoundException("User not found: $userId") }
+        val manager =
+            userRepository.findById(managerId)
+                .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
+        val user =
+            userRepository.findById(userId)
+                .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
-        val entry = TimeEntryEntity(
-            user = user,
-            entryType = request.entryType,
-            timestamp = request.timestamp,
-            source = request.source,
-            notes = request.notes,
-            isModified = true,
-            modifiedBy = manager,
-        )
+        val entry =
+            TimeEntryEntity(
+                user = user,
+                entryType = request.entryType,
+                timestamp = request.timestamp,
+                source = request.source,
+                notes = request.notes,
+                isModified = true,
+                modifiedBy = manager,
+            )
         val saved = timeEntryRepository.save(entry)
         val date = request.timestamp.atZone(ZoneOffset.UTC).toLocalDate()
         recalculateDailySummary(userId, date)
@@ -300,10 +332,12 @@ class TimeTrackingService(
         entryId: UUID,
         request: EditTimeEntryRequest,
     ): TimeEntryResponse {
-        val manager = userRepository.findById(managerId)
-            .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
-        val entry = timeEntryRepository.findById(entryId)
-            .orElseThrow { ResourceNotFoundException("TimeEntry not found: $entryId") }
+        val manager =
+            userRepository.findById(managerId)
+                .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
+        val entry =
+            timeEntryRepository.findById(entryId)
+                .orElseThrow { ResourceNotFoundException("TimeEntry not found: $entryId") }
 
         val oldResponse = entry.toResponse()
 
@@ -327,8 +361,9 @@ class TimeTrackingService(
     ) {
         userRepository.findById(managerId)
             .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
-        val entry = timeEntryRepository.findById(entryId)
-            .orElseThrow { ResourceNotFoundException("TimeEntry not found: $entryId") }
+        val entry =
+            timeEntryRepository.findById(entryId)
+                .orElseThrow { ResourceNotFoundException("TimeEntry not found: $entryId") }
 
         val oldResponse = entry.toResponse()
         val date = entry.timestamp.atZone(ZoneOffset.UTC).toLocalDate()
@@ -338,9 +373,11 @@ class TimeTrackingService(
         auditService.logDataChange(managerId, "TIME_ENTRY_DELETED", "TimeEntry", entryId, oldResponse, null)
     }
 
+    @Transactional(readOnly = true)
     fun getTeamCurrentStatus(managerId: UUID): Map<UUID, TrackingStatusResponse> {
-        val manager = userRepository.findById(managerId)
-            .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
+        val manager =
+            userRepository.findById(managerId)
+                .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
         return manager.subordinates.associate { it.id to getCurrentStatus(it.id) }
     }
 
@@ -376,35 +413,39 @@ class TimeTrackingService(
             }
         }
 
-        // Handle open clock-in (no clock-out yet) for live status
+        // Handle open clock-in (no clock-out yet) for live status.
+        // If currently on break, work only counts up to when the break started.
         if (clockInTime != null && openEndTime != null) {
-            workMinutes += ChronoUnit.MINUTES.between(clockInTime, openEndTime)
+            val workEnd = breakStartTime ?: openEndTime
+            workMinutes += ChronoUnit.MINUTES.between(clockInTime, workEnd)
         }
 
         return Pair(workMinutes.toInt(), breakMinutes.toInt())
     }
 
-    private fun TimeEntryEntity.toResponse() = TimeEntryResponse(
-        id = id,
-        userId = user.id,
-        entryType = entryType,
-        timestamp = timestamp,
-        source = source,
-        terminalId = terminalId,
-        notes = notes,
-        isModified = isModified,
-        modifiedById = modifiedBy?.id,
-        createdAt = createdAt,
-    )
+    private fun TimeEntryEntity.toResponse() =
+        TimeEntryResponse(
+            id = id,
+            userId = user.id,
+            entryType = entryType,
+            timestamp = timestamp,
+            source = source,
+            terminalId = terminalId,
+            notes = notes,
+            isModified = isModified,
+            modifiedById = modifiedBy?.id,
+            createdAt = createdAt,
+        )
 
-    private fun DailySummaryEntity.toResponse() = DailySummaryResponse(
-        id = id,
-        userId = user.id,
-        date = date,
-        totalWorkMinutes = totalWorkMinutes,
-        totalBreakMinutes = totalBreakMinutes,
-        overtimeMinutes = overtimeMinutes,
-        isCompliant = isCompliant,
-        complianceNotes = complianceNotes,
-    )
+    private fun DailySummaryEntity.toResponse() =
+        DailySummaryResponse(
+            id = id,
+            userId = user.id,
+            date = date,
+            totalWorkMinutes = totalWorkMinutes,
+            totalBreakMinutes = totalBreakMinutes,
+            overtimeMinutes = overtimeMinutes,
+            isCompliant = isCompliant,
+            complianceNotes = complianceNotes,
+        )
 }

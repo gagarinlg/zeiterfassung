@@ -30,8 +30,9 @@ class TerminalController(
     fun scan(
         @RequestBody request: TerminalScanRequest,
     ): ResponseEntity<TerminalScanResponse> {
-        val user = userRepository.findByRfidTagId(request.rfidTagId)
-            .orElseThrow { ResourceNotFoundException("No employee found for RFID tag: ${request.rfidTagId}") }
+        val user =
+            userRepository.findByRfidTagId(request.rfidTagId)
+                .orElseThrow { ResourceNotFoundException("No employee found for RFID tag: ${request.rfidTagId}") }
 
         val status = timeTrackingService.getCurrentStatus(user.id)
         val action: String
@@ -51,12 +52,13 @@ class TerminalController(
 
         return ResponseEntity.ok(
             TerminalScanResponse(
-                employee = EmployeeInfo(
-                    id = user.id,
-                    firstName = user.firstName,
-                    lastName = user.lastName,
-                    photoUrl = user.photoUrl,
-                ),
+                employee =
+                    EmployeeInfo(
+                        id = user.id,
+                        firstName = user.firstName,
+                        lastName = user.lastName,
+                        photoUrl = user.photoUrl,
+                    ),
                 action = action,
                 timestamp = timestamp,
                 todayWorkMinutes = summary.totalWorkMinutes,

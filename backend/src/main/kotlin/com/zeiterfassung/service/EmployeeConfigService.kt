@@ -23,8 +23,9 @@ class EmployeeConfigService(
     fun getConfig(userId: UUID): EmployeeConfigResponse {
         userRepository.findById(userId)
             .orElseThrow { ResourceNotFoundException("User not found: $userId") }
-        val config = employeeConfigRepository.findByUser_Id(userId)
-            ?: return createDefaultConfig(userId)
+        val config =
+            employeeConfigRepository.findByUserId(userId)
+                ?: return createDefaultConfig(userId)
         return config.toResponse()
     }
 
@@ -34,13 +35,14 @@ class EmployeeConfigService(
         userId: UUID,
         request: EmployeeConfigRequest,
     ): EmployeeConfigResponse {
-        val user = userRepository.findById(userId)
-            .orElseThrow { ResourceNotFoundException("User not found: $userId") }
+        val user =
+            userRepository.findById(userId)
+                .orElseThrow { ResourceNotFoundException("User not found: $userId") }
 
-        val config = employeeConfigRepository.findByUser_Id(userId)
-            ?: EmployeeConfigEntity(user = user)
-
-        val oldResponse = if (employeeConfigRepository.existsById(config.id)) config.toResponse() else null
+        val existingConfig = employeeConfigRepository.findByUserId(userId)
+        val isNew = existingConfig == null
+        val config = existingConfig ?: EmployeeConfigEntity(user = user)
+        val oldResponse = if (!isNew) config.toResponse() else null
 
         request.weeklyWorkHours?.let { config.weeklyWorkHours = it }
         request.dailyWorkHours?.let { config.dailyWorkHours = it }
@@ -58,19 +60,21 @@ class EmployeeConfigService(
 
     @Transactional
     private fun createDefaultConfig(userId: UUID): EmployeeConfigResponse {
-        val user = userRepository.findById(userId)
-            .orElseThrow { ResourceNotFoundException("User not found: $userId") }
+        val user =
+            userRepository.findById(userId)
+                .orElseThrow { ResourceNotFoundException("User not found: $userId") }
         val config = EmployeeConfigEntity(user = user)
         val saved = employeeConfigRepository.save(config)
         return saved.toResponse()
     }
 
     private fun EmployeeConfigEntity.toResponse(): EmployeeConfigResponse {
-        val workDaysList: List<Int> = try {
-            objectMapper.readValue(workDays)
-        } catch (e: Exception) {
-            listOf(1, 2, 3, 4, 5)
-        }
+        val workDaysList: List<Int> =
+            try {
+                objectMapper.readValue(workDays)
+            } catch (e: Exception) {
+                listOf(1, 2, 3, 4, 5)
+            }
         return EmployeeConfigResponse(
             id = id,
             userId = user.id,

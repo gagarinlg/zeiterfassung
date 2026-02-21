@@ -81,8 +81,7 @@ class TimeTrackingController(
     @PreAuthorize("hasAuthority('time.view.own')")
     fun getStatus(
         @AuthenticationPrincipal actorId: String,
-    ): ResponseEntity<TrackingStatusResponse> =
-        ResponseEntity.ok(timeTrackingService.getCurrentStatus(UUID.fromString(actorId)))
+    ): ResponseEntity<TrackingStatusResponse> = ResponseEntity.ok(timeTrackingService.getCurrentStatus(UUID.fromString(actorId)))
 
     @GetMapping("/today")
     @PreAuthorize("hasAuthority('time.view.own')")
@@ -105,8 +104,7 @@ class TimeTrackingController(
     fun getDailySummary(
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate,
         @AuthenticationPrincipal actorId: String,
-    ): ResponseEntity<DailySummaryResponse> =
-        ResponseEntity.ok(timeTrackingService.getDailySummary(UUID.fromString(actorId), date))
+    ): ResponseEntity<DailySummaryResponse> = ResponseEntity.ok(timeTrackingService.getDailySummary(UUID.fromString(actorId), date))
 
     @GetMapping("/summary/weekly")
     @PreAuthorize("hasAuthority('time.view.own')")
@@ -138,8 +136,7 @@ class TimeTrackingController(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) start: LocalDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) end: LocalDate,
         @AuthenticationPrincipal actorId: String,
-    ): ResponseEntity<TimeSheetResponse> =
-        ResponseEntity.ok(timeTrackingService.getTimeSheet(UUID.fromString(actorId), start, end))
+    ): ResponseEntity<TimeSheetResponse> = ResponseEntity.ok(timeTrackingService.getTimeSheet(UUID.fromString(actorId), start, end))
 
     @GetMapping("/manage/team/entries")
     @PreAuthorize("hasAuthority('time.view.team')")
@@ -147,8 +144,7 @@ class TimeTrackingController(
         @RequestParam userId: UUID,
         @RequestParam start: Instant,
         @RequestParam end: Instant,
-    ): ResponseEntity<List<TimeEntryResponse>> =
-        ResponseEntity.ok(timeTrackingService.getEntriesForUser(userId, start, end))
+    ): ResponseEntity<List<TimeEntryResponse>> = ResponseEntity.ok(timeTrackingService.getEntriesForUser(userId, start, end))
 
     @PostMapping("/manage/entry")
     @PreAuthorize("hasAuthority('time.edit.team')")
@@ -167,8 +163,7 @@ class TimeTrackingController(
         @PathVariable id: UUID,
         @Valid @RequestBody request: EditTimeEntryRequest,
         @AuthenticationPrincipal actorId: String,
-    ): ResponseEntity<TimeEntryResponse> =
-        ResponseEntity.ok(timeTrackingService.editTimeEntry(UUID.fromString(actorId), id, request))
+    ): ResponseEntity<TimeEntryResponse> = ResponseEntity.ok(timeTrackingService.editTimeEntry(UUID.fromString(actorId), id, request))
 
     @DeleteMapping("/manage/entry/{id}")
     @PreAuthorize("hasAuthority('time.edit.team')")

@@ -6,9 +6,12 @@ import java.time.LocalDate
 import java.util.UUID
 
 interface DailySummaryRepository : JpaRepository<DailySummaryEntity, UUID> {
-    fun findByUser_IdAndDate(userId: UUID, date: LocalDate): DailySummaryEntity?
+    fun findByUserIdAndDate(
+        userId: UUID,
+        date: LocalDate,
+    ): DailySummaryEntity?
 
-    fun findByUser_IdAndDateBetweenOrderByDateAsc(
+    fun findByUserIdAndDateBetweenOrderByDateAsc(
         userId: UUID,
         startDate: LocalDate,
         endDate: LocalDate,

@@ -12,16 +12,19 @@ data class ComplianceResult(
 @Service
 class ArbZGComplianceService {
     companion object {
-        const val MAX_WORK_MINUTES = 600   // §3 ArbZG: 10h absolute max
-        const val WARN_WORK_MINUTES = 480  // §3 ArbZG: 8h regular max
-        const val BREAK_THRESHOLD_1 = 360  // §4 ArbZG: >6h requires 30 min break
-        const val BREAK_THRESHOLD_2 = 540  // §4 ArbZG: >9h requires 45 min break
+        const val MAX_WORK_MINUTES = 600 // §3 ArbZG: 10h absolute max
+        const val WARN_WORK_MINUTES = 480 // §3 ArbZG: 8h regular max
+        const val BREAK_THRESHOLD_1 = 360 // §4 ArbZG: >6h requires 30 min break
+        const val BREAK_THRESHOLD_2 = 540 // §4 ArbZG: >9h requires 45 min break
         const val REQUIRED_BREAK_1 = 30
         const val REQUIRED_BREAK_2 = 45
-        const val MIN_REST_MINUTES = 660   // §5 ArbZG: 11h rest between shifts
+        const val MIN_REST_MINUTES = 660 // §5 ArbZG: 11h rest between shifts
     }
 
-    fun checkCompliance(workMinutes: Int, breakMinutes: Int): ComplianceResult {
+    fun checkCompliance(
+        workMinutes: Int,
+        breakMinutes: Int,
+    ): ComplianceResult {
         val notes = mutableListOf<String>()
         var compliant = true
 
@@ -48,7 +51,10 @@ class ArbZGComplianceService {
             else -> 0
         }
 
-    fun checkRestPeriod(previousDayLastEntry: Instant?, currentDayFirstEntry: Instant?): Boolean {
+    fun checkRestPeriod(
+        previousDayLastEntry: Instant?,
+        currentDayFirstEntry: Instant?,
+    ): Boolean {
         if (previousDayLastEntry == null || currentDayFirstEntry == null) return true
         val minutesBetween = ChronoUnit.MINUTES.between(previousDayLastEntry, currentDayFirstEntry)
         return minutesBetween >= MIN_REST_MINUTES

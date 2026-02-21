@@ -8,13 +8,13 @@ import java.time.Instant
 import java.util.UUID
 
 interface TimeEntryRepository : JpaRepository<TimeEntryEntity, UUID> {
-    fun findByUser_IdAndTimestampBetweenOrderByTimestampAsc(
+    fun findByUserIdAndTimestampBetweenOrderByTimestampAsc(
         userId: UUID,
         start: Instant,
         end: Instant,
     ): List<TimeEntryEntity>
 
-    fun findTopByUser_IdOrderByTimestampDesc(userId: UUID): TimeEntryEntity?
+    fun findTopByUserIdOrderByTimestampDesc(userId: UUID): TimeEntryEntity?
 
     @Query(
         """
@@ -25,7 +25,7 @@ interface TimeEntryRepository : JpaRepository<TimeEntryEntity, UUID> {
         ORDER BY e.timestamp ASC
         """,
     )
-    fun findByUser_IdAndDateRange(
+    fun findByUserIdAndDateRange(
         @Param("userId") userId: UUID,
         @Param("startOfDay") startOfDay: Instant,
         @Param("endOfDay") endOfDay: Instant,
