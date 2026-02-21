@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Zeiterfassung</string>
+    <string name="login">Anmelden</string>
+    <string name="logout">Abmelden</string>
+    <string name="email">E-Mail-Adresse</string>
+    <string name="password">Passwort</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="time_tracking">Zeiterfassung</string>
+    <string name="vacation">Urlaub</string>
+    <string name="clock_in">Einstempeln</string>
+    <string name="clock_out">Ausstempeln</string>
+    <string name="break_start">Pause beginnen</string>
+    <string name="break_end">Pause beenden</string>
+    <string name="today_hours">Heutige Stunden</string>
+    <string name="week_hours">Wochenstunden</string>
+    <string name="vacation_remaining">Verbleibender Urlaub</string>
+    <string name="error_login">Ungültige Anmeldedaten</string>
+    <string name="error_network">Netzwerkfehler. Bitte versuchen Sie es erneut.</string>
+    <string name="loading">Laden…</string>
+    <string name="save">Speichern</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="settings">Einstellungen</string>
+</resources>

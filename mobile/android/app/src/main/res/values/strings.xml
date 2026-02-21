@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Zeiterfassung</string>
+    <string name="login">Sign In</string>
+    <string name="logout">Sign Out</string>
+    <string name="email">Email Address</string>
+    <string name="password">Password</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="time_tracking">Time Tracking</string>
+    <string name="vacation">Vacation</string>
+    <string name="clock_in">Clock In</string>
+    <string name="clock_out">Clock Out</string>
+    <string name="break_start">Start Break</string>
+    <string name="break_end">End Break</string>
+    <string name="today_hours">Today\'s Hours</string>
+    <string name="week_hours">Weekly Hours</string>
+    <string name="vacation_remaining">Remaining Vacation</string>
+    <string name="error_login">Invalid credentials</string>
+    <string name="error_network">Network error. Please try again.</string>
+    <string name="loading">Loading…</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="settings">Settings</string>
+</resources>

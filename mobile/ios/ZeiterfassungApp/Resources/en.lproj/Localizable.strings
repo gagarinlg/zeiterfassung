@@ -1,0 +1,40 @@
+/* App */
+"app_name" = "Zeiterfassung";
+"app_tagline" = "Time Tracking System";
+
+/* Navigation */
+"nav_dashboard" = "Dashboard";
+"nav_time_tracking" = "Time Tracking";
+"nav_vacation" = "Vacation";
+"nav_profile" = "Profile";
+
+/* Auth */
+"auth_email" = "Email Address";
+"auth_password" = "Password";
+"auth_login_button" = "Sign In";
+"auth_login_error" = "Invalid credentials";
+"auth_logout" = "Sign Out";
+
+/* Dashboard */
+"dashboard_title" = "Dashboard";
+"dashboard_today_hours" = "Today's Hours";
+"dashboard_week_hours" = "Weekly Hours";
+"dashboard_vacation_remaining" = "Remaining Vacation";
+
+/* Time Tracking */
+"time_tracking_title" = "Time Tracking";
+"time_tracking_clock_in" = "Clock In";
+"time_tracking_clock_out" = "Clock Out";
+"time_tracking_break_start" = "Start Break";
+"time_tracking_break_end" = "End Break";
+
+/* Vacation */
+"vacation_title" = "Vacation";
+"vacation_request" = "Request Vacation";
+"vacation_remaining" = "Remaining Days";
+
+/* Common */
+"common_loading" = "Loading...";
+"common_error" = "Error";
+"common_save" = "Save";
+"common_cancel" = "Cancel";

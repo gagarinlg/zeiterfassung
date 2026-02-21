@@ -1,0 +1,84 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 2 * * 1"  # Weekly on Monday at 2 AM UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [java-kotlin, javascript-typescript]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        if: matrix.language == 'java-kotlin'
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: temurin
+          cache: gradle
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended
+
+      - name: Build backend for CodeQL (Java/Kotlin)
+        if: matrix.language == 'java-kotlin'
+        working-directory: backend
+        run: |
+          chmod +x gradlew
+          ./gradlew compileKotlin --no-daemon
+
+      - name: Autobuild (JavaScript/TypeScript)
+        if: matrix.language == 'javascript-typescript'
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:${{ matrix.language }}
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+  owasp-zap:
+    name: OWASP ZAP Scan (Placeholder)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - name: ZAP Scan placeholder
+        run: |
+          echo "OWASP ZAP scan will be activated when application is deployed to a staging environment."
+          echo "Configure ZAP_TARGET_URL secret and uncomment the ZAP action below."
+        # Uncomment when staging environment is available:
+        # - name: ZAP Baseline Scan
+        #   uses: zaproxy/action-baseline@v0.12.0
+        #   with:
+        #     target: ${{ secrets.ZAP_TARGET_URL }}
+        #     rules_file_name: .zap/rules.tsv
+        #     cmd_options: '-a'

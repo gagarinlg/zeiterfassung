@@ -1,0 +1,40 @@
+/* App */
+"app_name" = "Zeiterfassung";
+"app_tagline" = "Zeiterfassungssystem";
+
+/* Navigation */
+"nav_dashboard" = "Dashboard";
+"nav_time_tracking" = "Zeiterfassung";
+"nav_vacation" = "Urlaub";
+"nav_profile" = "Profil";
+
+/* Auth */
+"auth_email" = "E-Mail-Adresse";
+"auth_password" = "Passwort";
+"auth_login_button" = "Anmelden";
+"auth_login_error" = "Ungültige Anmeldedaten";
+"auth_logout" = "Abmelden";
+
+/* Dashboard */
+"dashboard_title" = "Dashboard";
+"dashboard_today_hours" = "Heutige Stunden";
+"dashboard_week_hours" = "Wochenstunden";
+"dashboard_vacation_remaining" = "Verbleibender Urlaub";
+
+/* Time Tracking */
+"time_tracking_title" = "Zeiterfassung";
+"time_tracking_clock_in" = "Einstempeln";
+"time_tracking_clock_out" = "Ausstempeln";
+"time_tracking_break_start" = "Pause beginnen";
+"time_tracking_break_end" = "Pause beenden";
+
+/* Vacation */
+"vacation_title" = "Urlaub";
+"vacation_request" = "Urlaub beantragen";
+"vacation_remaining" = "Verbleibende Tage";
+
+/* Common */
+"common_loading" = "Laden...";
+"common_error" = "Fehler";
+"common_save" = "Speichern";
+"common_cancel" = "Abbrechen";
