@@ -1,0 +1,56 @@
+[package]
+name = "zeiterfassung-terminal"
+version = "0.1.0"
+edition = "2021"
+authors = ["Zeiterfassung Team"]
+description = "Raspberry Pi 5 terminal application for time tracking via NFC/RFID"
+license = "MIT"
+
+[[bin]]
+name = "zeiterfassung-terminal"
+path = "src/main.rs"
+
+[dependencies]
+# GUI framework
+iced = { version = "0.12", features = ["tokio"] }
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# HTTP client
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Configuration
+toml = "0.8"
+
+# Date/time
+chrono = { version = "0.4", features = ["serde"] }
+
+# SQLite offline buffer
+rusqlite = { version = "0.31", features = ["bundled"] }
+
+# Audio feedback
+rodio = { version = "0.19", default-features = false, features = ["wav"] }
+
+# Logging
+log = "0.4"
+env_logger = "0.11"
+
+# Localization
+fluent = "0.16"
+fluent-bundle = "0.15"
+unic-langid = { version = "0.9", features = ["macros"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

@@ -1,0 +1,35 @@
+[display]
+resolution = "1024x600"
+fullscreen = true
+orientation = "landscape"
+theme = "dark"
+font_scale = 1.0
+idle_timeout_seconds = 8
+error_timeout_seconds = 5
+
+[api]
+base_url = "https://zeiterfassung.example.com/api"
+timeout_seconds = 10
+retry_attempts = 3
+
+[offline]
+buffer_path = "/var/lib/zeiterfassung/buffer.db"
+sync_interval_seconds = 30
+max_buffer_size = 10000
+
+[rfid]
+input_device = "auto"
+debounce_ms = 500
+
+[audio]
+enabled = true
+success_sound = "assets/sounds/success.wav"
+error_sound = "assets/sounds/error.wav"
+volume = 0.7
+
+[locale]
+language = "de"
+
+[company]
+name = "Firma GmbH"
+logo_path = "assets/logo.png"
