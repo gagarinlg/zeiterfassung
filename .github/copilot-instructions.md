@@ -522,3 +522,24 @@ Maintain comprehensive documentation in the `docs/` directory:
 10. **Fix all issues** — Fix every build error, test failure, lint violation, and pre-existing bug encountered during development — even if unrelated to the current task. Leave the codebase in a better state than you found it.
 11. **DSGVO / GDPR** — Employees must never be able to access other employees' personal time or vacation data. Every service method and endpoint that returns data about a user must verify that the requesting user is either the owner of that data, a manager of that user, or an admin.
 12. **Email notifications** — Notify relevant users on all important events (vacation requests, approvals, rejections, cancellations). Send monthly hours and vacation balance reports to all active employees and team summaries to managers.
+
+---
+
+## Project Phase Tracking (MANDATORY)
+
+Every PR that implements features or fixes bugs MUST update the project phase documentation:
+
+### Files to update:
+1. **`docs/PHASES.md`** — Update the relevant phase status, add details about what was delivered
+2. **`docs/CHANGELOG.md`** — Add entries under the appropriate phase/version section
+3. **`docs/CURRENT_STATE.md`** — Update the "What Works Right Now" section and "Next Steps"
+
+### Rules:
+- When starting work, ALWAYS read `docs/PHASES.md` and `docs/CURRENT_STATE.md` first to understand what exists
+- When completing a phase, mark it as ✅ COMPLETE with PR number and merge date
+- When starting a new phase, mark it as 🚧 IN PROGRESS
+- Always update the "Last updated" date in CURRENT_STATE.md
+- Keep CHANGELOG.md in reverse chronological order
+- If you add new features not covered by existing phases, add them to the appropriate phase or create a new phase
+- Include specific file paths and API endpoints in phase documentation
+- The documentation must be detailed enough that a completely new session (human or AI) can continue development without any other context
