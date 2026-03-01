@@ -45,4 +45,3 @@ struct VacationBalance: Codable, Identifiable {
     let carriedOverDays: Double
     let remainingDays: Double
 }
-

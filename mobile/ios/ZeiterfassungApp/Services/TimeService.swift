@@ -33,4 +33,3 @@ class TimeService: TimeServiceProtocol {
         return try await client.post("/time-entries/break/end", body: EmptyBody())
     }
 }
-

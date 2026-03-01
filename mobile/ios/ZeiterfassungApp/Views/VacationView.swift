@@ -104,4 +104,3 @@ private struct VacationRequestRow: View {
         }
     }
 }
-

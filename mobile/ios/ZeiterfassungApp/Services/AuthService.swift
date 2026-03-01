@@ -23,4 +23,3 @@ class AuthService: AuthServiceProtocol {
         let _: EmptyResponse = try await client.post("/auth/logout", body: EmptyBody())
     }
 }
-

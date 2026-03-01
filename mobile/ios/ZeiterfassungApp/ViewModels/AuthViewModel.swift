@@ -54,4 +54,3 @@ class AuthViewModel: ObservableObject {
         isAuthenticated = false
     }
 }
-

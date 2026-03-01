@@ -29,4 +29,3 @@ struct PageResponse<T: Codable>: Codable {
     let pageNumber: Int
     let pageSize: Int
 }
-

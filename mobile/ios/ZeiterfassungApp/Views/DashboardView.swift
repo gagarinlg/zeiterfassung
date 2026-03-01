@@ -111,4 +111,3 @@ private struct SummaryCard: View {
         .cornerRadius(12)
     }
 }
-

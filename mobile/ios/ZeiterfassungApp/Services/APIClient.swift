@@ -50,4 +50,3 @@ class APIClient {
         return try JSONDecoder().decode(T.self, from: data)
     }
 }
-
