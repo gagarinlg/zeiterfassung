@@ -63,7 +63,7 @@ final class VacationViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.isLoading)
         XCTAssertNil(viewModel.errorMessage)
         XCTAssertNotNil(viewModel.balance)
-        XCTAssertEqual(viewModel.balance?.remainingDays, balance.remainingDays, accuracy: 0.001)
+        XCTAssertEqual(viewModel.balance?.remainingDays ?? 0, balance.remainingDays, accuracy: 0.001)
         XCTAssertEqual(viewModel.requests.count, 1)
         XCTAssertEqual(viewModel.requests.first?.id, request.id)
     }
