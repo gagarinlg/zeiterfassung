@@ -2,7 +2,7 @@
 
 > Last updated: 2026-03-01
 >
-> **Current phase:** Phase 12 — Planned
+> **Current phase:** Phase 12 — Complete
 
 ---
 
@@ -514,13 +514,29 @@
 
 ---
 
-## Phase 12: Performance, Accessibility & API Documentation 🔲
-- **Status**: PLANNED
+## Phase 12: Performance, Accessibility & API Documentation ✅
+- **Status**: COMPLETE
 - **Priority**: MEDIUM
 
-### What needs to be built
-- **Performance optimization**: database indexing, query optimization, caching
+### What was built
+- **Performance optimization**: database indexing (23 indexes from prior phases), Spring caching
+  - ✅ `CacheConfig.kt` with `ConcurrentMapCacheManager` for `publicHolidays` and `systemSettings` caches
+  - ✅ `@Cacheable` on `VacationService.getPublicHolidays()` and `AdminService.getSystemSettings()`
+  - ✅ `@CacheEvict` on `AdminService.updateSystemSetting()` to invalidate cache on updates
 - **Accessibility**: WCAG 2.1 AA compliance
-- **Cross-browser testing**: compatibility verification across major browsers
-- **OpenAPI/Swagger annotations**: complete API documentation with annotations on all endpoints
-- **Architecture decision records**: document key technical decisions
+  - ✅ Skip-to-content link in `Layout.tsx` (screen reader visible, focused on tab)
+  - ✅ ARIA landmarks: `aria-label` on sidebar, `id="main-content"` on main element
+  - ✅ `aria-live="polite"` on loading states in `DashboardPage.tsx`
+  - ✅ `.focus-ring` reusable CSS utility class for `focus-visible` ring styles
+  - ✅ i18n keys for accessibility labels (`nav.skip_to_content`, `nav.sidebar`) in DE and EN
+- **Cross-browser testing**: Playwright config updated for Chromium, Firefox, and WebKit
+  - ✅ `playwright.config.ts` includes all three browsers in both CI and local environments
+- **OpenAPI/Swagger annotations**: complete API documentation
+  - ✅ `OpenApiConfig.kt` with `@OpenAPIDefinition` (title, description, version, 7 tags) and `@SecurityScheme` for JWT Bearer
+  - ✅ `@Tag`, `@Operation`, `@ApiResponse`, `@SecurityRequirement` on all 7 controllers (63 endpoints total)
+- **Architecture decision records**: 5 ADRs in `docs/architecture/decisions/`
+  - ✅ ADR-001: Spring Boot with Kotlin for Backend
+  - ✅ ADR-002: JWT-Based Authentication
+  - ✅ ADR-003: React with TypeScript for Frontend
+  - ✅ ADR-004: ArbZG Compliance Engine Design
+  - ✅ ADR-005: Rust for Raspberry Pi Terminal Application

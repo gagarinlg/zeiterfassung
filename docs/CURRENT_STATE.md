@@ -4,7 +4,7 @@
 
 ## Quick Summary
 
-Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–11 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, admin endpoints, TOTP 2FA, password reset flow, LDAP configuration, and manager substitute/deputy feature. The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright across all 7 frontend pages (62+ tests). Documentation includes user guide, administration guide, and 12 auto-generated screenshots.
+Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–12 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, admin endpoints, TOTP 2FA, password reset flow, LDAP configuration, manager substitute/deputy feature, Spring caching, and full OpenAPI/Swagger documentation. The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization, WCAG 2.1 AA accessibility, and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright across Chromium, Firefox, and WebKit. Documentation includes user guide, administration guide, 12 auto-generated screenshots, and 5 architecture decision records.
 
 ## What Works Right Now
 
@@ -36,6 +36,8 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Recursive subordinate listing: `GET /api/users/{id}/all-subordinates`
 - ✅ Manager substitute/deputy feature: configurable substitute with same rights for subordinates
 - ✅ Test email fix: proper mailEnabled check, dev profile uses env vars, SMTP timeouts
+- ✅ Spring caching: `CacheConfig.kt` with `ConcurrentMapCacheManager` for `publicHolidays` and `systemSettings` caches; `@Cacheable` on `VacationService.getPublicHolidays()` and `AdminService.getSystemSettings()`; `@CacheEvict` on `AdminService.updateSystemSetting()`
+- ✅ OpenAPI/Swagger: all 7 controllers annotated with `@Tag`, `@Operation`, `@ApiResponse`, `@SecurityRequirement`; `OpenApiConfig.kt` with API metadata and JWT security scheme
 
 ### Frontend (Fully Implemented)
 - ✅ Login page with validation and error handling
@@ -61,6 +63,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ TOTP 2FA setup with QR code in UserSettingsPage
 - ✅ LDAP configuration tab in AdminPage
 - ✅ Manager substitute dropdown in user management
+- ✅ WCAG 2.1 AA: skip-to-content link, ARIA landmarks, aria-live loading states, focus-visible utility
 - ✅ 25 new backend unit tests (TotpService, PasswordResetService, LdapService, EmailService)
 - ✅ 8 additional backend unit tests (TimeTrackingService break gap detection, VacationService setBalance/triggerCarryOver, NotificationService email dispatch)
 - ✅ Playwright screenshot generation (12 screenshots)
@@ -82,6 +85,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - iOS: push notifications, Face ID / Touch ID — not yet implemented
 
 ## Next Steps
-1. **Phase 12: Performance, Accessibility & API Documentation** — performance optimization, WCAG 2.1 AA accessibility, cross-browser testing, OpenAPI/Swagger annotations, architecture decision records
-2. Continue dependency updates (review and merge Dependabot PRs)
+1. Continue dependency updates (review and merge Dependabot PRs)
+2. Increase backend test coverage toward ≥90% target
+3. Mobile: push notifications, biometric auth, offline caching
 

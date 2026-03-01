@@ -3,9 +3,20 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased]
+## [Unreleased] — Phase 12: Performance, Accessibility & API Documentation (COMPLETE)
+
+### Improved
+- **WCAG 2.1 AA accessibility**: Added skip-to-content link in Layout.tsx, ARIA landmark on sidebar, `id="main-content"` on main element, `aria-live="polite"` on DashboardPage loading state, reusable `.focus-ring` CSS utility class, and i18n keys for accessibility labels (EN + DE)
 
 ### Added
+- **Spring caching**: `CacheConfig.kt` with `ConcurrentMapCacheManager` for `publicHolidays` and `systemSettings` caches; `@Cacheable` on `VacationService.getPublicHolidays()` and `AdminService.getSystemSettings()`; `@CacheEvict` on `AdminService.updateSystemSetting()` to invalidate cache on updates
+- **OpenAPI/Swagger annotations**: Added `@Tag`, `@Operation`, `@ApiResponse`, and `@SecurityRequirement` annotations to all 7 backend controllers (AuthController, AdminController, TerminalController, EmployeeConfigController, TimeTrackingController, UserController, VacationController)
+- **OpenApiConfig.kt**: New configuration class with `@OpenAPIDefinition` (title, description, version, tags) and `@SecurityScheme` for JWT Bearer authentication
+- **Cross-browser testing**: Playwright config updated to run tests on Chromium, Firefox, and WebKit in all environments
+- **Architecture Decision Records**: 5 ADRs in `docs/architecture/decisions/` (Spring Boot, JWT auth, React frontend, ArbZG compliance, Rust terminal)
+
+### Changed
+- Phase 12 status: PLANNED → COMPLETE
 - **Break gap detection**: Gaps ≥15 min between CLOCK_OUT and next CLOCK_IN on the same day are now treated as qualifying breaks (ArbZG §4)
 - **Vacation balance management**: Admin can manually set vacation balance via PUT /vacation/balance/{userId} (totalDays, usedDays, carriedOverDays)
 - **Vacation carry-over endpoint**: Admin can trigger carry-over calculation via POST /vacation/balance/{userId}/carry-over

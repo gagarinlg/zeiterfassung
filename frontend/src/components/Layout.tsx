@@ -15,7 +15,13 @@ export default function Layout() {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <aside className="w-64 bg-white shadow-md flex flex-col">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary-700 focus:text-white"
+      >
+        {t('nav.skip_to_content')}
+      </a>
+      <aside className="w-64 bg-white shadow-md flex flex-col" aria-label={t('nav.sidebar')}>
         <div className="p-6 border-b">
           <h1 className="text-xl font-bold text-primary-700">{t('app.name')}</h1>
           <p className="text-sm text-gray-500">{t('app.tagline')}</p>
@@ -109,7 +115,7 @@ export default function Layout() {
           </button>
         </div>
       </aside>
-      <main className="flex-1 overflow-auto">
+      <main id="main-content" className="flex-1 overflow-auto">
         <Outlet />
       </main>
     </div>
