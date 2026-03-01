@@ -451,10 +451,32 @@
 - GET /api/admin/ldap, PUT /api/admin/ldap
 
 ### What still needs to be built
-- Frontend UI for TOTP setup/disable
-- Frontend password reset page
+- Frontend UI for TOTP setup/disable (toggle in UserSettingsPage)
 - Frontend LDAP configuration page in admin panel
 - Unit tests for TotpService, PasswordResetService, LdapService
+
+### Frontend delivered (Phase 10)
+- UserSettingsPage: display preferences (date/time format) and password change with confirmation
+- Password reset flow: PasswordResetRequestPage + PasswordResetConfirmPage
+- Login TOTP code support: shown on 401 with TOTP-required error
+- Admin UserModal: manager dropdown (filtered to MANAGER/ADMIN roles), always-visible employee number
+- Admin ResetPasswordModal: confirm password field with mismatch validation
+- AuthContext: refreshUser method for re-fetching user after profile update
+- Layout: Settings nav link with UserCog icon
+- Routes: /settings, /forgot-password, /reset-password
+- i18n: all new keys for auth, nav, settings, users (DE + EN)
+
+### Key frontend files
+- `frontend/src/pages/UserSettingsPage.tsx` — user preferences and password change
+- `frontend/src/pages/PasswordResetRequestPage.tsx` — request password reset email
+- `frontend/src/pages/PasswordResetConfirmPage.tsx` — confirm password reset with token
+- `frontend/src/pages/LoginPage.tsx` — TOTP code field, forgot password link
+- `frontend/src/pages/AdminPage.tsx` — manager dropdown, employee number, confirm password
+- `frontend/src/services/adminService.ts` — LDAP config, updateOwnProfile, changeOwnPassword
+- `frontend/src/services/authService.ts` — TOTP and password reset methods
+- `frontend/src/context/AuthContext.tsx` — refreshUser method
+- `frontend/src/components/Layout.tsx` — Settings nav link
+- `frontend/src/App.tsx` — new routes
 
 ### Depends on
 - Phase 2 (auth/users) ✅

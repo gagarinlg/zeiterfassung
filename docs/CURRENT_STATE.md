@@ -1,6 +1,6 @@
 # Current Project State
 
-> Last updated: 2026-03-01
+> Last updated: 2026-03-02
 
 ## Quick Summary
 
@@ -46,6 +46,13 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Time Tracking page: full implementation (status, clock in/out/break, live timer, today's entries list, monthly timesheet, CSV export)
 - ✅ Admin page: 3-tab UI (User Management, Audit Log, System Settings) with full CRUD, search, modals
 - ✅ Date/calendar localization: `dateUtils.ts` utility with `formatDate`, `formatTime`, `formatDateTime`, `formatMonthYear` using date-fns locales; `DateFormatContext` for per-user date/time format preferences; all pages (Dashboard, TimeTracking, Vacation) use localized date formatting
+- ✅ User Settings page: display preferences (date/time format) and password change with confirmation
+- ✅ Password reset flow: request page and confirm page with token
+- ✅ TOTP 2FA support on login page (shown after TOTP-required error)
+- ✅ Admin UserModal: manager assignment dropdown, always-visible employee number
+- ✅ Admin ResetPasswordModal: confirm password field
+- ✅ Forgot password link on login page
+- ✅ Settings nav link in sidebar
 - ✅ Unit tests: 59 tests total (LoginPage, AuthContext, ProtectedRoute, AdminPage, dateUtils)
 - ✅ E2E tests: 62+ Playwright tests covering all 7 pages (login, navigation, dashboard, time-tracking, vacation, vacation-approval, admin)
 - ✅ CI: E2E testing with Playwright (Chromium) integrated into GitHub Actions workflow

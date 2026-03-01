@@ -18,6 +18,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - **UserResponse extended**: `totpEnabled` field added to `UserResponse`
 - **UpdateUserRequest extended**: `employeeNumber` field added for admin updates
 - **SecurityConfig**: password reset endpoints added to public paths
+- **Frontend: UserSettingsPage** (`/settings`): display preferences and password change with confirmation
+- **Frontend: PasswordResetRequestPage** (`/forgot-password`): request password reset email
+- **Frontend: PasswordResetConfirmPage** (`/reset-password`): confirm password reset with token
+- **Frontend: LoginPage TOTP**: TOTP code input shown on 401 TOTP-required; forgot password link
+- **Frontend: AdminPage**: manager dropdown, always-visible employee number, confirm password in reset modal
+- **Frontend: AuthContext**: `refreshUser` method; Settings nav link in sidebar
+- **Frontend: Services**: LDAP config, updateOwnProfile, changeOwnPassword, TOTP, password reset APIs
+- **Frontend: i18n**: auth reset, TOTP, settings, nav keys for DE and EN
 
 ## [Unreleased] — Phase 9: Testing & Security Hardening (COMPLETE)
 
