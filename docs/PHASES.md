@@ -2,7 +2,7 @@
 
 > Last updated: 2026-03-01
 >
-> **Current phase:** Phase 10 (Security Features & LDAP Integration) — IN PROGRESS
+> **Current phase:** Phase 12 — Planned
 
 ---
 
@@ -420,8 +420,8 @@
 
 ---
 
-## Phase 10: Security Features & LDAP Integration 🚧
-- **Status**: IN PROGRESS
+## Phase 10: Security Features & LDAP Integration ✅
+- **Status**: COMPLETE
 - **Priority**: HIGH
 
 ### What has been delivered
@@ -434,6 +434,11 @@
 - **Auth enhancements**: TOTP verification during login, password confirmation validation
 - **New DTOs**: TOTP, password reset, LDAP configuration
 - **SecurityConfig**: public password reset endpoints
+- **Frontend UI for TOTP setup/disable with QR code (UserSettingsPage)** ✅
+- **Frontend LDAP configuration page in admin panel (new tab)** ✅
+- **Unit tests**: TotpServiceTest (8), PasswordResetServiceTest (7), LdapServiceTest (5), EmailServiceTest (5) = 25 new tests ✅
+- **Manager substitute/deputy feature**: V9 migration (substitute_id), UserEntity, DTOs, service access checks, frontend UI ✅
+- **Test email 500 fix**: mailEnabled check, dev profile mail config fix, SMTP timeouts ✅
 
 ### Key files
 - `backend/src/main/resources/db/migration/V8__add_totp_and_password_reset.sql`
@@ -442,6 +447,12 @@
 - `backend/src/main/kotlin/com/zeiterfassung/service/TotpService.kt`
 - `backend/src/main/kotlin/com/zeiterfassung/service/PasswordResetService.kt`
 - `backend/src/main/kotlin/com/zeiterfassung/service/LdapService.kt`
+- `backend/src/test/kotlin/com/zeiterfassung/service/TotpServiceTest.kt`
+- `backend/src/test/kotlin/com/zeiterfassung/service/PasswordResetServiceTest.kt`
+- `backend/src/test/kotlin/com/zeiterfassung/service/LdapServiceTest.kt`
+- `backend/src/test/kotlin/com/zeiterfassung/service/EmailServiceTest.kt`
+- `frontend/src/pages/UserSettingsPage.tsx` (TOTP with QR code)
+- `frontend/src/pages/AdminPage.tsx` (LDAP tab, substitute dropdown)
 
 ### Key API endpoints
 - POST /api/auth/totp/setup, /totp/enable, /totp/disable
@@ -450,10 +461,10 @@
 - GET /api/users/{id}/all-subordinates
 - GET /api/admin/ldap, PUT /api/admin/ldap
 
-### What still needs to be built
-- Frontend UI for TOTP setup/disable (toggle in UserSettingsPage)
-- Frontend LDAP configuration page in admin panel
-- Unit tests for TotpService, PasswordResetService, LdapService
+### What was completed (previously "still needs to be built")
+- Frontend UI for TOTP setup/disable with QR code (UserSettingsPage) ✅
+- Frontend LDAP configuration page in admin panel (new tab) ✅
+- Unit tests for TotpService, PasswordResetService, LdapService, EmailService ✅
 
 ### Frontend delivered (Phase 10)
 - UserSettingsPage: display preferences (date/time format) and password change with confirmation
@@ -484,16 +495,32 @@
 
 ---
 
-## Phase 11: Documentation & Polish 🔲
+## Phase 11: Documentation & Polish ✅
+- **Status**: COMPLETE
+- **Priority**: MEDIUM
+
+### What was delivered
+- **Playwright screenshot generation spec**: `e2e/tests/screenshots.spec.ts` — generates 12 documentation screenshots across all pages
+- **12 documentation screenshots** in `docs/screenshots/` (login, dashboard, time tracking, vacation, admin, settings, password reset)
+- **User Guide**: `docs/user-guide/README.md` — comprehensive guide with annotated screenshots
+- **Administration Guide**: `docs/administration/README.md` — admin panel, email config, security, terminal management
+- **Manager substitute feature documentation**
+
+### Key files
+- `e2e/tests/screenshots.spec.ts`
+- `docs/screenshots/` (12 PNG screenshots)
+- `docs/user-guide/README.md`
+- `docs/administration/README.md`
+
+---
+
+## Phase 12: Performance, Accessibility & API Documentation 🔲
 - **Status**: PLANNED
 - **Priority**: MEDIUM
 
 ### What needs to be built
-- **User documentation**: with Playwright screenshots
-- **Admin documentation**: configuration guide
-- **API documentation**: complete OpenAPI/Swagger annotations
-- **Installation guide**: complete with Docker, development, production, terminal, and mobile setup
-- **Architecture decision records**: document key technical decisions
 - **Performance optimization**: database indexing, query optimization, caching
 - **Accessibility**: WCAG 2.1 AA compliance
-- **Browser testing**: cross-browser compatibility
+- **Cross-browser testing**: compatibility verification across major browsers
+- **OpenAPI/Swagger annotations**: complete API documentation with annotations on all endpoints
+- **Architecture decision records**: document key technical decisions

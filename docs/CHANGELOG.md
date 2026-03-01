@@ -3,7 +3,18 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased] — Phase 10: Security Features & LDAP Integration
+## [Unreleased] — Phase 11: Documentation & Polish (COMPLETE)
+
+### Added
+- **Playwright screenshot spec**: `e2e/tests/screenshots.spec.ts` — generates 12 documentation screenshots across all pages
+- **Documentation screenshots**: 12 PNG screenshots in `docs/screenshots/` (login, dashboard, time tracking, vacation, admin, settings, password reset)
+- **User Guide**: `docs/user-guide/README.md` — comprehensive guide with annotated screenshots
+- **Administration Guide**: `docs/administration/README.md` — admin panel, email config, security, terminal management
+
+### Changed
+- Phase 11 status: PLANNED → COMPLETE
+
+## [Unreleased] — Phase 10: Security Features & LDAP Integration (COMPLETE)
 
 ### Added
 - **V8 Flyway migration**: TOTP columns on users table (`totp_secret`, `totp_enabled`), `password_reset_tokens` table, LDAP configuration settings in `system_settings`
@@ -26,6 +37,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - **Frontend: AuthContext**: `refreshUser` method; Settings nav link in sidebar
 - **Frontend: Services**: LDAP config, updateOwnProfile, changeOwnPassword, TOTP, password reset APIs
 - **Frontend: i18n**: auth reset, TOTP, settings, nav keys for DE and EN
+- **Manager substitute feature**: V9 Flyway migration (substitute_id), UserEntity, DTOs, access check updates in TimeTrackingService & VacationService, UserService substitute helpers, Admin UI dropdown
+- **TOTP 2FA QR code**: `qrcode.react` dependency for rendering QR codes in UserSettingsPage
+- **LDAP admin tab**: New tab in AdminPage with full LDAP/AD configuration form (17 fields)
+- **Backend unit tests**: TotpServiceTest (8), PasswordResetServiceTest (7), LdapServiceTest (5), EmailServiceTest (5) = 25 new tests
+- **i18n**: TOTP, LDAP, and substitute keys in both DE and EN
+
+### Fixed
+- **Test email 500 error**: `sendTestMail()` now checks `mailEnabled` flag before attempting to send
+- **Dev profile mail config**: Changed hardcoded SMTP values to env var placeholders so MAIL_HOST, MAIL_PORT etc. work in development
+- **SMTP timeouts**: Added 5-second connection/read/write timeouts to prevent hanging connections
 
 ## [Unreleased] — Phase 9: Testing & Security Hardening (COMPLETE)
 
