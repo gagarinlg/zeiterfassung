@@ -175,4 +175,56 @@ mod tests {
         assert_eq!(config.resolution_width(), 1024);
         assert_eq!(config.resolution_height(), 600);
     }
+
+    #[test]
+    fn test_load_from_toml_string() {
+        let toml_str = r#"
+[display]
+resolution = "800x480"
+fullscreen = false
+orientation = "portrait"
+theme = "light"
+font_scale = 1.2
+idle_timeout_seconds = 10
+error_timeout_seconds = 3
+
+[api]
+base_url = "https://example.com/api"
+timeout_seconds = 15
+retry_attempts = 5
+
+[offline]
+buffer_path = "/tmp/test.db"
+sync_interval_seconds = 60
+max_buffer_size = 500
+
+[rfid]
+input_device = "auto"
+debounce_ms = 300
+
+[audio]
+enabled = false
+success_sound = "assets/sounds/ok.wav"
+error_sound = "assets/sounds/fail.wav"
+volume = 0.5
+
+[locale]
+language = "en"
+
+[company]
+name = "Test GmbH"
+logo_path = "assets/test-logo.png"
+"#;
+        let config: AppConfig = toml::from_str(toml_str).expect("failed to parse TOML");
+        assert_eq!(config.display.resolution, "800x480");
+        assert_eq!(config.display.resolution_width(), 800);
+        assert_eq!(config.display.resolution_height(), 480);
+        assert!(!config.display.fullscreen);
+        assert_eq!(config.display.theme, "light");
+        assert_eq!(config.api.base_url, "https://example.com/api");
+        assert_eq!(config.api.retry_attempts, 5);
+        assert!(!config.audio.enabled);
+        assert_eq!(config.locale.language, "en");
+        assert_eq!(config.company.name, "Test GmbH");
+    }
 }

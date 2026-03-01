@@ -242,18 +242,27 @@
 
 ---
 
-## Phase 6: Terminal (Raspberry Pi) Full Integration 🔲
-- **Status**: PLANNED
+## Phase 6: Terminal (Raspberry Pi) Full Integration 🚧
+- **Status**: IN PROGRESS
 - **Priority**: MEDIUM
 
-### What needs to be built
-- **Terminal API endpoint**: POST /api/terminal/clock (RFID-based clock in/out)
-- **Terminal service**: look up user by RFID tag, create time entry, return employee info
-- **Terminal UI completion**: implement full iced screens (Idle → scan → ClockIn/ClockOut/Error)
-- **Offline buffering**: complete SQLite buffer sync with backend
-- **Audio feedback**: success/error sounds on scan
-- **Network resilience**: automatic retry, offline queue processing
-- **Terminal configuration**: admin page for managing terminals
+### What was delivered (terminal Rust app — this PR)
+- **Full iced 0.12.1 Application**: `terminal/src/ui/mod.rs` — complete state machine
+  (Idle → Loading → ClockIn/ClockOut/OfflineConfirm/Error → Idle) with auto-return timers
+- **Screen views**: `terminal/src/ui/screens.rs` — all 6 screens with colour-coded layouts
+  (green clock-in, red clock-out, amber offline/error)
+- **RFID subscription**: async iced subscription polling `RfidReader` at 50 ms intervals
+- **API fix**: `#[serde(rename_all = "camelCase")]` on all request/response structs;
+  endpoint corrected to `POST /terminal/scan`
+- **Offline buffering**: network errors trigger SQLite buffer; auto-sync every
+  `sync_interval_seconds` via `iced::time::every` subscription
+- **Audio**: rodio 0.22 `DeviceSinkBuilder` + `Player` wired in for success/error sounds
+- **Tests**: 14 tests — api serialisation, buffer CRUD & max-size, config TOML parsing
+
+### Still needs to be built
+- **Backend endpoint**: POST /api/terminal/scan (RFID-based clock in/out)
+- **Backend service**: look up user by RFID tag, create time entry, return employee info
+- **Terminal admin UI**: web page for managing terminals and viewing heartbeat status
 - **Terminal health monitoring**: heartbeat endpoint, admin status view
 
 ### Depends on

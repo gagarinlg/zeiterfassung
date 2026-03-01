@@ -1,6 +1,6 @@
 # Current Project State
 
-> Last updated: 2026-03-01
+> Last updated: 2026-03-01 (terminal Rust app implemented)
 
 ## Quick Summary
 
@@ -39,10 +39,15 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ⚠️ Android: navigation + placeholder screens
 - ⚠️ iOS: tab view + placeholder views
 
-### Terminal (Scaffolded Only)
-- ⚠️ Rust app compiles with iced GUI, reqwest, rusqlite
-- ⚠️ Config parsing works, RFID reader module exists
-- ⚠️ API client and buffer modules exist but need backend integration
+### Terminal (Rust app — Phase 6 in progress)
+- ✅ Full iced 0.12.1 Application with complete state machine (Idle/Loading/ClockIn/ClockOut/OfflineConfirm/Error)
+- ✅ All 6 screens implemented with colour-coded views (green/red/amber)
+- ✅ RFID subscription (async iced subscription via `subscription::channel`)
+- ✅ Offline SQLite buffering with auto-sync (`iced::time::every`)
+- ✅ Audio feedback (rodio 0.22 `DeviceSinkBuilder` + `Player`)
+- ✅ `POST /terminal/scan` API call with camelCase JSON serialisation
+- ✅ 14 unit tests (api, buffer, config)
+- ⚠️ Backend endpoint `POST /api/terminal/scan` not yet implemented
 
 ## Tech Debt / Known Issues
 - Admin page is a placeholder (Phase 8)
@@ -50,9 +55,9 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - Frontend test coverage targets (≥85%) not yet fully verified
 - E2E Playwright tests need expansion
 - Mobile apps are scaffold-only (Phase 7)
-- Terminal needs full iced screen implementation and backend integration (Phase 6)
+- Terminal needs full iced screen implementation and backend integration (Phase 6) — **terminal Rust app done; backend endpoint pending**
 
 ## Next Steps
-1. **Phase 6: Terminal (Raspberry Pi) Full Integration** — complete terminal API endpoint, full iced screens, offline buffering
+1. **Phase 6: Terminal backend endpoint** — implement `POST /api/terminal/scan` in Spring Boot (RFID lookup → time entry → ClockResponse)
 2. **Phase 8: Admin Panel** — replace admin placeholder with full user/role/settings management UI
 3. Continue dependency updates (review and merge Dependabot PRs)

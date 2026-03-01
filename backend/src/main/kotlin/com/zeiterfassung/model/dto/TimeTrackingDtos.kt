@@ -122,7 +122,7 @@ data class TerminalScanRequest(
 
 data class TerminalScanResponse(
     val employee: EmployeeInfo,
-    val action: String,
+    val entryType: String,
     val timestamp: Instant,
     val todayWorkMinutes: Int,
     val todayBreakMinutes: Int,

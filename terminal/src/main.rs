@@ -1,7 +1,3 @@
-// The terminal application is currently in the scaffold phase (see docs/PHASES.md Phase 6).
-// Many modules define structs and functions that are not yet wired up to main().
-// TODO: Remove this allowance once all scaffold modules are integrated into main() in Phase 6.
-#![allow(dead_code)]
 mod api;
 mod audio;
 mod buffer;

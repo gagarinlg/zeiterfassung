@@ -7,8 +7,34 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ### Planned
 - Phase 5 (continued): Charts, admin dashboard, reports page
-- Phase 6: Terminal (Raspberry Pi) Full Integration
+- Phase 6: Terminal backend endpoint (`POST /api/terminal/scan`)
 - Phase 7: Mobile Apps Full Implementation
+
+## [Phase 6 - terminal Rust app] - 2026-03-01
+
+### Added (terminal/)
+- `src/ui/mod.rs`: Full iced 0.12.1 `Application` implementation
+  - State machine: `Idle` → `Loading` → `ClockIn` / `ClockOut` / `OfflineConfirm` / `Error` → `Idle`
+  - Auto-return timers using `iced::time::every` (1 s ticks, configurable timeouts)
+  - Async scan command via `Command::perform` → `POST /terminal/scan`
+  - RFID subscription via `iced::subscription::channel` polling `RfidReader` at 50 ms
+  - Background sync subscription triggered every `sync_interval_seconds`
+- `src/ui/screens.rs`: Six screen view functions with colour-coded backgrounds
+  - `idle_view` — clock, company name, offline banner
+  - `loading_view` — "Verarbeitung…" spinner text
+  - `clock_in_view` — green, employee name, timestamp, countdown
+  - `clock_out_view` — red, hours worked, break time, overtime, remaining vacation
+  - `offline_confirm_view` — amber, buffered-locally message
+  - `error_view` — amber, error type and message
+- 14 unit tests across `api`, `buffer`, and `config` modules
+
+### Fixed
+- `src/api/mod.rs`: Added `#[serde(rename_all = "camelCase")]` to `EmployeeInfo`,
+  `ClockResponse`, and `ClockRequest`; changed endpoint from `/terminal/clock` to
+  `/terminal/scan`
+- `src/audio/mod.rs`: Explicit `drop(handle)` after playback to keep audio device
+  alive until sound finishes
+- `src/main.rs`: Removed `#![allow(dead_code)]` scaffold placeholder
 
 ## [Phase 5 - partial] - 2026-02-22
 

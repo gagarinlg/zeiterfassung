@@ -30,8 +30,8 @@ impl AudioPlayer {
         let path = path.to_string();
         let volume = self.config.volume;
 
-        std::thread::spawn(
-            move || match rodio::DeviceSinkBuilder::open_default_sink() {
+        std::thread::spawn(move || {
+            match rodio::DeviceSinkBuilder::open_default_sink() {
                 Ok(handle) => {
                     let player = Player::connect_new(handle.mixer());
                     player.set_volume(volume);
@@ -49,9 +49,11 @@ impl AudioPlayer {
                         }
                         Err(e) => warn!("Failed to open audio file {}: {}", path, e),
                     }
+                    // Keep handle alive until playback is done (drops here)
+                    drop(handle);
                 }
                 Err(e) => warn!("Failed to initialize audio output: {}", e),
-            },
-        );
+            }
+        });
     }
 }
