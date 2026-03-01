@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, ClipboardList, Settings, Plus, Edit, Trash2, Key, Wifi } from 'lucide-react'
+import { Users, ClipboardList, Settings, Plus, Edit, Trash2, Key, Wifi, Mail } from 'lucide-react'
 import adminService from '../services/adminService'
 import type { AuditLogEntry, SystemSetting, CreateUserPayload, UpdateUserPayload } from '../services/adminService'
 import type { User } from '../types'
@@ -688,6 +688,9 @@ function SettingsTab() {
   const [error, setError] = useState<string | null>(null)
   const [editing, setEditing] = useState<{ key: string; value: string } | null>(null)
   const [saving, setSaving] = useState(false)
+  const [testMailEmail, setTestMailEmail] = useState('')
+  const [testMailSending, setTestMailSending] = useState(false)
+  const [testMailResult, setTestMailResult] = useState<{ status: 'ok' | 'error'; message: string } | null>(null)
 
   const loadSettings = useCallback(async () => {
     setLoading(true)
@@ -720,8 +723,23 @@ function SettingsTab() {
     }
   }
 
+  const handleSendTestMail = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setTestMailSending(true)
+    setTestMailResult(null)
+    try {
+      const result = await adminService.sendTestMail(testMailEmail)
+      setTestMailResult({ status: 'ok', message: result.message })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : t('admin.errors.save_failed')
+      setTestMailResult({ status: 'error', message: msg })
+    } finally {
+      setTestMailSending(false)
+    }
+  }
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {error && <ErrorBanner message={error} />}
       {loading ? (
         <LoadingSpinner />
@@ -775,6 +793,48 @@ function SettingsTab() {
           </table>
         </div>
       )}
+
+      {/* Test Mail */}
+      <div className="bg-white rounded-xl border p-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <Mail size={16} />
+          {t('admin.settings.test_mail')}
+        </h3>
+        <p className="text-xs text-gray-500 mb-4">{t('admin.settings.test_mail_description')}</p>
+        <form onSubmit={handleSendTestMail} className="flex items-end gap-3">
+          <div className="flex-1">
+            <label htmlFor="test-mail-email" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('common.email')}
+            </label>
+            <input
+              id="test-mail-email"
+              type="email"
+              value={testMailEmail}
+              onChange={(e) => setTestMailEmail(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 text-sm"
+              placeholder="admin@example.com"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={testMailSending}
+            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 disabled:opacity-50 whitespace-nowrap"
+          >
+            <Mail size={14} />
+            {testMailSending ? t('common.loading') : t('admin.settings.send_test')}
+          </button>
+        </form>
+        {testMailResult && (
+          <div className={`mt-3 p-3 rounded-lg text-sm ${
+            testMailResult.status === 'ok'
+              ? 'bg-green-50 border border-green-200 text-green-700'
+              : 'bg-red-50 border border-red-200 text-red-700'
+          }`}>
+            {testMailResult.message}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

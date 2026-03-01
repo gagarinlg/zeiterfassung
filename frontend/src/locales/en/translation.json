@@ -202,7 +202,10 @@
     "settings": {
       "key": "Setting Key",
       "value": "Value",
-      "description": "Description"
+      "description": "Description",
+      "test_mail": "Email Test",
+      "test_mail_description": "Send a test email to verify that the email configuration is working correctly.",
+      "send_test": "Send Test Email"
     },
     "reports": "Reports",
     "audit": {

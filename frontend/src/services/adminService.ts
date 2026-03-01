@@ -103,6 +103,10 @@ const adminService = {
   // Self-service password change
   changeOwnPassword: (userId: string, currentPassword: string, newPassword: string, confirmPassword: string) =>
     apiClient.put(`/users/${userId}/password`, { currentPassword, newPassword, confirmPassword }).then((r) => r.data),
+
+  // Test mail
+  sendTestMail: (recipientEmail: string) =>
+    apiClient.post<{ status: string; message: string }>('/admin/mail/test', { recipientEmail }).then((r) => r.data),
 }
 
 export default adminService

@@ -26,3 +26,7 @@ data class SystemSettingResponse(
 data class UpdateSystemSettingRequest(
     val value: String,
 )
+
+data class TestMailRequest(
+    val recipientEmail: String,
+)

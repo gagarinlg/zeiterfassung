@@ -4,9 +4,11 @@ import com.zeiterfassung.model.dto.AuditLogResponse
 import com.zeiterfassung.model.dto.LdapConfigResponse
 import com.zeiterfassung.model.dto.PageResponse
 import com.zeiterfassung.model.dto.SystemSettingResponse
+import com.zeiterfassung.model.dto.TestMailRequest
 import com.zeiterfassung.model.dto.UpdateLdapConfigRequest
 import com.zeiterfassung.model.dto.UpdateSystemSettingRequest
 import com.zeiterfassung.service.AdminService
+import com.zeiterfassung.service.EmailService
 import com.zeiterfassung.service.LdapService
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -15,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -28,6 +31,7 @@ import java.util.UUID
 class AdminController(
     private val adminService: AdminService,
     private val ldapService: LdapService,
+    private val emailService: EmailService,
 ) {
     @GetMapping("/audit-log")
     fun getAuditLog(
@@ -67,4 +71,15 @@ class AdminController(
     fun updateLdapConfig(
         @RequestBody request: UpdateLdapConfigRequest,
     ): ResponseEntity<LdapConfigResponse> = ResponseEntity.ok(ldapService.updateLdapConfig(request))
+
+    @PostMapping("/mail/test")
+    fun sendTestMail(
+        @RequestBody request: TestMailRequest,
+    ): ResponseEntity<Map<String, String>> =
+        try {
+            emailService.sendTestMail(request.recipientEmail)
+            ResponseEntity.ok(mapOf("status" to "ok", "message" to "Test email sent successfully"))
+        } catch (e: Exception) {
+            ResponseEntity.status(500).body(mapOf("status" to "error", "message" to (e.message ?: "Unknown error")))
+        }
 }

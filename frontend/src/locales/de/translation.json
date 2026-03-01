@@ -202,7 +202,10 @@
     "settings": {
       "key": "Einstellungsschlüssel",
       "value": "Wert",
-      "description": "Beschreibung"
+      "description": "Beschreibung",
+      "test_mail": "E-Mail-Test",
+      "test_mail_description": "Senden Sie eine Test-E-Mail, um zu überprüfen, ob die E-Mail-Konfiguration korrekt funktioniert.",
+      "send_test": "Test-E-Mail senden"
     },
     "reports": "Berichte",
     "audit": {
