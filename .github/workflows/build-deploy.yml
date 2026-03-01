@@ -164,25 +164,25 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Download terminal binary
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: terminal-arm64
           path: ./artifacts/
 
       - name: Download Android release APK
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: android-release-apk
           path: ./artifacts/android/
 
       - name: Download Android release AAB
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: android-release-aab
           path: ./artifacts/android/
 
       - name: Download iOS release build
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ios-release-build
           path: ./artifacts/ios/
