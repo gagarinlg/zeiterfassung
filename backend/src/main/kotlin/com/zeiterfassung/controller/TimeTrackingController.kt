@@ -195,7 +195,7 @@ class TimeTrackingController(
     ) {
         val userId = UUID.fromString(actorId)
         val sheet = timeTrackingService.getTimeSheet(userId, start, end)
-        response.setHeader("Content-Disposition", "attachment; filename=\"timesheet_${start}_${end}.csv\"")
+        response.setHeader("Content-Disposition", "attachment; filename=\"timesheet_$start-$end.csv\"")
         val writer = response.writer
         writer.println("Date,Work Minutes,Break Minutes,Overtime Minutes,Compliant,Notes")
         sheet.dailySummaries.forEach { summary ->
@@ -204,10 +204,18 @@ class TimeTrackingController(
             // - Neutralise formula-injection prefixes (=, +, -, @, TAB, CR/LF) by
             //   prepending a space, so spreadsheet applications won't interpret the
             //   cell value as a formula.
-            val notes = (summary.complianceNotes ?: "")
-                .replace("\"", "\"\"")
-                .let { if (it.isNotEmpty() && it[0] in setOf('=', '+', '-', '@', '\t', '\r', '\n')) " $it" else it }
-            writer.println("${summary.date},${summary.totalWorkMinutes},${summary.totalBreakMinutes},${summary.overtimeMinutes},${summary.isCompliant},\"$notes\"")
+            val rawNotes = summary.complianceNotes ?: ""
+            val escapedNotes = rawNotes.replace("\"", "\"\"")
+            val safeNotes =
+                if (escapedNotes.isNotEmpty() && escapedNotes[0] in setOf('=', '+', '-', '@', '\t', '\r', '\n')) {
+                    " $escapedNotes"
+                } else {
+                    escapedNotes
+                }
+            writer.println(
+                "${summary.date},${summary.totalWorkMinutes},${summary.totalBreakMinutes}," +
+                    "${summary.overtimeMinutes},${summary.isCompliant},\"$safeNotes\"",
+            )
         }
         writer.flush()
     }

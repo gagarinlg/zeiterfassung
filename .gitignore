@@ -4,6 +4,7 @@
 build/
 .gradle/
 *.jar
+!**/gradle/wrapper/gradle-wrapper.jar
 *.class
 out/
 *.war
