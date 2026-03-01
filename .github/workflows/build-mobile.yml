@@ -41,7 +41,7 @@ jobs:
           GRADLE_OPTS: -Xmx4g
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: android-debug-apk
           path: mobile/android/app/build/outputs/apk/debug/*.apk
@@ -61,7 +61,7 @@ jobs:
         run: swift build -c release
 
       - name: Upload iOS build artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ios-build
           path: mobile/ios/.build/release/
@@ -110,14 +110,14 @@ jobs:
           GRADLE_OPTS: -Xmx4g
 
       - name: Upload release APK
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: android-release-apk
           path: mobile/android/app/build/outputs/apk/release/*.apk
           retention-days: 30
 
       - name: Upload release AAB
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: android-release-aab
           path: mobile/android/app/build/outputs/bundle/release/*.aab
@@ -138,7 +138,7 @@ jobs:
         run: swift build -c release
 
       - name: Upload iOS release artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ios-release-build
           path: mobile/ios/.build/release/
