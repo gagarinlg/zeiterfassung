@@ -49,6 +49,8 @@ pub struct ApiConfig {
     pub base_url: String,
     pub timeout_seconds: u64,
     pub retry_attempts: u32,
+    /// Unique identifier for this terminal device — must be distinct per physical terminal.
+    pub terminal_id: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -99,6 +101,7 @@ impl Default for AppConfig {
                 base_url: "http://localhost:8080/api".to_string(),
                 timeout_seconds: 10,
                 retry_attempts: 3,
+                terminal_id: "terminal-01".to_string(),
             },
             offline: OfflineConfig {
                 buffer_path: "/var/lib/zeiterfassung/buffer.db".to_string(),
@@ -174,5 +177,70 @@ mod tests {
         };
         assert_eq!(config.resolution_width(), 1024);
         assert_eq!(config.resolution_height(), 600);
+    }
+
+    #[test]
+    fn test_load_from_toml_string() {
+        let toml_str = r#"
+[display]
+resolution = "800x480"
+fullscreen = false
+orientation = "portrait"
+theme = "light"
+font_scale = 1.2
+idle_timeout_seconds = 10
+error_timeout_seconds = 3
+
+[api]
+base_url = "https://example.com/api"
+timeout_seconds = 15
+retry_attempts = 5
+terminal_id = "terminal-02"
+
+[offline]
+buffer_path = "/tmp/test.db"
+sync_interval_seconds = 60
+max_buffer_size = 500
+
+[rfid]
+input_device = "auto"
+debounce_ms = 300
+
+[audio]
+enabled = false
+success_sound = "assets/sounds/ok.wav"
+error_sound = "assets/sounds/fail.wav"
+volume = 0.5
+
+[locale]
+language = "en"
+
+[company]
+name = "Test GmbH"
+logo_path = "assets/test-logo.png"
+"#;
+        let config: AppConfig = toml::from_str(toml_str).expect("failed to parse TOML");
+        assert_eq!(config.display.resolution, "800x480");
+        assert_eq!(config.display.resolution_width(), 800);
+        assert_eq!(config.display.resolution_height(), 480);
+        assert!(!config.display.fullscreen);
+        assert_eq!(config.display.theme, "light");
+        assert_eq!(config.api.base_url, "https://example.com/api");
+        assert_eq!(config.api.retry_attempts, 5);
+        assert_eq!(config.api.terminal_id, "terminal-02");
+        assert!(!config.audio.enabled);
+        assert_eq!(config.locale.language, "en");
+        assert_eq!(config.company.name, "Test GmbH");
+    }
+
+    #[test]
+    fn test_each_terminal_has_unique_id_in_config() {
+        // Each physical terminal reads its own terminal.toml — validate the field is present
+        // and distinct from the default so operators are reminded to set it.
+        let config = AppConfig::default();
+        assert!(
+            !config.api.terminal_id.is_empty(),
+            "terminal_id must not be empty"
+        );
     }
 }

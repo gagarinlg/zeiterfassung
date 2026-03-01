@@ -6,9 +6,51 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Planned
-- Phase 5 (continued): Charts, admin dashboard, reports page
-- Phase 6: Terminal (Raspberry Pi) Full Integration
 - Phase 7: Mobile Apps Full Implementation
+- Phase 8: Admin Panel & Settings UI
+
+## [Phase 6 - multi-terminal support] - 2026-03-01
+
+### Added (backend)
+- `TerminalService`: extracted business logic from `TerminalController`; `remainingVacationDays` now uses real `VacationService.getBalance()` instead of a TODO placeholder
+- `@Transactional` on `TerminalService.scan()` — makes `getCurrentStatus` + `clockIn/clockOut` atomic; concurrent scans from two terminals cannot both succeed with the same action — the loser receives HTTP 409
+- `GET /api/terminal/heartbeat` — terminals poll this to detect backend connectivity
+- Renamed `TerminalScanResponse.action` → `entryType` for consistency with Rust struct
+- `TerminalServiceTest`: 9 unit tests including race-condition scenario and per-terminal ID attribution
+
+### Added (terminal/)
+- `terminal_id` added to `[api]` section of `terminal.toml` and `ApiConfig` — each physical terminal must set a unique value so clock entries are attributed to the correct device
+- `ApiError::Conflict` (HTTP 409) — distinguished from generic errors; shown as "Bitte erneut scannen" on screen
+- Offline-sync loop now explicitly discards stale/conflicted events (409, 404) instead of blocking the queue
+- New config test: `test_each_terminal_has_unique_id_in_config`
+- Updated `test_load_from_toml_string` to include and assert `terminal_id`
+- Updated `test_api_error_display` to cover `ApiError::Conflict`
+- 15 total unit tests (terminal)
+
+
+### Added (terminal/)
+- `src/ui/mod.rs`: Full iced 0.12.1 `Application` implementation
+  - State machine: `Idle` → `Loading` → `ClockIn` / `ClockOut` / `OfflineConfirm` / `Error` → `Idle`
+  - Auto-return timers using `iced::time::every` (1 s ticks, configurable timeouts)
+  - Async scan command via `Command::perform` → `POST /terminal/scan`
+  - RFID subscription via `iced::subscription::channel` polling `RfidReader` at 50 ms
+  - Background sync subscription triggered every `sync_interval_seconds`
+- `src/ui/screens.rs`: Six screen view functions with colour-coded backgrounds
+  - `idle_view` — clock, company name, offline banner
+  - `loading_view` — "Verarbeitung…" spinner text
+  - `clock_in_view` — green, employee name, timestamp, countdown
+  - `clock_out_view` — red, hours worked, break time, overtime, remaining vacation
+  - `offline_confirm_view` — amber, buffered-locally message
+  - `error_view` — amber, error type and message
+- 14 unit tests across `api`, `buffer`, and `config` modules
+
+### Fixed
+- `src/api/mod.rs`: Added `#[serde(rename_all = "camelCase")]` to `EmployeeInfo`,
+  `ClockResponse`, and `ClockRequest`; changed endpoint from `/terminal/clock` to
+  `/terminal/scan`
+- `src/audio/mod.rs`: Explicit `drop(handle)` after playback to keep audio device
+  alive until sound finishes
+- `src/main.rs`: Removed `#![allow(dead_code)]` scaffold placeholder
 
 ## [Phase 5 - partial] - 2026-02-22
 
