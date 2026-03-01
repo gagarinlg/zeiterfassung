@@ -3,6 +3,13 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Added
+- **TimeTrackingServiceTest**: 2 new tests for break gap detection (qualifying ≥15 min and short <15 min gaps between CLOCK_OUT/CLOCK_IN)
+- **VacationServiceTest**: 4 new tests for `setBalance` (update totalDays, update carriedOverDays) and `triggerCarryOver` (carry over remaining, cap at max)
+- **NotificationServiceTest**: new test class with 2 tests for `notifyVacationRequestCreated` (sends to all managers, skips blank emails)
+
 ## [Unreleased] — Phase 11: Documentation & Polish (COMPLETE)
 
 ### Added

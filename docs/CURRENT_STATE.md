@@ -62,6 +62,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ LDAP configuration tab in AdminPage
 - ✅ Manager substitute dropdown in user management
 - ✅ 25 new backend unit tests (TotpService, PasswordResetService, LdapService, EmailService)
+- ✅ 8 additional backend unit tests (TimeTrackingService break gap detection, VacationService setBalance/triggerCarryOver, NotificationService email dispatch)
 - ✅ Playwright screenshot generation (12 screenshots)
 
 ### Mobile (Fully Implemented)

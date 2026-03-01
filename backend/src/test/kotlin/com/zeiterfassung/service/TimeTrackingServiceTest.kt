@@ -24,6 +24,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import java.time.Instant
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.Optional
 import java.util.UUID
 
@@ -172,6 +173,68 @@ class TimeTrackingServiceTest {
 
         val result = service.endBreak(userId, TimeEntrySource.WEB)
         assertThat(result.entryType).isEqualTo(TimeEntryType.BREAK_END)
+    }
+
+    @Test
+    fun `getCurrentStatus should count gap between clock out and clock in as qualifying break`() {
+        val now = Instant.now()
+        val entries =
+            listOf(
+                TimeEntryEntity(user = user, entryType = TimeEntryType.CLOCK_IN, timestamp = now.minus(5, ChronoUnit.HOURS)),
+                TimeEntryEntity(user = user, entryType = TimeEntryType.CLOCK_OUT, timestamp = now.minus(4, ChronoUnit.HOURS)),
+                // 30-minute gap (qualifying break)
+                TimeEntryEntity(
+                    user = user,
+                    entryType = TimeEntryType.CLOCK_IN,
+                    timestamp = now.minus(3, ChronoUnit.HOURS).minus(30, ChronoUnit.MINUTES),
+                ),
+                TimeEntryEntity(user = user, entryType = TimeEntryType.CLOCK_OUT, timestamp = now.minus(1, ChronoUnit.HOURS)),
+            )
+        `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
+        `when`(timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)).thenReturn(entries.last())
+        `when`(
+            timeEntryRepository.findByUserIdAndDateRange(
+                any(UUID::class.java) ?: userId,
+                any(Instant::class.java) ?: now,
+                any(Instant::class.java) ?: now,
+            ),
+        ).thenReturn(entries)
+
+        val result = service.getCurrentStatus(userId)
+
+        // Total work = 60 + 150 = 210 min, gap = 30 min (qualifying break)
+        assertThat(result.todayBreakMinutes).isGreaterThanOrEqualTo(30)
+    }
+
+    @Test
+    fun `getCurrentStatus should count short gap between sessions as short break`() {
+        val now = Instant.now()
+        val entries =
+            listOf(
+                TimeEntryEntity(user = user, entryType = TimeEntryType.CLOCK_IN, timestamp = now.minus(3, ChronoUnit.HOURS)),
+                TimeEntryEntity(user = user, entryType = TimeEntryType.CLOCK_OUT, timestamp = now.minus(2, ChronoUnit.HOURS)),
+                // 10-minute gap (short break, < 15 min)
+                TimeEntryEntity(
+                    user = user,
+                    entryType = TimeEntryType.CLOCK_IN,
+                    timestamp = now.minus(2, ChronoUnit.HOURS).plus(10, ChronoUnit.MINUTES),
+                ),
+                TimeEntryEntity(user = user, entryType = TimeEntryType.CLOCK_OUT, timestamp = now.minus(1, ChronoUnit.HOURS)),
+            )
+        `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
+        `when`(timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)).thenReturn(entries.last())
+        `when`(
+            timeEntryRepository.findByUserIdAndDateRange(
+                any(UUID::class.java) ?: userId,
+                any(Instant::class.java) ?: now,
+                any(Instant::class.java) ?: now,
+            ),
+        ).thenReturn(entries)
+
+        val result = service.getCurrentStatus(userId)
+
+        // Total break includes the 10-minute short break gap
+        assertThat(result.todayBreakMinutes).isGreaterThanOrEqualTo(10)
     }
 
     private fun makeClockIn() =
