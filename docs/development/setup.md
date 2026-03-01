@@ -1,5 +1,7 @@
 # Development Environment Setup
 
+> See also: **[Testing Guide](testing.md)** — Unit tests, E2E tests, coverage, and CI/CD integration for all components.
+
 ## Prerequisites
 
 | Tool | Version | Purpose |

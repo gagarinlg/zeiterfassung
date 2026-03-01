@@ -9,6 +9,8 @@ import java.util.UUID
 
 @Repository
 interface AuditLogRepository : JpaRepository<AuditLogEntity, UUID> {
+    fun findByUserIdOrderByCreatedAtAsc(userId: UUID): List<AuditLogEntity>
+
     fun findByUserId(
         userId: UUID,
         pageable: Pageable,

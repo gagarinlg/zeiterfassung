@@ -8,6 +8,8 @@ import java.time.Instant
 import java.util.UUID
 
 interface TimeEntryRepository : JpaRepository<TimeEntryEntity, UUID> {
+    fun findByUserIdOrderByTimestampAsc(userId: UUID): List<TimeEntryEntity>
+
     fun findByUserIdAndTimestampBetweenOrderByTimestampAsc(
         userId: UUID,
         start: Instant,

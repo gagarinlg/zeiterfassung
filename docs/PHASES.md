@@ -2,7 +2,97 @@
 
 > Last updated: 2026-03-01
 >
-> **Current phase:** Phase 12 — Complete
+> **Current phase:** Phase 14 — Sick Leave, Business Trips, Projects & GDPR 🚧
+
+---
+
+## Phase 14: Sick Leave, Business Trips, Projects & GDPR 🚧
+- **Status**: IN PROGRESS (backend complete, frontend pending)
+
+### What was delivered
+- **Sick Leave Tracking**: Full backend with entity, repository, service, controller at `/sick-leave`
+  - Status workflow: REPORTED → CERTIFICATE_PENDING → CERTIFICATE_RECEIVED / CANCELLED
+  - Manager can report on behalf of employee
+  - Overlap detection, audit logging, email notifications
+- **Business Trip Management**: Full backend with entity, repository, service, controller at `/business-trips`
+  - Status workflow: REQUESTED → APPROVED → COMPLETED / REJECTED / CANCELLED
+  - Cost tracking (estimated/actual), cost center field
+  - Manager approval/rejection workflow (same pattern as vacation)
+  - Overlap detection, audit logging, email notifications
+- **Project/Cost Center Time Allocation**: Full backend with entities, repositories, service, controller at `/projects`
+  - Project CRUD (admin-only create/update)
+  - Time allocation CRUD for employees with date/range queries
+  - Project-level allocation reporting (admin)
+- **Database migration** V10: 4 new tables (sick_leaves, business_trips, projects, time_allocations) with indexes
+- **i18n**: German and English email templates for sick leave and business trip notifications
+
+### Key files created
+- `backend/src/main/kotlin/com/zeiterfassung/model/enums/SickLeaveStatus.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/enums/BusinessTripStatus.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/entity/SickLeaveEntity.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/entity/BusinessTripEntity.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/entity/ProjectEntity.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/entity/TimeAllocationEntity.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/repository/SickLeaveRepository.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/repository/BusinessTripRepository.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/repository/ProjectRepository.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/repository/TimeAllocationRepository.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/dto/SickLeaveDtos.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/dto/BusinessTripDtos.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/dto/ProjectDtos.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/SickLeaveService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/BusinessTripService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/ProjectService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/controller/SickLeaveController.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/controller/BusinessTripController.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/controller/ProjectController.kt`
+- `backend/src/main/resources/db/migration/V10__create_sick_leave_business_trip_projects.sql`
+
+### Key files modified
+- `backend/src/main/kotlin/com/zeiterfassung/service/NotificationService.kt` — added sick leave and business trip notification methods
+- `backend/src/main/resources/messages_de.properties` — added German email templates
+- `backend/src/main/resources/messages_en.properties` — added English email templates
+
+### GDPR Compliance (Art. 15 & Art. 17)
+- **GdprService**: Data export (all personal data, time entries, vacation requests, sick leaves, business trips, audit log) and account deletion/anonymization (soft delete + data anonymization + token revocation)
+- **GdprController** at `/gdpr`: Self-service export/delete endpoints + admin-only export/delete endpoints
+
+### Key GDPR files created
+- `backend/src/main/kotlin/com/zeiterfassung/model/dto/GdprDtos.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/GdprService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/controller/GdprController.kt`
+
+### Unit Tests (49 tests)
+- `SickLeaveServiceTest` (12 tests)
+- `BusinessTripServiceTest` (16 tests)
+- `ProjectServiceTest` (14 tests)
+- `GdprServiceTest` (7 tests)
+
+---
+
+## Phase 13: Database Backup & Restore ✅
+- **Status**: COMPLETE
+
+### What was delivered
+- `BackupService` with scheduled daily backups (cron at 2 AM), configurable retention (default 31)
+- `BackupController` at `/admin/backups` with full CRUD + restore endpoints
+- `BackupDtos.kt` with `BackupInfo` and `RestoreResponse` DTOs
+- `pg_dump`/`psql`-based backup/restore via `ProcessBuilder`
+- Path traversal protection and filename validation
+- Audit logging for all backup/restore/delete operations
+- Configurable backup directory and max backup count via `application.yml`
+- **Frontend Backups Tab**: Admin page now has a 5th tab "Backups" with full UI for listing, creating, downloading, restoring, deleting backups, and uploading backup files for restore
+- **i18n**: English and German translations for all backup-related UI strings
+
+### Key files created/modified
+- `backend/src/main/kotlin/com/zeiterfassung/service/BackupService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/controller/BackupController.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/dto/BackupDtos.kt`
+- `backend/src/main/resources/application.yml` — added `app.backup.*` properties
+- `frontend/src/services/adminService.ts` — added `BackupInfo`, `RestoreResponse` types; backup CRUD methods
+- `frontend/src/pages/AdminPage.tsx` — added `BackupsTab` component and 'backups' tab
+- `frontend/src/locales/en/translation.json` — added `backup` i18n section and `admin.backups_tab`
+- `frontend/src/locales/de/translation.json` — added `backup` i18n section and `admin.backups_tab`
 
 ---
 

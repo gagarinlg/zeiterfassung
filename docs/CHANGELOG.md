@@ -3,6 +3,144 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Unit Tests & Code Quality
+
+### Added
+- **`SickLeaveServiceTest`** (12 tests): report, update, cancel, certificate, validation, authorization
+- **`BusinessTripServiceTest`** (16 tests): create, update, cancel, approve, reject, complete, validation, authorization
+- **`ProjectServiceTest`** (14 tests): project CRUD, time allocation CRUD, validation, authorization
+- **`GdprServiceTest`** (7 tests): data export, anonymization, deletion flags, token revocation
+
+### Fixed
+- All ktlint issues across the entire codebase (unused imports, expression body formatting)
+- Hardcoded fallback value in `NotificationService` replaced with localized `common.not_specified` message key
+- Fully qualified `Page.empty()` call replaced with short form in `BusinessTripService`
+
+### Changed
+- Backend test count increased from 210 to 260 tests across 26 test classes
+
+## [Unreleased] — Phase 13: Database Backup Frontend Tab
+
+### Added
+- **Admin Backups Tab** (frontend): New "Backups" tab in AdminPage with full backup management UI
+  - List existing backups in a table (filename, human-readable size, date)
+  - Create new backup with loading state
+  - Download backup files
+  - Restore from existing backup with confirmation dialog
+  - Delete backup with confirmation dialog
+  - Upload & restore from a `.sql.gz` file with file input
+  - Success/error banners with auto-clear after 5 seconds
+- **`adminService` backup methods**: `listBackups`, `createBackup`, `downloadBackup`, `restoreBackup`, `restoreFromUpload`, `deleteBackup` with `encodeURIComponent` for safe filenames
+- **`BackupInfo` and `RestoreResponse` types** in `adminService.ts`
+- **i18n translations**: Full English and German translations for all backup UI strings (`backup.*` keys, `admin.backups_tab`)
+
+## [Unreleased] — GDPR Data Export & Deletion
+
+### Added
+- **GDPR Data Export** (backend): `GdprService.exportUserData()` gathers all personal data (user info, time entries, vacation requests, sick leaves, business trips, audit log) into a structured `GdprDataExportResponse`
+- **GDPR Account Deletion** (backend): `GdprService.requestDeletion()` performs soft delete, anonymizes personal data (name, email, phone, RFID, employee number, TOTP), and revokes all refresh tokens
+- **GdprController** at `/gdpr`: 4 endpoints with Swagger annotations
+  - `GET /gdpr/export` — export own data (authenticated users)
+  - `POST /gdpr/delete` — request own account deletion (authenticated users)
+  - `GET /gdpr/export/{userId}` — admin export of user data (`admin.users.manage`)
+  - `POST /gdpr/delete/{userId}` — admin delete user data (`admin.users.manage`)
+- **GdprDtos.kt**: `GdprDataExportResponse`, `GdprPersonalInfo`, `GdprTimeEntry`, `GdprVacationRequest`, `GdprSickLeave`, `GdprBusinessTrip`, `GdprAuditEntry`, `GdprDeletionResponse`
+- **Repository methods**: `TimeEntryRepository.findByUserIdOrderByTimestampAsc()`, `AuditLogRepository.findByUserIdOrderByCreatedAtAsc()` for unpaginated GDPR data retrieval
+
+## [Unreleased] — Phase 14: Sick Leave, Business Trips & Project Time Allocation
+
+### Added
+- **Sick Leave Tracking** (backend): `SickLeaveEntity`, `SickLeaveRepository`, `SickLeaveService`, `SickLeaveController` at `/sick-leave`
+  - Report, update, cancel sick leave; certificate submission workflow
+  - Manager can report on behalf of employee (`POST /sick-leave/{userId}`)
+  - Overlap detection for non-cancelled sick leaves
+  - Audit logging for all state changes
+  - Email notifications to managers on sick leave report
+- **Business Trip Management** (backend): `BusinessTripEntity`, `BusinessTripRepository`, `BusinessTripService`, `BusinessTripController` at `/business-trips`
+  - Full CRUD + approve/reject/complete workflow (like vacation requests)
+  - Cost tracking (estimated and actual costs, cost center)
+  - Overlap detection for active trips
+  - Pending trips endpoint for managers
+  - Audit logging and email notifications
+- **Project/Cost Center Time Allocation** (backend): `ProjectEntity`, `TimeAllocationEntity`, repositories, `ProjectService`, `ProjectController` at `/projects`
+  - Project CRUD (admin-only create/update, authenticated read)
+  - Time allocation CRUD for employees with date/range queries
+  - Project-level allocation reporting (admin)
+  - Duplicate code/name detection for projects
+- **Database migration** `V10__create_sick_leave_business_trip_projects.sql`: 4 new tables with indexes
+- **Enums**: `SickLeaveStatus`, `BusinessTripStatus`
+- **DTOs**: `SickLeaveDtos.kt`, `BusinessTripDtos.kt`, `ProjectDtos.kt`
+- **Notification methods**: sick leave reported, business trip requested/approved/rejected
+- **i18n messages**: German and English email templates for sick leave and business trip notifications
+
+## [Unreleased] — Backend Unit Test Coverage Expansion
+
+### Added
+- **`BackupServiceTest`** (11 tests): list/get/delete backups, filename validation, path traversal protection, temp dir handling
+- **`EmployeeConfigServiceTest`** (8 tests): get/update config, default config creation, partial updates, invalid JSON fallback
+- **`MonthlyReportSchedulerTest`** (7 tests): personal & team report sending, inactive/deleted user skipping, email failure handling, formatHours
+- **`AuditServiceTest`** (6 tests): login/logout/data-change/permission-change audit logging, exception handling, non-existent user
+- **`TimeTrackingServiceEdgeCasesTest`** (12 tests): break-state conflicts, notes/terminal fields, delete/getTimeSheet errors, CLOCKED_OUT status
+- **`UserServiceEdgeCasesTest`** (18 tests): update/delete edge cases, manager/substitute assignment, password change/reset, recursive subordinates, substitute delegation
+- **`AuthServiceEdgeCasesTest`** (12 tests): successful login, TOTP flows, refresh token reuse detection, logout/logoutAll, getCurrentUser
+
+### Changed
+- Backend test count increased from 136 to 210 tests across 22 test classes
+
+## [Unreleased] — CI: Mobile Release Builds
+
+### Added
+- **`build-mobile.yml`**: `build-android-release` job — builds signed (or unsigned) release APK/AAB on push to main or tags; uses `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` secrets for signing
+- **`build-mobile.yml`**: `build-ios-release` job — builds Swift package in release configuration on push to main or tags
+- **`build-deploy.yml`**: `build-android-release` and `build-ios-release` jobs added to tag-triggered release workflow; Android APK/AAB and iOS release artifacts are downloaded and included in GitHub Releases alongside the terminal binary
+
+## [Unreleased] — Documentation: Installation, Provisioning & Testing Guides
+
+### Added
+- **`docs/installation/mobile-apps.md`**: Comprehensive mobile app installation guide covering Android and iOS build, signing, distribution (APK, Google Play, TestFlight, App Store), server URL configuration, and MDM provisioning overview
+- **`docs/installation/mobile-provisioning.md`**: Detailed MDM/enterprise provisioning guide with configuration examples for Google Workspace, VMware Workspace ONE, Microsoft Intune (Android), Jamf Pro, Microsoft Intune (iOS), VMware Workspace ONE (iOS); includes local testing procedures
+- **`docs/installation/terminal.md`**: Full Raspberry Pi terminal installation guide covering hardware requirements, OS setup, system dependencies, building from source, cross-compilation, `terminal.toml` annotated reference, kiosk mode with cage, RFID reader setup, audio configuration, systemd service file, network/firewall, offline buffering, maintenance, and troubleshooting
+- **`docs/development/testing.md`**: Testing strategies guide covering backend (JUnit 5 + Mockito), frontend (Vitest + Playwright), terminal (cargo test, mock HTTP, virtual RFID, GUI state testing, offline buffer), mobile (JUnit + MockK, XCTest, Compose UI tests, device matrix), E2E overview, CI/CD integration, and coverage reporting
+
+### Changed
+- **`docs/installation/README.md`**: Added links to the new detailed installation guides (mobile-apps.md, mobile-provisioning.md, terminal.md)
+- **`docs/development/setup.md`**: Added cross-reference link to the new testing guide
+- **`docs/CURRENT_STATE.md`**: Added Documentation section listing all new guides; updated summary
+
+## [Unreleased] — iOS Server URL Configuration
+
+### Added
+- **ServerConfigManager**: Singleton managing server URL with priority chain (MDM managed config > UserDefaults > default)
+- **ServerSettingsView**: SwiftUI Form view for viewing/editing server URL; disables editing when URL is managed via MDM
+- **ServerSettingsViewModel**: `@MainActor` ViewModel with managed config detection, save with success feedback
+- **APIClient**: Updated initializer to use `ServerConfigManager.shared.effectiveServerUrl` instead of `ProcessInfo` environment variable
+- **MainTabView**: Added gear menu with server settings and logout options
+- **Localizable.strings**: Added 11 new i18n keys for server settings UI (EN + DE)
+
+## [Unreleased] — Android Server URL Configuration
+
+### Added
+- **ServerConfigPreferences**: DataStore-based preferences for storing server URL with MDM managed app configuration support (`RestrictionsManager`)
+- **ServerSettingsScreen**: Compose UI screen for viewing/editing server URL; disables editing when URL is managed by MDM
+- **ServerSettingsViewModel**: ViewModel with managed config detection, save with success feedback
+- **app_restrictions.xml**: Android managed app configuration schema for MDM provisioning of `server_url`
+- **AndroidManifest.xml**: `APP_RESTRICTIONS` meta-data reference
+- **NetworkModule**: `provideRetrofit` now reads effective server URL from `ServerConfigPreferences` (managed > user setting > default)
+- **ZeiterfassungNavGraph**: `ServerSettings` route added to navigation
+
+## [Unreleased] — Phase 13: Database Backup & Restore (IN PROGRESS)
+
+### Added
+- **BackupService**: scheduled daily backups at 2 AM via `@Scheduled(cron)`, configurable retention limit (default 31), `pg_dump`/`psql` via `ProcessBuilder`, gzip compression, audit logging for all operations
+- **BackupController** (`/api/admin/backups`): `GET /` (list), `POST /` (create), `GET /{filename}` (download), `POST /restore/{filename}` (restore), `POST /restore/upload` (restore from upload), `DELETE /{filename}` (delete) — all `@PreAuthorize("hasAuthority('admin.users.manage')")`
+- **BackupDtos.kt**: `BackupInfo(filename, sizeBytes, createdAt)`, `RestoreResponse(status, message)`
+- **application.yml**: `app.backup.directory` and `app.backup.max-count` configuration properties with env var support
+
+### Security
+- Path traversal prevention: filename regex validation (`^[a-zA-Z0-9._-]+$`), canonical path check
+- Uploaded files saved to temp location before restore
+- All operations logged via `AuditService`
+
 ## [Unreleased] — Phase 12: Performance, Accessibility & API Documentation (COMPLETE)
 
 ### Improved

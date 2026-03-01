@@ -4,7 +4,7 @@
 
 ## Quick Summary
 
-Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–12 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, admin endpoints, TOTP 2FA, password reset flow, LDAP configuration, manager substitute/deputy feature, Spring caching, and full OpenAPI/Swagger documentation. The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization, WCAG 2.1 AA accessibility, and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright across Chromium, Firefox, and WebKit. Documentation includes user guide, administration guide, 12 auto-generated screenshots, and 5 architecture decision records.
+Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–13 are complete.** Phase 14 (Sick Leave, Business Trips, Projects, GDPR) backend is complete. The backend has working auth, user management, time tracking, vacation management, sick leave tracking, business trip management, project/cost center time allocation, email notifications, CSV export, terminal RFID scan endpoint, admin endpoints, TOTP 2FA, password reset flow, LDAP configuration, manager substitute/deputy feature, Spring caching, full OpenAPI/Swagger documentation, database backup/restore system (with frontend UI), and GDPR data export/deletion. The backend now has 260 unit tests across 26 test classes covering all major services. The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages (including database backup management tab) with proper date/calendar localization, WCAG 2.1 AA accessibility, and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration, configurable server URL (UI + MDM provisioning), and ViewModel unit tests. CI includes E2E testing with Playwright across Chromium, Firefox, and WebKit, plus release build jobs for Android and iOS. Documentation includes user guide, administration guide, 12 auto-generated screenshots, 5 architecture decision records, comprehensive installation guides for mobile apps and terminal, MDM provisioning documentation (including AppTech360), and a full testing guide.
 
 ## What Works Right Now
 
@@ -38,6 +38,12 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Test email fix: proper mailEnabled check, dev profile uses env vars, SMTP timeouts
 - ✅ Spring caching: `CacheConfig.kt` with `ConcurrentMapCacheManager` for `publicHolidays` and `systemSettings` caches; `@Cacheable` on `VacationService.getPublicHolidays()` and `AdminService.getSystemSettings()`; `@CacheEvict` on `AdminService.updateSystemSetting()`
 - ✅ OpenAPI/Swagger: all 7 controllers annotated with `@Tag`, `@Operation`, `@ApiResponse`, `@SecurityRequirement`; `OpenApiConfig.kt` with API metadata and JWT security scheme
+- ✅ Database backup/restore: `BackupService` with scheduled daily backups, configurable retention, `BackupController` at `/admin/backups` with list/create/download/restore/upload/delete endpoints, audit logging, path traversal protection
+- ✅ Sick leave tracking: report, update, cancel, certificate submission; manager can report on behalf; overlap detection; audit logging; email notifications
+- ✅ Business trip management: create, update, cancel, approve, reject, complete workflow; overlap detection; cost tracking; audit logging; email notifications
+- ✅ Project/cost center time allocation: project CRUD (admin), time allocation CRUD (employees), date/range queries, project-level reporting
+- ✅ GDPR data export: `GET /gdpr/export` (own data), `GET /gdpr/export/{userId}` (admin); returns all personal info, time entries, vacation requests, sick leaves, business trips, and audit log
+- ✅ GDPR account deletion: `POST /gdpr/delete` (own account), `POST /gdpr/delete/{userId}` (admin); soft delete with data anonymization and token revocation
 
 ### Frontend (Fully Implemented)
 - ✅ Login page with validation and error handling
@@ -48,7 +54,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Vacation approval page: manager queue with approve/reject-with-reason modal
 - ✅ Dashboard: real data widgets (today hours, weekly hours, vacation balance, team status, compliance warnings)
 - ✅ Time Tracking page: full implementation (status, clock in/out/break, live timer, today's entries list, monthly timesheet, CSV export)
-- ✅ Admin page: 3-tab UI (User Management, Audit Log, System Settings) with full CRUD, search, modals
+- ✅ Admin page: 5-tab UI (User Management, Audit Log, System Settings, LDAP, Backups) with full CRUD, search, modals
 - ✅ Date/calendar localization: `dateUtils.ts` utility with `formatDate`, `formatTime`, `formatDateTime`, `formatMonthYear` using date-fns locales; `DateFormatContext` for per-user date/time format preferences; all pages (Dashboard, TimeTracking, Vacation) use localized date formatting
 - ✅ User Settings page: display preferences (date/time format) and password change with confirmation
 - ✅ Password reset flow: request page and confirm page with token
@@ -69,8 +75,8 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Playwright screenshot generation (12 screenshots)
 
 ### Mobile (Fully Implemented)
-- ✅ **Android**: real API integration with Retrofit + Moshi + Hilt; LoginScreen, DashboardScreen, TimeTrackingScreen (state-aware buttons), VacationScreen (balance + requests); 24 ViewModel unit tests
-- ✅ **iOS**: real API integration using URLSession; Keychain token storage (replaces UserDefaults); DashboardView, TimeTrackingView (action buttons, elapsed timer), VacationView (balance breakdown + request list); AuthViewModel, DashboardViewModel, TimeTrackingViewModel, VacationViewModel
+- ✅ **Android**: real API integration with Retrofit + Moshi + Hilt; LoginScreen, DashboardScreen, TimeTrackingScreen (state-aware buttons), VacationScreen (balance + requests); ServerSettingsScreen with configurable server URL (DataStore + MDM managed config support); 24 ViewModel unit tests
+- ✅ **iOS**: real API integration using URLSession; Keychain token storage (replaces UserDefaults); DashboardView, TimeTrackingView (action buttons, elapsed timer), VacationView (balance breakdown + request list); AuthViewModel, DashboardViewModel, TimeTrackingViewModel, VacationViewModel; ServerConfigManager with MDM + UserDefaults + default URL priority; ServerSettingsView with gear menu in MainTabView
 
 ### Terminal (Fully Functional — Phase 6 Complete)
 - ✅ Full iced 0.12.1 Application with complete state machine (Idle/Loading/ClockIn/ClockOut/OfflineConfirm/Error)
@@ -79,13 +85,23 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Multi-terminal support with HTTP 409 race condition protection
 - ✅ 15 unit tests (api, buffer, config)
 
+### Documentation
+- ✅ User guide, administration guide
+- ✅ 12 auto-generated screenshots
+- ✅ 5 architecture decision records
+- ✅ Comprehensive mobile app installation & deployment guide (`docs/installation/mobile-apps.md`)
+- ✅ MDM provisioning guide with examples for Intune, Jamf, Workspace ONE, Google Workspace, AppTech360 (`docs/installation/mobile-provisioning.md`)
+- ✅ Raspberry Pi terminal full installation guide with systemd, kiosk mode, offline buffering (`docs/installation/terminal.md`)
+- ✅ Testing guide covering all components: backend, frontend, terminal, mobile, E2E, CI/CD (`docs/development/testing.md`)
+
 ## Tech Debt / Known Issues
-- Backend test coverage targets (≥90%) not yet fully verified for all services
 - Android: push notifications, biometric auth, offline caching — not yet implemented
 - iOS: push notifications, Face ID / Touch ID — not yet implemented
+- Frontend pages for sick leave, business trips, projects — not yet implemented
 
 ## Next Steps
-1. Continue dependency updates (review and merge Dependabot PRs)
-2. Increase backend test coverage toward ≥90% target
+1. Frontend pages for sick leave, business trips, and project time allocation
+2. Continue dependency updates (review and merge Dependabot PRs)
 3. Mobile: push notifications, biometric auth, offline caching
+4. Frontend UI for sick leave, business trips, and project time allocation
 

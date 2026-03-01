@@ -10,6 +10,11 @@
 - [Configuration Reference](#configuration-reference)
 - [Troubleshooting](#troubleshooting)
 
+### Detailed Guides
+- **[Mobile Apps — Full Installation & Deployment Guide](mobile-apps.md)** — Building, signing, distribution, and MDM provisioning for Android and iOS
+- **[Mobile Provisioning & MDM Configuration](mobile-provisioning.md)** — Enterprise MDM setup for Google Workspace, Intune, Jamf, Workspace ONE
+- **[Raspberry Pi Terminal — Full Installation Guide](terminal.md)** — Hardware setup, OS configuration, kiosk mode, RFID, systemd service, offline buffering
+
 ## System Requirements
 
 ### Docker Deployment

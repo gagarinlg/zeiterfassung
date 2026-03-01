@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, ClipboardList, Settings, Plus, Edit, Trash2, Key, Wifi, Mail, FolderTree } from 'lucide-react'
+import { Users, ClipboardList, Settings, Plus, Edit, Trash2, Key, Wifi, Mail, FolderTree, Database, Download, Upload, RefreshCw } from 'lucide-react'
 import adminService from '../services/adminService'
-import type { AuditLogEntry, SystemSetting, CreateUserPayload, UpdateUserPayload } from '../services/adminService'
+import type { AuditLogEntry, SystemSetting, CreateUserPayload, UpdateUserPayload, BackupInfo } from '../services/adminService'
 import type { User } from '../types'
 
-type Tab = 'users' | 'audit' | 'settings' | 'ldap'
+type Tab = 'users' | 'audit' | 'settings' | 'ldap' | 'backups'
 
 const AVAILABLE_ROLES = ['EMPLOYEE', 'MANAGER', 'ADMIN', 'SUPER_ADMIN']
 
@@ -1024,6 +1024,271 @@ function LdapTab() {
   )
 }
 
+function BackupsTab() {
+  const { t } = useTranslation()
+  const [backups, setBackups] = useState<BackupInfo[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [creating, setCreating] = useState(false)
+  const [restoring, setRestoring] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState<string | null>(null)
+  const [confirmRestore, setConfirmRestore] = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const showSuccess = (msg: string) => {
+    setSuccess(msg)
+    setTimeout(() => setSuccess(null), 5000)
+  }
+
+  const loadBackups = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await adminService.listBackups()
+      setBackups(data)
+    } catch {
+      setError(t('backup.error_list'))
+    } finally {
+      setLoading(false)
+    }
+  }, [t])
+
+  useEffect(() => {
+    loadBackups()
+  }, [loadBackups])
+
+  const handleCreate = async () => {
+    setCreating(true)
+    setError(null)
+    try {
+      await adminService.createBackup()
+      showSuccess(t('backup.backup_created'))
+      await loadBackups()
+    } catch {
+      setError(t('backup.error_create'))
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  const handleDownload = async (filename: string) => {
+    try {
+      await adminService.downloadBackup(filename)
+    } catch {
+      setError(t('backup.error_download'))
+    }
+  }
+
+  const handleRestore = async (filename: string) => {
+    setRestoring(filename)
+    setConfirmRestore(null)
+    setError(null)
+    try {
+      await adminService.restoreBackup(filename)
+      showSuccess(t('backup.restore_started'))
+    } catch {
+      setError(t('backup.error_restore'))
+    } finally {
+      setRestoring(null)
+    }
+  }
+
+  const handleDelete = async (filename: string) => {
+    setDeleting(filename)
+    setConfirmDelete(null)
+    setError(null)
+    try {
+      await adminService.deleteBackup(filename)
+      showSuccess(t('backup.backup_deleted'))
+      await loadBackups()
+    } catch {
+      setError(t('backup.error_delete'))
+    } finally {
+      setDeleting(null)
+    }
+  }
+
+  const handleUploadRestore = async () => {
+    const file = fileInputRef.current?.files?.[0]
+    if (!file) {
+      setError(t('backup.error_no_file'))
+      return
+    }
+    setUploading(true)
+    setError(null)
+    try {
+      await adminService.restoreFromUpload(file)
+      showSuccess(t('backup.upload_restore_success'))
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      await loadBackups()
+    } catch {
+      setError(t('backup.error_upload'))
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const formatSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  }
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'medium' })
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">{t('backup.title')}</h2>
+          <p className="text-sm text-gray-500 mt-1">{t('backup.subtitle')}</p>
+        </div>
+        <button
+          onClick={handleCreate}
+          disabled={creating}
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 disabled:opacity-50"
+        >
+          {creating ? (
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <Plus size={16} />
+          )}
+          {creating ? t('backup.creating') : t('backup.create')}
+        </button>
+      </div>
+
+      {success && (
+        <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700" role="status">
+          {success}
+        </div>
+      )}
+      {error && <ErrorBanner message={error} />}
+
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <div className="bg-white rounded-xl border overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b">
+              <tr>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">{t('backup.filename')}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">{t('backup.size')}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">{t('backup.date')}</th>
+                <th className="px-4 py-3 text-left font-medium text-gray-700">{t('backup.actions')}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {backups.map((backup) => (
+                <tr key={backup.filename} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 font-medium text-gray-900 font-mono text-xs">{backup.filename}</td>
+                  <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{formatSize(backup.sizeBytes)}</td>
+                  <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{formatDate(backup.createdAt)}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1">
+                      <button
+                        aria-label={t('backup.download')}
+                        onClick={() => handleDownload(backup.filename)}
+                        className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-gray-100 rounded"
+                      >
+                        <Download size={14} />
+                      </button>
+                      <button
+                        aria-label={t('backup.restore')}
+                        onClick={() => setConfirmRestore(backup.filename)}
+                        disabled={restoring === backup.filename}
+                        className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-gray-100 rounded disabled:opacity-50"
+                      >
+                        {restoring === backup.filename ? (
+                          <div className="w-3.5 h-3.5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <RefreshCw size={14} />
+                        )}
+                      </button>
+                      <button
+                        aria-label={t('backup.delete')}
+                        onClick={() => setConfirmDelete(backup.filename)}
+                        disabled={deleting === backup.filename}
+                        className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded disabled:opacity-50"
+                      >
+                        {deleting === backup.filename ? (
+                          <div className="w-3.5 h-3.5 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Trash2 size={14} />
+                        )}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {backups.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-8 text-center text-gray-500">{t('backup.no_backups')}</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <div className="bg-white rounded-xl border p-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-1">{t('backup.upload_restore')}</h3>
+        <p className="text-xs text-gray-500 mb-4">{t('backup.upload_hint')}</p>
+        <div className="flex items-center gap-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".sql.gz,.sql,.gz"
+            className="text-sm text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+            aria-label={t('backup.select_file')}
+          />
+          <button
+            onClick={handleUploadRestore}
+            disabled={uploading}
+            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 disabled:opacity-50"
+          >
+            {uploading ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Upload size={16} />
+            )}
+            {t('backup.upload_restore')}
+          </button>
+        </div>
+      </div>
+
+      {confirmRestore && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">{t('backup.confirm_restore_title')}</h2>
+            <p className="text-sm text-gray-500 mb-6">{t('backup.confirm_restore_message')}</p>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setConfirmRestore(null)} className="px-4 py-2 text-sm text-gray-700 border rounded-lg hover:bg-gray-50">{t('common.cancel')}</button>
+              <button onClick={() => handleRestore(confirmRestore)} className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700">{t('backup.restore')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmDelete && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">{t('backup.confirm_delete_title')}</h2>
+            <p className="text-sm text-gray-500 mb-6">{t('backup.confirm_delete_message')}</p>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setConfirmDelete(null)} className="px-4 py-2 text-sm text-gray-700 border rounded-lg hover:bg-gray-50">{t('common.cancel')}</button>
+              <button onClick={() => handleDelete(confirmDelete)} className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700">{t('common.delete')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function AdminPage() {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<Tab>('users')
@@ -1040,12 +1305,14 @@ export default function AdminPage() {
         <TabButton active={activeTab === 'audit'} onClick={() => setActiveTab('audit')} icon={ClipboardList} label={t('admin.audit_log')} />
         <TabButton active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} icon={Settings} label={t('admin.settings_tab')} />
         <TabButton active={activeTab === 'ldap'} onClick={() => setActiveTab('ldap')} icon={FolderTree} label={t('admin.ldap_tab')} />
+        <TabButton active={activeTab === 'backups'} onClick={() => setActiveTab('backups')} icon={Database} label={t('admin.backups_tab')} />
       </div>
 
       {activeTab === 'users' && <UsersTab />}
       {activeTab === 'audit' && <AuditLogTab />}
       {activeTab === 'settings' && <SettingsTab />}
       {activeTab === 'ldap' && <LdapTab />}
+      {activeTab === 'backups' && <BackupsTab />}
     </div>
   )
 }

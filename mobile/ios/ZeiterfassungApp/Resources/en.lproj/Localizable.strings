@@ -38,10 +38,22 @@
 "vacation_used" = "Used";
 "vacation_remaining_label" = "Remaining";
 
+/* Server Settings */
+"server_settings_title" = "Server Settings";
+"server_settings_managed_info" = "Server URL is managed by your organization and cannot be changed.";
+"server_settings_url_placeholder" = "https://zeiterfassung.example.com/api";
+"server_settings_save" = "Save";
+"server_settings_restart_hint" = "Server URL saved. Please restart the app for changes to take effect.";
+"server_settings_info_header" = "Information";
+"server_settings_info_body" = "The server URL determines which Zeiterfassung server this app connects to. Contact your administrator if you are unsure about the correct URL.";
+"nav_server_settings" = "Server Settings";
+"auth_logout_button" = "Logout";
+
 /* Common */
 "common_loading" = "Loading...";
 "common_error" = "An error occurred. Please try again.";
 "common_save" = "Save";
 "common_cancel" = "Cancel";
+"common_close" = "Close";
 "common_days" = "days";
 

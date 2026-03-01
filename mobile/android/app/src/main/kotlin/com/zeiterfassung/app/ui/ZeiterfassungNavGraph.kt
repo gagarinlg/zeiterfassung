@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.zeiterfassung.app.ui.screen.DashboardScreen
 import com.zeiterfassung.app.ui.screen.LoginScreen
+import com.zeiterfassung.app.ui.screen.ServerSettingsScreen
 import com.zeiterfassung.app.ui.screen.TimeTrackingScreen
 import com.zeiterfassung.app.ui.screen.VacationScreen
 
@@ -14,6 +15,7 @@ sealed class Screen(val route: String) {
     object Dashboard : Screen("dashboard")
     object TimeTracking : Screen("time_tracking")
     object Vacation : Screen("vacation")
+    object ServerSettings : Screen("server_settings")
 }
 
 @Composable
@@ -36,6 +38,9 @@ fun ZeiterfassungNavGraph() {
         }
         composable(Screen.Vacation.route) {
             VacationScreen()
+        }
+        composable(Screen.ServerSettings.route) {
+            ServerSettingsScreen(onBack = { navController.popBackStack() })
         }
     }
 }
