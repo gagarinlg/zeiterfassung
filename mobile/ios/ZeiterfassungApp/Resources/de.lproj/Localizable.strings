@@ -27,14 +27,21 @@
 "time_tracking_clock_out" = "Ausstempeln";
 "time_tracking_break_start" = "Pause beginnen";
 "time_tracking_break_end" = "Pause beenden";
+"time_tracking_today_work" = "Heute gearbeitet";
+"time_tracking_today_break" = "Pause heute";
 
 /* Vacation */
 "vacation_title" = "Urlaub";
-"vacation_request" = "Urlaub beantragen";
+"vacation_request" = "Urlaubsanträge";
 "vacation_remaining" = "Verbleibende Tage";
+"vacation_total" = "Gesamt";
+"vacation_used" = "Verbraucht";
+"vacation_remaining_label" = "Verbleibend";
 
 /* Common */
 "common_loading" = "Laden...";
-"common_error" = "Fehler";
+"common_error" = "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.";
 "common_save" = "Speichern";
 "common_cancel" = "Abbrechen";
+"common_days" = "Tage";
+

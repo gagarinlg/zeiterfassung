@@ -1,7 +1,7 @@
 # Zeiterfassung — Project Phases & Roadmap
 
 > **Last updated:** 2026-03-01
-> **Current phase:** Phase 7 (Mobile Apps) — NEXT UP
+> **Current phase:** Phase 9 (Testing & Security Hardening) — NEXT UP
 
 ---
 
@@ -290,36 +290,83 @@
 
 ---
 
-## Phase 7: Mobile Apps Full Implementation 🔲
-- **Status**: PLANNED
+## Phase 7: Mobile Apps Full Implementation ✅
+- **Status**: COMPLETE
+- **PR**: #59 (copilot/update-project-phase-and-tests)
+- **Merged**: 2026-03-01
 - **Priority**: MEDIUM
 
-### What needs to be built
-- **Android**: implement all placeholder screens (login, dashboard, time tracking, vacation)
-- **iOS**: implement all placeholder views (login, dashboard, time tracking, vacation)
-- **Push notifications**: time tracking reminders, vacation approvals
-- **Biometric auth**: fingerprint/face ID for quick access
-- **Offline support**: local caching, sync on reconnect
-- **App store preparation**: icons, screenshots, metadata
+### What was delivered
+
+#### Android (Kotlin / Jetpack Compose)
+- **Data layer**: `Models.kt` (User, LoginResponse, TrackingStatusResponse, VacationBalance, VacationRequest, PageResponse), Retrofit `ZeiterfassungApi`, `AuthPreferences` (DataStore), `AuthRepository`, `TimeTrackingRepository`, `VacationRepository`
+- **DI**: `NetworkModule` (OkHttp auth interceptor, Moshi, Retrofit)
+- **ViewModels**: `AuthViewModel` (login/logout with input validation, session restore), `DashboardViewModel`, `TimeTrackingViewModel` (clock-in/out/break), `VacationViewModel`
+- **Screens**: `LoginScreen`, `DashboardScreen` (status + vacation summary), `TimeTrackingScreen` (state-aware buttons, today totals), `VacationScreen` (balance card + request list)
+- **NavGraph**: updated to use real screens (replaced all `*Placeholder` composables)
+- **Tests**: `AuthViewModelTest` (8 tests), `TimeTrackingViewModelTest` (9 tests), `VacationViewModelTest` (7 tests)
+- **New deps**: `mockk`, `turbine`, `kotlinx-coroutines-test`, `androidx.arch.core:core-testing`
+
+#### iOS (Swift / SwiftUI)
+- **Security**: replaced all `UserDefaults` token storage with `KeychainHelper` (Security framework) — including `APIClient` auth header and `AuthViewModel`
+- **Models**: fixed `LoginResponse` to flat structure matching backend; added `TrackingStatusResponse`, `VacationBalance`, `PageResponse<T>`; updated `VacationRequest` to match backend fields
+- **Services**: `VacationService` (balance, paginated requests), `TimeService` extended (status, startBreak, endBreak), `AuthService` cleaned up
+- **ViewModels**: `AuthViewModel` (Keychain, `currentUserId`), `DashboardViewModel`, `TimeTrackingViewModel`, `VacationViewModel`
+- **Views**: `DashboardView` (real status + vacation balance), `TimeTrackingView` (state-aware action buttons, elapsed timer format), `VacationView` (balance breakdown + request list with rejection reasons)
+- **i18n**: added `vacation_request`, `time_tracking_today_work`, `time_tracking_today_break`, `vacation_total`, `vacation_used`, `common_days`, improved `common_error` in EN + DE
+
+### Key files
+- `mobile/android/app/src/main/kotlin/com/zeiterfassung/app/data/`
+- `mobile/android/app/src/main/kotlin/com/zeiterfassung/app/di/NetworkModule.kt`
+- `mobile/android/app/src/main/kotlin/com/zeiterfassung/app/ui/viewmodel/`
+- `mobile/android/app/src/main/kotlin/com/zeiterfassung/app/ui/screen/`
+- `mobile/android/app/src/test/kotlin/com/zeiterfassung/app/`
+- `mobile/ios/ZeiterfassungApp/Utils/KeychainHelper.swift`
+- `mobile/ios/ZeiterfassungApp/ViewModels/`
+- `mobile/ios/ZeiterfassungApp/Views/`
+- `mobile/ios/ZeiterfassungApp/Services/`
 
 ### Depends on
 - Phase 4 (vacation management) ✅
-- Phase 5 (dashboard/reporting)
+- Phase 5 (dashboard/reporting) ✅
 
 ---
 
-## Phase 8: Admin Panel & Settings 🔲
-- **Status**: PLANNED
+## Phase 8: Admin Panel & Settings ✅
+- **Status**: COMPLETE
+- **PR**: #59 (copilot/update-project-phase-and-tests)
+- **Merged**: 2026-03-01
 - **Priority**: MEDIUM
 
-### What needs to be built
-- **Admin page**: replace placeholder with full user management UI
-- **User CRUD UI**: create/edit/delete users, assign roles, manage RFID
-- **Role management UI**: view/edit roles and permissions
-- **System settings UI**: ArbZG thresholds, company info, email config
-- **Public holiday management UI**: add/edit/remove holidays
-- **Audit log viewer**: searchable/filterable audit trail
-- **CSV import UI**: upload and preview CSV data before import
+### What was delivered
+
+#### Backend
+- **`SystemSettingEntity`** + **`SystemSettingRepository`**: JPA entity for key-value system settings
+- **`AdminService`**: audit log (paginated, user-filtered), system settings CRUD (getAll, getByKey, update)
+- **`AdminController`** (`/api/admin`): `GET /audit-log`, `GET /settings`, `PUT /settings/{key}` — all `@PreAuthorize("hasRole('ADMIN')")`
+- **`AdminDtos.kt`**: `AuditLogResponse`, `SystemSettingResponse`, `UpdateSystemSettingRequest`
+- **`AdminServiceTest`**: 9 unit tests (audit log paging, user filter, settings CRUD, key-not-found, edge cases)
+
+#### Frontend
+- **`adminService.ts`**: typed client for user management, audit log, and settings endpoints
+- **`AdminPage.tsx`**: 3-tab UI:
+  - **User Management**: paginated table with client-side search, create/edit/deactivate/delete modals, role checkbox assignment, RFID update modal, password reset modal, delete confirmation
+  - **Audit Log**: paginated table showing action, user, entity type/ID, IP address, timestamp
+  - **System Settings**: inline-editable settings table (click pencil → edit input → save/cancel)
+- **All form labels** have `htmlFor`/`id` pairs for accessibility
+- **`AdminPage.test.tsx`**: 25 frontend tests (all tabs, modals, error banners, search filter, CRUD flows)
+- **i18n**: `admin.users_tab`, `admin.audit.*`, `admin.settings.*`, `admin.errors.*` in EN + DE
+
+### Key files
+- `backend/src/main/kotlin/com/zeiterfassung/model/entity/SystemSettingEntity.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/repository/SystemSettingRepository.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/AdminService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/controller/AdminController.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/dto/AdminDtos.kt`
+- `backend/src/test/kotlin/com/zeiterfassung/service/AdminServiceTest.kt`
+- `frontend/src/services/adminService.ts`
+- `frontend/src/pages/AdminPage.tsx`
+- `frontend/src/test/AdminPage.test.tsx`
 
 ### Depends on
 - Phase 2 (auth/users) ✅

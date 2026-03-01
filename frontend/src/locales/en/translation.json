@@ -80,7 +80,29 @@
   },
   "vacation": {
     "title": "Vacation",
-    "request": "Request Vacation",
+    "request": {
+      "new": "New Vacation Request",
+      "edit": "Edit Request",
+      "cancel": "Cancel",
+      "cancel_confirm": "Are you sure you want to cancel this request?",
+      "submit": "Submit Request",
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "half_day_start": "Half day on start date",
+      "half_day_end": "Half day on end date",
+      "notes": "Notes",
+      "total_days": "Total Days",
+      "actions": "Actions",
+      "calculated_days": "Calculated working days",
+      "no_requests": "No vacation requests found",
+      "see_reason": "See reason",
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
+      }
+    },
     "remaining_days": "Remaining Vacation Days",
     "used_days": "Used Vacation Days",
     "total_days": "Total Vacation Days",
@@ -105,29 +127,6 @@
       "requests": "My Requests",
       "new_request": "New Request",
       "calendar": "Calendar"
-    },
-    "request": {
-      "new": "New Vacation Request",
-      "edit": "Edit Request",
-      "cancel": "Cancel",
-      "cancel_confirm": "Are you sure you want to cancel this request?",
-      "submit": "Submit Request",
-      "start_date": "Start Date",
-      "end_date": "End Date",
-      "half_day_start": "Half day on start date",
-      "half_day_end": "Half day on end date",
-      "notes": "Notes",
-      "total_days": "Total Days",
-      "actions": "Actions",
-      "calculated_days": "Calculated working days",
-      "no_requests": "No vacation requests found",
-      "see_reason": "See reason",
-      "status": {
-        "pending": "Pending",
-        "approved": "Approved",
-        "rejected": "Rejected",
-        "cancelled": "Cancelled"
-      }
     },
     "approval": {
       "title": "Vacation Approvals",
@@ -175,9 +174,37 @@
   },
   "admin": {
     "title": "Administration",
-    "users": "User Management",
-    "settings": "Settings",
-    "reports": "Reports"
+    "subtitle": "Manage users, system settings, and view the audit trail",
+    "users": {
+      "create": "Create User",
+      "edit": "Edit User",
+      "no_users": "No users found",
+      "update_rfid": "Update RFID Tag",
+      "rfid_placeholder": "Scan or enter RFID tag ID",
+      "rfid_hint": "Leave empty to remove the RFID tag",
+      "password_reset_success": "Password has been reset successfully"
+    },
+    "audit_log": "Audit Log",
+    "settings_tab": "System Settings",
+    "settings": {
+      "key": "Setting Key",
+      "value": "Value",
+      "description": "Description"
+    },
+    "reports": "Reports",
+    "audit": {
+      "user": "User",
+      "action": "Action",
+      "entity": "Entity",
+      "ip": "IP Address",
+      "no_entries": "No audit log entries found"
+    },
+    "errors": {
+      "load_failed": "Failed to load data",
+      "save_failed": "Failed to save changes",
+      "delete_failed": "Failed to delete"
+    },
+    "users_tab": "User Management"
   },
   "common": {
     "save": "Save",
@@ -207,7 +234,9 @@
     "phone": "Phone",
     "required": "Required",
     "back_to_dashboard": "Back to Dashboard",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "previous": "Previous",
+    "next": "Next"
   },
   "errors": {
     "not_found": "Not Found",

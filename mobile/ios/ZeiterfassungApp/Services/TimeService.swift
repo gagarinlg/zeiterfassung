@@ -1,10 +1,16 @@
 import Foundation
 
-class TimeService {
+class TimeService: TimeServiceProtocol {
     private let client: APIClient
 
     init(client: APIClient = .shared) {
         self.client = client
+    }
+
+    private struct EmptyBody: Encodable {}
+
+    func getTrackingStatus(userId: String) async throws -> TrackingStatusResponse {
+        return try await client.get("/time-entries/status/\(userId)")
     }
 
     func getTimeEntries(userId: String) async throws -> [TimeEntry] {
@@ -19,5 +25,11 @@ class TimeService {
         return try await client.post("/time-entries/clock-out", body: EmptyBody())
     }
 
-    private struct EmptyBody: Encodable {}
+    func startBreak() async throws -> TimeEntry {
+        return try await client.post("/time-entries/break/start", body: EmptyBody())
+    }
+
+    func endBreak() async throws -> TimeEntry {
+        return try await client.post("/time-entries/break/end", body: EmptyBody())
+    }
 }

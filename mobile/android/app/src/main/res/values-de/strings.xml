@@ -21,4 +21,14 @@
     <string name="save">Speichern</string>
     <string name="cancel">Abbrechen</string>
     <string name="settings">Einstellungen</string>
+    <string name="status_clocked_in">Eingestempelt</string>
+    <string name="status_on_break">In der Pause</string>
+    <string name="status_clocked_out">Ausgestempelt</string>
+    <string name="today_work">Heute gearbeitet</string>
+    <string name="today_break">Pause heute</string>
+    <string name="vacation_requests">Urlaubsanträge</string>
+    <string name="days">Tage</string>
+    <string name="balance_total">Gesamt</string>
+    <string name="balance_used">Verwendet</string>
+    <string name="balance_remaining">Verbleibend</string>
 </resources>

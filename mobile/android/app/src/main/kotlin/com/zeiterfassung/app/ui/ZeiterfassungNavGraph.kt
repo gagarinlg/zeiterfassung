@@ -4,6 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.zeiterfassung.app.ui.screen.DashboardScreen
+import com.zeiterfassung.app.ui.screen.LoginScreen
+import com.zeiterfassung.app.ui.screen.TimeTrackingScreen
+import com.zeiterfassung.app.ui.screen.VacationScreen
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -18,20 +22,21 @@ fun ZeiterfassungNavGraph() {
 
     NavHost(navController = navController, startDestination = Screen.Login.route) {
         composable(Screen.Login.route) {
-            LoginScreenPlaceholder(onLoginSuccess = {
+            LoginScreen(onLoginSuccess = {
                 navController.navigate(Screen.Dashboard.route) {
                     popUpTo(Screen.Login.route) { inclusive = true }
                 }
             })
         }
         composable(Screen.Dashboard.route) {
-            DashboardScreenPlaceholder()
+            DashboardScreen()
         }
         composable(Screen.TimeTracking.route) {
-            TimeTrackingScreenPlaceholder()
+            TimeTrackingScreen()
         }
         composable(Screen.Vacation.route) {
-            VacationScreenPlaceholder()
+            VacationScreen()
         }
     }
 }
+
