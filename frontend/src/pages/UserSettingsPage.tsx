@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import adminService from '../services/adminService'
 import { authService } from '../services/authService'
+import { QRCodeSVG } from 'qrcode.react'
 
 export default function UserSettingsPage() {
   const { t } = useTranslation()
@@ -14,7 +15,7 @@ export default function UserSettingsPage() {
   const [error, setError] = useState<string | null>(null)
 
   // TOTP 2FA
-  const [totpSetupData, setTotpSetupData] = useState<{ secret: string; otpauthUrl: string } | null>(null)
+  const [totpSetupData, setTotpSetupData] = useState<{ secret: string; qrCodeUri: string } | null>(null)
   const [totpCode, setTotpCode] = useState('')
   const [totpSaving, setTotpSaving] = useState(false)
   const [totpSuccess, setTotpSuccess] = useState<string | null>(null)
@@ -194,8 +195,8 @@ export default function UserSettingsPage() {
         {totpSetupData && (
           <form onSubmit={handleEnableTotp} className="space-y-4">
             <p className="text-sm text-gray-600">{t('settings.totp_setup_instructions')}</p>
-            <div className="p-3 bg-gray-50 border rounded-lg text-sm font-mono break-all">
-              {totpSetupData.otpauthUrl}
+            <div className="flex justify-center p-4 bg-white border rounded-lg">
+              <QRCodeSVG value={totpSetupData.qrCodeUri} size={200} level="M" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
