@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import adminService from '../services/adminService'
-import apiClient from '../services/apiClient'
 
 export default function UserSettingsPage() {
   const { t } = useTranslation()
@@ -47,11 +46,7 @@ export default function UserSettingsPage() {
     setPasswordError(null)
     setPasswordSuccess(null)
     try {
-      await apiClient.put(`/users/${user?.id}/password`, {
-        currentPassword,
-        newPassword,
-        confirmPassword,
-      })
+      await adminService.changeOwnPassword(user!.id, currentPassword, newPassword, confirmPassword)
       setPasswordSuccess(t('settings.password_changed'))
       setCurrentPassword('')
       setNewPassword('')

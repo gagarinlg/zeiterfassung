@@ -99,6 +99,10 @@ const adminService = {
   // Self-service profile update
   updateOwnProfile: (payload: UpdateUserPayload) =>
     apiClient.put<User>('/users/me', payload).then((r) => r.data),
+
+  // Self-service password change
+  changeOwnPassword: (userId: string, currentPassword: string, newPassword: string, confirmPassword: string) =>
+    apiClient.put(`/users/${userId}/password`, { currentPassword, newPassword, confirmPassword }).then((r) => r.data),
 }
 
 export default adminService

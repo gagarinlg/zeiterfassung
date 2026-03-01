@@ -211,7 +211,7 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
                 onChange={(e) => setForm((p) => ({ ...p, managerId: e.target.value }))}
               >
                 <option value="">—</option>
-                {allUsers.filter((u) => u.id !== user?.id).map((u) => (
+                {allUsers.filter((u) => u.id !== user?.id && (u.roles.includes('MANAGER') || u.roles.includes('ADMIN') || u.roles.includes('SUPER_ADMIN'))).map((u) => (
                   <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
                 ))}
               </select>
