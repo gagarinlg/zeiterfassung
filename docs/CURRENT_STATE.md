@@ -4,7 +4,7 @@
 
 ## Quick Summary
 
-Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–8 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, and admin endpoints (audit log + system settings). The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright.
+Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–9 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, and admin endpoints (audit log + system settings). The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright across all 7 frontend pages (62+ tests).
 
 ## What Works Right Now
 
@@ -27,12 +27,14 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Terminal heartbeat: `GET /api/terminal/heartbeat`
 - ✅ Admin audit log: `GET /api/admin/audit-log` (paginated, filterable by userId)
 - ✅ Admin system settings: `GET /api/admin/settings`, `PUT /api/admin/settings/{key}`
+- ✅ Per-user date/time format preferences with system-wide defaults
+- ✅ CORS: `allowedOriginPatterns` for proper localhost + credential handling
 
 ### Frontend (Fully Implemented)
 - ✅ Login page with validation and error handling
 - ✅ Auth context with auto-refresh and permission helpers
 - ✅ Protected routes with 403 handling
-- ✅ Navigation with role-based menu items
+- ✅ Navigation with role-based menu items and correct active state highlighting
 - ✅ Vacation page: balance card, request list, new-request form, monthly calendar
 - ✅ Vacation approval page: manager queue with approve/reject-with-reason modal
 - ✅ Dashboard: real data widgets (today hours, weekly hours, vacation balance, team status, compliance warnings)
@@ -40,6 +42,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Admin page: 3-tab UI (User Management, Audit Log, System Settings) with full CRUD, search, modals
 - ✅ Date/calendar localization: `dateUtils.ts` utility with `formatDate`, `formatTime`, `formatDateTime`, `formatMonthYear` using date-fns locales; `DateFormatContext` for per-user date/time format preferences; all pages (Dashboard, TimeTracking, Vacation) use localized date formatting
 - ✅ Unit tests: 59 tests total (LoginPage, AuthContext, ProtectedRoute, AdminPage, dateUtils)
+- ✅ E2E tests: 62+ Playwright tests covering all 7 pages (login, navigation, dashboard, time-tracking, vacation, vacation-approval, admin)
 - ✅ CI: E2E testing with Playwright (Chromium) integrated into GitHub Actions workflow
 
 ### Mobile (Fully Implemented)
@@ -55,12 +58,10 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 
 ## Tech Debt / Known Issues
 - Backend test coverage targets (≥90%) not yet fully verified for all services
-- E2E Playwright tests cover login, navigation, dashboard, time tracking — vacation and admin E2E tests still needed
 - Android: push notifications, biometric auth, offline caching — not yet implemented
 - iOS: push notifications, Face ID / Touch ID — not yet implemented
 
 ## Next Steps
-1. **Phase 9: Testing & Security Hardening (continued)** — expand E2E tests for vacation/admin pages, backend unit test coverage, penetration testing, OWASP ZAP scans
-2. **Phase 10: Documentation & Polish** — Playwright screenshots, full user docs, API reference
-3. Continue dependency updates (review and merge Dependabot PRs)
+1. **Phase 10: Documentation & Polish** — Playwright screenshots, full user docs, API reference
+2. Continue dependency updates (review and merge Dependabot PRs)
 

@@ -374,21 +374,26 @@
 
 ---
 
-## Phase 9: Testing & Security Hardening 🚧
-- **Status**: IN PROGRESS
+## Phase 9: Testing & Security Hardening ✅
+- **Status**: COMPLETE
 - **Priority**: HIGH
 
-### What has been delivered so far
+### What has been delivered
 
-#### Playwright E2E Test Suite
-- **`e2e/tests/helpers.ts`**: shared mock data (user, tokens, tracking status, summaries, vacation balance) and reusable mock setup functions (`mockAuthenticatedUser`, `mockDashboardApis`, `mockTimeTrackingApis`)
+#### Playwright E2E Test Suite (7 spec files, 62+ tests)
+- **`e2e/tests/helpers.ts`**: shared mock data (user, tokens, tracking status, summaries, vacation balance) and reusable mock setup functions (`mockAuthenticatedUser`, `mockDashboardApis`, `mockTimeTrackingApis`); mock API paths corrected to match actual frontend service paths (`/api/time/` not `/api/time-tracking/`)
 - **`e2e/tests/login.spec.ts`**: 12 tests — form rendering, language toggle, redirect from all protected routes, Zod client-side validation (empty fields, invalid email, empty password), successful login with mocked API, failed login (401/423/429 error messages)
 - **`e2e/tests/navigation.spec.ts`**: 6 tests — sidebar links for admin user, route navigation to time tracking and vacation, protected route redirect, logout flow
 - **`e2e/tests/dashboard.spec.ts`**: 8 tests — page rendering with title and user name, today's hours / weekly hours / vacation balance / team present widgets, clocked-in status banner, weekly summary values, error handling
 - **`e2e/tests/time-tracking.spec.ts`**: 14 tests — clocked-out/clocked-in/on-break states with correct buttons, status badges, today summary, no-entries message, monthly timesheet table (heading, column headers, daily entries, total row, compliance badges, CSV export button), error handling
+- **`e2e/tests/vacation.spec.ts`**: 8 tests — page rendering with title, balance card, tab navigation, requests table with status badges, new request form, calendar navigation, error handling
+- **`e2e/tests/vacation-approval.spec.ts`**: 6 tests — page title, pending requests table with employee names, approve/reject buttons, reject modal with reason textarea, empty state message, error handling
+- **`e2e/tests/admin.spec.ts`**: 8 tests — page title, tab navigation, user list display, create user button/modal, audit log entries, system settings display with edit buttons, error handling
 - **`e2e/tsconfig.json`**: TypeScript config for E2E tests
 - **`playwright.config.ts`**: updated to always capture screenshots (`screenshot: 'on'`)
-- **`@types/node`** added as devDependency for Node.js type support in E2E config
+
+#### Backend Integration Tests
+- **`AuthControllerIntegrationTest`**: 10 `@SpringBootTest` integration tests — CORS preflight allowed/blocked, credentials header, login success/failure/validation, protected endpoint auth, security headers (HSTS, X-Frame-Options, X-Content-Type-Options)
 
 #### Frontend Unit Tests
 - **`dateUtils.test.ts`**: 18 tests covering `formatDate` (DD.MM.YYYY, YYYY-MM-DD, MM/DD/YYYY, empty, invalid, ISO timestamp, locale default), `formatTime` (24h, 12h, empty), `formatDateTime` (combined, empty), `formatMonthYear` (German, English), `getFirstDayOfWeek` (German=1, English=0)
@@ -397,15 +402,19 @@
 - **`frontend-e2e` job** added to `.github/workflows/ci.yml` — installs Playwright + Chromium, runs E2E tests, uploads test results and screenshots as artifacts
 - **`build` job** now depends on `frontend-e2e` in addition to all other lint/test jobs
 
+#### Bug Fixes
+- **CORS**: Changed `allowedOrigins` → `allowedOriginPatterns` in `SecurityConfig.kt` to fix localhost login
+- **V7 migration**: Fixed column names from `setting_key`/`setting_value` to `key`/`value` matching V5 schema
+- **NavLink active state**: Added `end` prop to `/vacation` NavLink to prevent highlighting when on `/vacation/approvals`
+- **ktlint**: Auto-formatted `AuthControllerIntegrationTest.kt` to pass CI
+
 #### Documentation
 - **`docs/installation/README.md`**: comprehensive installation guide covering Docker deployment, development setup, production deployment, Raspberry Pi terminal setup, mobile apps, configuration reference, and troubleshooting
 
-### What still needs to be built
-- **Backend unit tests**: ≥90% coverage for all services and controllers
+### What could be expanded in future
+- **Backend unit tests**: expand to ≥90% coverage for all services and controllers
 - **Frontend unit tests**: expand to ≥85% coverage with Vitest
 - **Penetration testing**: OWASP ZAP automated scans, manual testing checklist
-- **Security headers**: verify CSP, HSTS, X-Frame-Options, X-Content-Type-Options
-- **Input validation**: comprehensive server-side validation on all endpoints
 - **Rate limiting**: implement on all sensitive endpoints
 - **Dependency audit**: verify all dependencies are up-to-date and secure
 

@@ -3,12 +3,16 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased] — Phase 9: Testing & Security Hardening
+## [Unreleased] — Phase 9: Testing & Security Hardening (COMPLETE)
 
 ### Fixed
 - **CORS**: Changed `allowedOrigins` to `allowedOriginPatterns` in SecurityConfig, fixing "Invalid CORS request" on localhost
 - **Date localization**: Dates now display in locale-correct format (DD.MM.YYYY for German) instead of US format; calendar uses Monday as first day of week for German locale
 - **JwtAuthenticationFilter**: Added `/terminal/` to publicPaths for consistency with SecurityConfig permitAll rules
+- **V7 migration**: Fixed column names from `setting_key`/`setting_value` to `key`/`value` matching V5 schema; fixed `ON CONFLICT` clause to target `(key)` column
+- **NavLink active state**: Added `end` prop to `/vacation` NavLink so it no longer highlights when on `/vacation/approvals`
+- **ktlint CI**: Auto-formatted `AuthControllerIntegrationTest.kt` to pass ktlint checks
+- **E2E mock API paths**: Corrected all E2E test mocks from wrong `/api/time-tracking/` to correct `/api/time/` matching actual frontend service endpoints
 
 ### Added
 - **V7 migration**: `date_format` and `time_format` columns on users table; system settings for `display.date_format`, `display.time_format`, `display.first_day_of_week`
@@ -17,43 +21,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - **`DateFormatContext`**: React context providing user's date/time format preferences to all components
 - **AuthControllerIntegrationTest**: 10 integration tests (CORS preflight, credentials, auth login/logout, security headers)
 - Frontend unit tests for `dateUtils.ts` (18 tests)
-  - `formatDate`: DD.MM.YYYY, YYYY-MM-DD, MM/DD/YYYY, empty, invalid, ISO timestamp, locale default
-  - `formatTime`: 24h, 12h, empty
-  - `formatDateTime`: combined, empty
-  - `formatMonthYear`: German and English locale-aware month names
-  - `getFirstDayOfWeek`: German (Monday=1) and English (Sunday=0)
+- **Playwright E2E test suite** (7 spec files, 62+ tests):
+  - `login.spec.ts`: 12 tests — form rendering, language toggle, validation, login flows
+  - `navigation.spec.ts`: 6 tests — sidebar, route navigation, protected routes, logout
+  - `dashboard.spec.ts`: 8 tests — widgets, status banners, weekly summary, error handling
+  - `time-tracking.spec.ts`: 14 tests — clock states, buttons, timesheet, CSV export, errors
+  - `vacation.spec.ts`: 8 tests — balance card, requests tab, new request form, calendar, errors
+  - `vacation-approval.spec.ts`: 6 tests — pending requests, approve/reject, reject modal, empty state, errors
+  - `admin.spec.ts`: 8 tests — user list, create user, audit log, settings, errors
 - E2E testing job in CI workflow (`.github/workflows/ci.yml`)
-  - `frontend-e2e` job: installs Playwright + Chromium, runs E2E tests, uploads results/screenshots
-  - `build` job now depends on `frontend-e2e`
 - Comprehensive installation guide (`docs/installation/README.md`)
-  - Docker deployment, development setup, production deployment
-  - Raspberry Pi terminal setup, mobile apps, configuration reference, troubleshooting
 
 ### Changed
-- Date/calendar localization across the frontend
-  - `frontend/src/utils/dateUtils.ts`: `formatDate`, `formatTime`, `formatDateTime`, `formatMonthYear`, `getFirstDayOfWeek`, `getWeekdayHeaders` utilities using date-fns with locale support (de, en)
-  - `frontend/src/context/DateFormatContext.tsx`: React context providing per-user date/time format preferences
-  - Translation keys for date/time format settings in both German and English locale files
-- Per-user date/time format preferences in backend
-  - `V7__add_user_date_preferences.sql`: adds `date_format` and `time_format` columns to users table; seeds system-wide display defaults
-  - `UserEntity.kt`: new `dateFormat` and `timeFormat` fields
-  - `UserResponse` DTO: includes `dateFormat` and `timeFormat`
-  - `UpdateUserRequest`: supports updating `dateFormat` and `timeFormat`
-  - `UserService` and `AuthService`: `toUserResponse()` includes new fields
-- Comprehensive Playwright E2E test suite (Phase 9)
-  - `e2e/tests/helpers.ts`: shared mock data and auth/API mock helpers
-  - `e2e/tests/login.spec.ts`: 12 tests covering form rendering, language toggle, validation, login flows (success/401/423/429)
-  - `e2e/tests/navigation.spec.ts`: 6 tests for sidebar, route navigation, protected routes, logout
-  - `e2e/tests/dashboard.spec.ts`: 8 tests for widgets, status banners, error handling
-  - `e2e/tests/time-tracking.spec.ts`: 14 tests for all clock states, buttons, timesheet table, CSV export, errors
-  - `e2e/tsconfig.json`: TypeScript configuration for E2E tests
-  - `@types/node` devDependency for Node.js types in E2E config
-
-### Changed
-- `playwright.config.ts`: screenshot mode changed from `only-on-failure` to `on` (always capture for docs)
+- Date/calendar localization across the frontend (Dashboard, TimeTracking, Vacation pages)
+- Per-user date/time format preferences in backend (V7 migration, UserEntity, DTOs)
+- `playwright.config.ts`: screenshot mode set to `on` (always capture for docs)
 
 ### Planned
-- Phase 9: Testing & Security Hardening (continued)
 - Phase 10: Documentation & Polish
 
 ## [Phase 7+8 - Mobile Apps + Admin Panel] - 2026-03-01
