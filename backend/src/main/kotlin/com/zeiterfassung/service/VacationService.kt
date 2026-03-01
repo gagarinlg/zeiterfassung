@@ -264,9 +264,13 @@ class VacationService(
                 .orElseThrow { ResourceNotFoundException("User not found: $requestingUserId") }
         val isOwner = entity.user.id == requestingUserId
         val isManagerOfOwner = requestingUser.subordinates.any { it.id == entity.user.id }
+        val isSubstituteOfManager =
+            userRepository.findBySubstituteId(requestingUserId).any { m ->
+                m.subordinates.any { it.id == entity.user.id }
+            }
         val hasAdminPermission =
             requestingUser.roles.flatMap { it.permissions }.any { it.name == "admin.users.manage" }
-        if (!isOwner && !isManagerOfOwner && !hasAdminPermission) {
+        if (!isOwner && !isManagerOfOwner && !isSubstituteOfManager && !hasAdminPermission) {
             throw ForbiddenException("vacation.error.not_owner")
         }
         return entity.toResponse()
@@ -317,7 +321,11 @@ class VacationService(
             userRepository
                 .findById(managerId)
                 .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
-        val subordinateIds = manager.subordinates.map { it.id }
+        val subordinateIds = manager.subordinates.map { it.id }.toMutableList()
+        // Include subordinates from managers who designated this user as substitute
+        userRepository.findBySubstituteId(managerId).forEach { m ->
+            subordinateIds.addAll(m.subordinates.map { it.id })
+        }
         if (subordinateIds.isEmpty()) {
             return org.springframework.data.domain.Page
                 .empty(pageable)
@@ -355,7 +363,13 @@ class VacationService(
                 .orElseThrow { ResourceNotFoundException("User not found: $managerId") }
         val isAdmin = manager.roles.flatMap { it.permissions }.any { it.name == "admin.users.manage" }
         if (!isAdmin && manager.subordinates.none { it.id == userId }) {
-            throw ForbiddenException("Access denied: user $userId is not your subordinate")
+            val isSubstitute =
+                userRepository.findBySubstituteId(managerId).any { m ->
+                    m.subordinates.any { it.id == userId }
+                }
+            if (!isSubstitute) {
+                throw ForbiddenException("Access denied: user $userId is not your subordinate")
+            }
         }
         return getBalance(userId, year)
     }
@@ -396,7 +410,11 @@ class VacationService(
         val startDate = LocalDate.of(year, month, 1)
         val endDate = startDate.withDayOfMonth(startDate.lengthOfMonth())
 
-        val subordinateIds = manager.subordinates.map { it.id }
+        val subordinateIds = manager.subordinates.map { it.id }.toMutableList()
+        // Include subordinates from managers who designated this user as substitute
+        userRepository.findBySubstituteId(managerId).forEach { m ->
+            subordinateIds.addAll(m.subordinates.map { it.id })
+        }
         val teamRequests =
             if (subordinateIds.isEmpty()) {
                 emptyList()

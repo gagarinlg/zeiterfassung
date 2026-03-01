@@ -50,6 +50,9 @@ class UserEntity(
     var manager: UserEntity? = null,
     @OneToMany(mappedBy = "manager", fetch = FetchType.LAZY)
     val subordinates: MutableList<UserEntity> = mutableListOf(),
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "substitute_id")
+    var substitute: UserEntity? = null,
     @Column(name = "is_active", nullable = false)
     var isActive: Boolean = true,
     @Column(name = "is_deleted", nullable = false)

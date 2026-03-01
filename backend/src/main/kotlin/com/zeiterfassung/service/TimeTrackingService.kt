@@ -323,7 +323,14 @@ class TimeTrackingService(
                 .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
         val isAdmin = manager.roles.flatMap { it.permissions }.any { it.name == "admin.users.manage" }
         if (!isAdmin && manager.subordinates.none { it.id == userId }) {
-            throw com.zeiterfassung.exception.ForbiddenException("Access denied: user $userId is not your subordinate")
+            // Check if user is a substitute for a manager who has this subordinate
+            val isSubstitute =
+                userRepository.findBySubstituteId(managerId).any { m ->
+                    m.subordinates.any { it.id == userId }
+                }
+            if (!isSubstitute) {
+                throw com.zeiterfassung.exception.ForbiddenException("Access denied: user $userId is not your subordinate")
+            }
         }
         return getEntriesForUser(userId, start, end)
     }
@@ -417,7 +424,13 @@ class TimeTrackingService(
             userRepository
                 .findById(managerId)
                 .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
-        return manager.subordinates.associate { it.id to getCurrentStatus(it.id) }
+        val allSubordinateIds = mutableSetOf<UUID>()
+        manager.subordinates.forEach { allSubordinateIds.add(it.id) }
+        // Include subordinates from managers who designated this user as substitute
+        userRepository.findBySubstituteId(managerId).forEach { m ->
+            m.subordinates.forEach { allSubordinateIds.add(it.id) }
+        }
+        return allSubordinateIds.associateWith { getCurrentStatus(it) }
     }
 
     /**
