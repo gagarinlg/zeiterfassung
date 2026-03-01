@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
-import { Clock, Calendar, LayoutDashboard, Settings, LogOut, User, CheckCircle, UserCog } from 'lucide-react'
+import { Clock, Calendar, LayoutDashboard, Settings, LogOut, User, CheckCircle, UserCog, Thermometer, Plane, FolderKanban } from 'lucide-react'
 
 export default function Layout() {
   const { t } = useTranslation()
@@ -74,6 +74,53 @@ export default function Layout() {
               {t('nav.vacation_approvals')}
             </NavLink>
           )}
+          <NavLink
+            to="/sick-leave"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+              }`
+            }
+          >
+            <Thermometer size={18} />
+            {t('nav.sick_leave')}
+          </NavLink>
+          <NavLink
+            to="/business-trips"
+            end
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+              }`
+            }
+          >
+            <Plane size={18} />
+            {t('nav.business_trips')}
+          </NavLink>
+          {hasPermission('vacation.approve') && (
+            <NavLink
+              to="/business-trips/approvals"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+                }`
+              }
+            >
+              <CheckCircle size={18} />
+              {t('nav.business_trip_approvals')}
+            </NavLink>
+          )}
+          <NavLink
+            to="/projects"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+              }`
+            }
+          >
+            <FolderKanban size={18} />
+            {t('nav.projects')}
+          </NavLink>
           {hasPermission('admin.users.manage') && (
             <NavLink
               to="/admin"

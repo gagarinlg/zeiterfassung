@@ -7,6 +7,10 @@ import DashboardPage from './pages/DashboardPage'
 import TimeTrackingPage from './pages/TimeTrackingPage'
 import VacationPage from './pages/VacationPage'
 import VacationApprovalPage from './pages/VacationApprovalPage'
+import SickLeavePage from './pages/SickLeavePage'
+import BusinessTripPage from './pages/BusinessTripPage'
+import BusinessTripApprovalPage from './pages/BusinessTripApprovalPage'
+import ProjectsPage from './pages/ProjectsPage'
 import AdminPage from './pages/AdminPage'
 import UserSettingsPage from './pages/UserSettingsPage'
 import PasswordResetRequestPage from './pages/PasswordResetRequestPage'
@@ -40,6 +44,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/sick-leave" element={<SickLeavePage />} />
+          <Route path="/business-trips" element={<BusinessTripPage />} />
+          <Route
+            path="/business-trips/approvals"
+            element={
+              <ProtectedRoute requiredPermission="vacation.approve">
+                <BusinessTripApprovalPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/projects" element={<ProjectsPage />} />
           <Route
             path="/admin"
             element={

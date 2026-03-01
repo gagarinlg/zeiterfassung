@@ -334,4 +334,239 @@ test.describe('Documentation Screenshots', () => {
     await page.waitForTimeout(300)
     await page.screenshot({ path: `${SCREENSHOT_DIR}/forgot-password.png`, fullPage: true })
   })
+
+  test('Sick Leave page', async ({ page }) => {
+    await mockAuthenticatedUser(page)
+    await page.route('**/api/sick-leave?**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          content: [
+            {
+              id: 'sl1',
+              userId: MOCK_USER.id,
+              userName: 'Admin User',
+              startDate: '2025-11-10',
+              endDate: '2025-11-14',
+              status: 'CERTIFICATE_RECEIVED',
+              hasCertificate: true,
+              certificateSubmittedAt: '2025-11-12T10:00:00Z',
+              notes: 'Flu',
+              reportedById: null,
+              reportedByName: null,
+              createdAt: '2025-11-10T08:00:00Z',
+              updatedAt: '2025-11-12T10:00:00Z',
+            },
+            {
+              id: 'sl2',
+              userId: MOCK_USER.id,
+              userName: 'Admin User',
+              startDate: '2025-12-01',
+              endDate: '2025-12-03',
+              status: 'REPORTED',
+              hasCertificate: false,
+              certificateSubmittedAt: null,
+              notes: null,
+              reportedById: null,
+              reportedByName: null,
+              createdAt: '2025-12-01T07:30:00Z',
+              updatedAt: '2025-12-01T07:30:00Z',
+            },
+          ],
+          totalElements: 2,
+          totalPages: 1,
+          pageNumber: 0,
+          pageSize: 20,
+        }),
+      }),
+    )
+    await page.goto('/sick-leave')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(500)
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/sick-leave.png`, fullPage: true })
+  })
+
+  test('Business Trips page', async ({ page }) => {
+    await mockAuthenticatedUser(page)
+    await page.route('**/api/business-trips?**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          content: [
+            {
+              id: 'bt1',
+              userId: MOCK_USER.id,
+              userName: 'Admin User',
+              startDate: '2025-09-15',
+              endDate: '2025-09-17',
+              destination: 'München',
+              purpose: 'Customer meeting',
+              status: 'COMPLETED',
+              approvedById: null,
+              approvedByName: null,
+              rejectionReason: null,
+              notes: null,
+              estimatedCost: 850.00,
+              actualCost: 920.50,
+              costCenter: 'CC-100',
+              createdAt: '2025-09-01T10:00:00Z',
+              updatedAt: '2025-09-17T18:00:00Z',
+            },
+            {
+              id: 'bt2',
+              userId: MOCK_USER.id,
+              userName: 'Admin User',
+              startDate: '2025-10-20',
+              endDate: '2025-10-22',
+              destination: 'Berlin',
+              purpose: 'Conference',
+              status: 'APPROVED',
+              approvedById: '00000000-0000-0000-0000-000000000003',
+              approvedByName: 'Maria Schmidt',
+              rejectionReason: null,
+              notes: 'Annual tech summit',
+              estimatedCost: 1200.00,
+              actualCost: null,
+              costCenter: 'CC-200',
+              createdAt: '2025-09-20T14:00:00Z',
+              updatedAt: '2025-09-22T09:00:00Z',
+            },
+          ],
+          totalElements: 2,
+          totalPages: 1,
+          pageNumber: 0,
+          pageSize: 20,
+        }),
+      }),
+    )
+    await page.goto('/business-trips')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(500)
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/business-trips.png`, fullPage: true })
+  })
+
+  test('Business Trip Approvals page', async ({ page }) => {
+    await mockAuthenticatedUser(page)
+    await page.route('**/api/business-trips/pending**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          content: [
+            {
+              id: 'bt3',
+              userId: '00000000-0000-0000-0000-000000000002',
+              userName: 'Max Mustermann',
+              startDate: '2025-11-05',
+              endDate: '2025-11-07',
+              destination: 'Hamburg',
+              purpose: 'Client workshop',
+              status: 'REQUESTED',
+              approvedById: null,
+              approvedByName: null,
+              rejectionReason: null,
+              notes: 'Need approval by end of week',
+              estimatedCost: 600.00,
+              actualCost: null,
+              costCenter: 'CC-100',
+              createdAt: '2025-10-28T11:00:00Z',
+              updatedAt: '2025-10-28T11:00:00Z',
+            },
+          ],
+          totalElements: 1,
+          totalPages: 1,
+          pageNumber: 0,
+          pageSize: 20,
+        }),
+      }),
+    )
+    await page.goto('/business-trips/approvals')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(500)
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/business-trip-approvals.png`, fullPage: true })
+  })
+
+  test('Projects page', async ({ page }) => {
+    await mockAuthenticatedUser(page)
+    await page.route('**/api/projects?**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          content: [
+            {
+              id: 'p1',
+              name: 'Website Redesign',
+              code: 'WEB-001',
+              description: 'Complete website overhaul',
+              costCenter: 'CC-100',
+              isActive: true,
+              createdAt: '2025-01-15T10:00:00Z',
+              updatedAt: '2025-01-15T10:00:00Z',
+            },
+            {
+              id: 'p2',
+              name: 'Mobile App',
+              code: 'MOB-001',
+              description: 'Native mobile application',
+              costCenter: 'CC-200',
+              isActive: true,
+              createdAt: '2025-02-01T10:00:00Z',
+              updatedAt: '2025-02-01T10:00:00Z',
+            },
+          ],
+          totalElements: 2,
+          totalPages: 1,
+          pageNumber: 0,
+          pageSize: 20,
+        }),
+      }),
+    )
+    await page.route('**/api/projects/allocations?**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          content: [
+            {
+              id: 'ta1',
+              userId: MOCK_USER.id,
+              userName: 'Admin User',
+              projectId: 'p1',
+              projectName: 'Website Redesign',
+              projectCode: 'WEB-001',
+              date: '2025-10-15',
+              minutes: 240,
+              notes: 'Frontend development',
+              createdAt: '2025-10-15T16:00:00Z',
+              updatedAt: '2025-10-15T16:00:00Z',
+            },
+            {
+              id: 'ta2',
+              userId: MOCK_USER.id,
+              userName: 'Admin User',
+              projectId: 'p2',
+              projectName: 'Mobile App',
+              projectCode: 'MOB-001',
+              date: '2025-10-15',
+              minutes: 120,
+              notes: 'API integration',
+              createdAt: '2025-10-15T16:00:00Z',
+              updatedAt: '2025-10-15T16:00:00Z',
+            },
+          ],
+          totalElements: 2,
+          totalPages: 1,
+          pageNumber: 0,
+          pageSize: 20,
+        }),
+      }),
+    )
+    await page.goto('/projects')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(500)
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/projects.png`, fullPage: true })
+  })
 })

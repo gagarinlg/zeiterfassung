@@ -138,6 +138,56 @@ Use the admin panel to send a test email:
 
 ---
 
+## Sick Leave Management
+
+Employees can report sick leave through the **Sick Leave** page. Managers are automatically notified by email.
+
+### Workflow
+1. Employee reports sick leave (start date, end date, optional notes)
+2. Status changes to **Reported**
+3. Employee submits medical certificate → status changes to **Certificate Received**
+4. Managers can also report sick leave on behalf of an employee
+
+### Overlap Detection
+The system prevents overlapping sick leave entries. If an employee tries to report sick leave for dates that overlap with an existing non-cancelled entry, the request is rejected.
+
+---
+
+## Business Trip Management
+
+Employees can request business trips through the **Business Trips** page.
+
+### Workflow
+1. Employee creates a trip request (destination, purpose, dates, estimated cost)
+2. Manager approves or rejects the request
+3. After the trip, the employee marks it as **Completed** with actual costs
+
+### Manager Approval
+Managers see pending trip requests in the **Trip Approvals** page and can:
+- **Approve** with optional notes
+- **Reject** with a mandatory reason
+
+---
+
+## Project / Cost Center Management
+
+Administrators can create and manage projects via the **Manage Projects** tab on the Projects page.
+
+### Project Setup
+1. Navigate to **Projects** → **Manage Projects**
+2. Enter project name, code, description, and cost center
+3. Click **Create Project**
+
+### Time Allocation
+Employees allocate their time to projects via the **New Allocation** tab:
+- Select a project from the dropdown
+- Choose the date and enter minutes worked
+- Add optional notes
+
+Administrators can view all allocations for a project through the API (`GET /projects/{projectId}/allocations`).
+
+---
+
 ## Terminal Management
 
 ### Raspberry Pi NFC Terminal Setup

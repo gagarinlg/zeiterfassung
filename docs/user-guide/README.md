@@ -111,6 +111,104 @@ Here you can:
 
 ---
 
+## Sick Leave
+
+The **Sick Leave** page lets you report and track sick leave.
+
+![Sick Leave](../screenshots/sick-leave.png)
+
+### Reporting Sick Leave
+
+1. Click the **Report Sick Leave** tab
+2. Enter start and end dates
+3. Add notes if needed (optional)
+4. Click **Report Sick Leave**
+
+Your manager will be notified by email.
+
+### Certificate Submission
+
+German labor law requires a medical certificate (Arbeitsunfähigkeitsbescheinigung) after a certain period of sick leave. You can mark a certificate as submitted by clicking **Submit Certificate** in the actions column.
+
+### Sick Leave Status
+
+- 🔵 **Reported**: Sick leave has been reported
+- 🟡 **Certificate Pending**: Certificate has been requested but not yet submitted
+- 🟢 **Certificate Received**: Medical certificate has been submitted
+- ⚪ **Cancelled**: Sick leave was cancelled
+
+---
+
+## Business Trips
+
+The **Business Trips** page lets you request and manage business trips.
+
+![Business Trips](../screenshots/business-trips.png)
+
+### Creating a Trip Request
+
+1. Click the **New Request** tab
+2. Enter destination and purpose (required)
+3. Select start and end dates
+4. Optionally add estimated cost and cost center
+5. Click **Submit Request**
+
+Your manager will be notified and can approve or reject the request.
+
+### Completing a Trip
+
+After an approved trip is finished, click **Complete** to mark it as completed. You can optionally enter the actual cost at this point.
+
+### Trip Status
+
+- 🟡 **Requested**: Awaiting manager approval
+- 🟢 **Approved**: Trip approved, ready to travel
+- 🔴 **Rejected**: Trip rejected (reason shown)
+- 🔵 **Completed**: Trip completed
+- ⚪ **Cancelled**: Trip cancelled
+
+---
+
+## Business Trip Approvals (Managers)
+
+If you are a manager, you will see the **Trip Approvals** page.
+
+![Business Trip Approvals](../screenshots/business-trip-approvals.png)
+
+Here you can:
+- View pending business trip requests from your team
+- **Approve** requests with one click
+- **Reject** requests with a mandatory reason
+
+---
+
+## Projects & Time Allocation
+
+The **Projects** page lets you allocate your work time to specific projects or cost centers.
+
+![Projects](../screenshots/projects.png)
+
+### Viewing Allocations
+
+The **My Allocations** tab shows all your time allocations with project name, code, duration, and notes.
+
+### Adding a Time Allocation
+
+1. Click the **New Allocation** tab
+2. Select a project from the dropdown
+3. Choose the date
+4. Enter the number of minutes worked
+5. Add notes if needed
+6. Click **Add Allocation**
+
+### Managing Projects (Admins)
+
+Administrators can see a **Manage Projects** tab where they can:
+- Create new projects with name, code, description, and cost center
+- View all existing projects and their status (active/inactive)
+
+---
+
 ## Settings
 
 The **Settings** page lets you customize your preferences.

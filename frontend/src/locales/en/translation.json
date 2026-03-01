@@ -8,6 +8,10 @@
     "time_tracking": "Time Tracking",
     "vacation": "Vacation",
     "vacation_approvals": "Vacation Approvals",
+    "sick_leave": "Sick Leave",
+    "business_trips": "Business Trips",
+    "business_trip_approvals": "Trip Approvals",
+    "projects": "Projects",
     "admin": "Administration",
     "profile": "Profile",
     "logout": "Logout",
@@ -340,6 +344,154 @@
     "totp_enabled_success": "Two-factor authentication enabled successfully",
     "totp_disabled_success": "Two-factor authentication disabled",
     "totp_error": "Failed to update two-factor authentication"
+  },
+  "sick_leave": {
+    "title": "Sick Leave",
+    "tabs": {
+      "list": "My Sick Leaves",
+      "report": "Report Sick Leave"
+    },
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "notes": "Notes",
+    "report_button": "Report Sick Leave",
+    "submit_certificate": "Submit Certificate",
+    "certificate_yes": "Submitted",
+    "certificate_no": "Not submitted",
+    "no_entries": "No sick leave entries found",
+    "status": {
+      "reported": "Reported",
+      "certificate_pending": "Certificate Pending",
+      "certificate_received": "Certificate Received",
+      "cancelled": "Cancelled"
+    },
+    "columns": {
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "status": "Status",
+      "certificate": "Certificate",
+      "notes": "Notes",
+      "actions": "Actions"
+    },
+    "errors": {
+      "load_failed": "Failed to load sick leave data",
+      "report_failed": "Failed to report sick leave",
+      "cancel_failed": "Failed to cancel sick leave",
+      "certificate_failed": "Failed to submit certificate"
+    },
+    "success": {
+      "reported": "Sick leave reported successfully",
+      "cancelled": "Sick leave cancelled",
+      "certificate_submitted": "Certificate submitted successfully"
+    }
+  },
+  "business_trip": {
+    "title": "Business Trips",
+    "tabs": {
+      "list": "My Trips",
+      "new_request": "New Request"
+    },
+    "destination": "Destination",
+    "purpose": "Purpose",
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "notes": "Notes",
+    "estimated_cost": "Estimated Cost",
+    "actual_cost": "Actual Cost",
+    "cost_center": "Cost Center",
+    "submit_button": "Submit Request",
+    "complete": "Complete",
+    "complete_title": "Complete Business Trip",
+    "no_entries": "No business trip entries found",
+    "status": {
+      "requested": "Requested",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
+    "columns": {
+      "destination": "Destination",
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "purpose": "Purpose",
+      "status": "Status",
+      "estimated_cost": "Est. Cost",
+      "actions": "Actions"
+    },
+    "approval": {
+      "title": "Business Trip Approvals",
+      "approve": "Approve",
+      "reject": "Reject",
+      "reject_title": "Reject Business Trip",
+      "rejection_reason": "Reason for rejection (required)",
+      "no_pending": "No pending business trip requests",
+      "employee": "Employee",
+      "destination": "Destination",
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "purpose": "Purpose",
+      "estimated_cost": "Est. Cost",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "errors": {
+      "load_failed": "Failed to load business trip data",
+      "create_failed": "Failed to create business trip request",
+      "cancel_failed": "Failed to cancel business trip",
+      "complete_failed": "Failed to complete business trip",
+      "approve_failed": "Failed to approve business trip",
+      "reject_failed": "Failed to reject business trip"
+    },
+    "success": {
+      "created": "Business trip request submitted successfully",
+      "cancelled": "Business trip cancelled",
+      "completed": "Business trip completed"
+    }
+  },
+  "projects": {
+    "title": "Projects & Time Allocation",
+    "tabs": {
+      "allocations": "My Allocations",
+      "new_allocation": "New Allocation",
+      "manage_projects": "Manage Projects"
+    },
+    "project": "Project",
+    "select_project": "Select a project...",
+    "minutes": "Minutes",
+    "notes": "Notes",
+    "add_allocation": "Add Allocation",
+    "create_project": "Create Project",
+    "project_name": "Project Name",
+    "project_code": "Project Code",
+    "description": "Description",
+    "cost_center": "Cost Center",
+    "no_allocations": "No time allocations found",
+    "columns": {
+      "date": "Date",
+      "project": "Project",
+      "code": "Code",
+      "duration": "Duration",
+      "notes": "Notes",
+      "actions": "Actions"
+    },
+    "project_columns": {
+      "name": "Name",
+      "code": "Code",
+      "cost_center": "Cost Center",
+      "status": "Status"
+    },
+    "errors": {
+      "load_failed": "Failed to load project data",
+      "allocation_create_failed": "Failed to create time allocation",
+      "allocation_delete_failed": "Failed to delete time allocation",
+      "project_create_failed": "Failed to create project"
+    },
+    "success": {
+      "allocation_created": "Time allocation created successfully",
+      "allocation_deleted": "Time allocation deleted",
+      "project_created": "Project created successfully"
+    }
   },
   "backup": {
     "title": "Database Backups",
