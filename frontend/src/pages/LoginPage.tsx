@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { useAuth } from '../hooks/useAuth'
@@ -21,6 +21,8 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<FormErrors>({})
   const [serverError, setServerError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [totpRequired, setTotpRequired] = useState(false)
+  const [totpCode, setTotpCode] = useState('')
 
   const validateForm = (): boolean => {
     const result = loginSchema.safeParse(formData)
@@ -44,7 +46,8 @@ export default function LoginPage() {
 
     setIsLoading(true)
     try {
-      const response = await authService.login(formData)
+      const request = totpRequired ? { ...formData, totpCode } : formData
+      const response = await authService.login(request)
       const tokens = {
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
@@ -53,11 +56,17 @@ export default function LoginPage() {
       login(tokens, response.user)
       navigate('/dashboard')
     } catch (err: unknown) {
-      const axiosError = err as { response?: { status?: number } }
+      const axiosError = err as { response?: { status?: number; data?: { message?: string } } }
       if (axiosError.response?.status === 423) {
         setServerError(t('auth.account_locked'))
       } else if (axiosError.response?.status === 429) {
         setServerError(t('auth.rate_limit_exceeded'))
+      } else if (
+        axiosError.response?.status === 401 &&
+        axiosError.response?.data?.message?.toLowerCase().includes('totp')
+      ) {
+        setTotpRequired(true)
+        setServerError(t('auth.totp_required'))
       } else {
         setServerError(t('auth.login_error'))
       }
@@ -138,6 +147,23 @@ export default function LoginPage() {
               </p>
             )}
           </div>
+          {totpRequired && (
+            <div>
+              <label htmlFor="totpCode" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('auth.totp_code')}
+              </label>
+              <input
+                id="totpCode"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                value={totpCode}
+                onChange={(e) => setTotpCode(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="000000"
+              />
+            </div>
+          )}
           <button
             type="submit"
             disabled={isLoading}
@@ -145,6 +171,11 @@ export default function LoginPage() {
           >
             {isLoading ? t('common.loading') : t('auth.login_button')}
           </button>
+          <div className="text-center">
+            <Link to="/forgot-password" className="text-sm text-primary-600 hover:underline">
+              {t('auth.forgot_password')}
+            </Link>
+          </div>
         </form>
       </div>
     </div>

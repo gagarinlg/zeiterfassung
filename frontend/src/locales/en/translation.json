@@ -10,7 +10,8 @@
     "vacation_approvals": "Vacation Approvals",
     "admin": "Administration",
     "profile": "Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "settings": "Settings"
   },
   "auth": {
     "login": "Login",
@@ -23,6 +24,18 @@
     "session_expired": "Session expired. Please log in again.",
     "switch_language": "Switch Language",
     "rate_limit_exceeded": "Too many login attempts. Please try again later.",
+    "reset_password": "Reset Password",
+    "reset_instructions": "Enter your email address. You will receive a link to reset your password.",
+    "reset_email_sent": "If an account with that email exists, a password reset link has been sent.",
+    "send_reset_link": "Send Reset Link",
+    "back_to_login": "Back to Login",
+    "forgot_password": "Forgot password?",
+    "set_new_password": "Set New Password",
+    "password_reset_success": "Your password has been changed successfully. You can now log in.",
+    "reset_failed": "Password reset failed. The link may have expired.",
+    "invalid_reset_token": "Invalid or missing reset link.",
+    "totp_code": "Two-Factor Code",
+    "totp_required": "Please enter the code from your authenticator app.",
     "validation": {
       "email_required": "Email address is required",
       "email_invalid": "Invalid email address",
@@ -264,7 +277,8 @@
     "change_password": "Change Password",
     "reset_password": "Reset Password",
     "current_password": "Current Password",
-    "new_password": "New Password"
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password"
   },
   "settings": {
     "date_format": "Date Format",
@@ -279,6 +293,11 @@
       "12h": "12-hour"
     },
     "preferences": "Preferences",
-    "preferences_saved": "Preferences saved"
+    "preferences_saved": "Preferences saved",
+    "display_preferences": "Display Preferences",
+    "confirm_password": "Confirm Password",
+    "passwords_no_match": "Passwords do not match",
+    "password_changed": "Password changed successfully",
+    "password_change_failed": "Failed to change password"
   }
 }

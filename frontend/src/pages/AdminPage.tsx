@@ -59,6 +59,7 @@ interface UserModalProps {
 
 function UserModal({ user, onClose, onSave }: UserModalProps) {
   const { t } = useTranslation()
+  const [allUsers, setAllUsers] = useState<User[]>([])
   const [form, setForm] = useState({
     email: user?.email ?? '',
     password: '',
@@ -68,10 +69,15 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
     phone: user?.phone ?? '',
     roles: user?.roles ?? ['EMPLOYEE'],
     isActive: user?.isActive ?? true,
+    managerId: user?.managerId ?? '',
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const isNew = user === null
+
+  useEffect(() => {
+    adminService.getUsers(0, 100).then((data) => setAllUsers(data.content)).catch(() => {})
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -95,6 +101,8 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
           lastName: form.lastName,
           phone: form.phone || undefined,
           isActive: form.isActive,
+          managerId: form.managerId || undefined,
+          employeeNumber: form.employeeNumber || undefined,
         }
         await adminService.updateUser(user.id, payload)
         if (JSON.stringify([...form.roles].sort()) !== JSON.stringify([...user.roles].sort())) {
@@ -185,17 +193,29 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
                 onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
               />
             </div>
-            {isNew && (
-              <div>
-                <label htmlFor="modal-employeeNumber" className="block text-sm font-medium text-gray-700 mb-1">{t('users.employee_number')}</label>
-                <input
-                  id="modal-employeeNumber"
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                  value={form.employeeNumber}
-                  onChange={(e) => setForm((p) => ({ ...p, employeeNumber: e.target.value }))}
-                />
-              </div>
-            )}
+            <div>
+              <label htmlFor="modal-employeeNumber" className="block text-sm font-medium text-gray-700 mb-1">{t('users.employee_number')}</label>
+              <input
+                id="modal-employeeNumber"
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                value={form.employeeNumber}
+                onChange={(e) => setForm((p) => ({ ...p, employeeNumber: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label htmlFor="modal-manager" className="block text-sm font-medium text-gray-700 mb-1">{t('users.manager')}</label>
+              <select
+                id="modal-manager"
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                value={form.managerId}
+                onChange={(e) => setForm((p) => ({ ...p, managerId: e.target.value }))}
+              >
+                <option value="">—</option>
+                {allUsers.filter((u) => u.id !== user?.id).map((u) => (
+                  <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
+                ))}
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.roles')}</label>
               <div className="flex flex-wrap gap-2">
@@ -304,16 +324,21 @@ function RfidModal({ user, onClose, onSave }: { user: User; onClose: () => void;
 function ResetPasswordModal({ user, onClose }: { user: User; onClose: () => void }) {
   const { t } = useTranslation()
   const [newPassword, setNewPassword] = useState('')
+  const [confirmPwd, setConfirmPwd] = useState('')
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (newPassword !== confirmPwd) {
+      setError(t('settings.passwords_no_match'))
+      return
+    }
     setSaving(true)
     setError(null)
     try {
-      await adminService.resetPassword(user.id, newPassword)
+      await adminService.resetPassword(user.id, newPassword, confirmPwd)
       setSuccess(true)
     } catch {
       setError(t('admin.errors.save_failed'))
@@ -351,6 +376,17 @@ function ResetPasswordModal({ user, onClose }: { user: User; onClose: () => void
                   className="w-full border rounded-lg px-3 py-2 text-sm"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  minLength={8}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.confirm_password')}</label>
+                <input
+                  type="password"
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  value={confirmPwd}
+                  onChange={(e) => setConfirmPwd(e.target.value)}
                   required
                   minLength={8}
                 />

@@ -27,4 +27,21 @@ export const authService = {
     const response = await apiClient.get<User>('/auth/me')
     return response.data
   },
+
+  // TOTP 2FA
+  setupTotp: () =>
+    apiClient.post('/auth/totp/setup').then((r) => r.data),
+
+  enableTotp: (secret: string, code: string) =>
+    apiClient.post(`/auth/totp/enable?secret=${encodeURIComponent(secret)}`, { code }).then((r) => r.data),
+
+  disableTotp: () =>
+    apiClient.post('/auth/totp/disable').then((r) => r.data),
+
+  // Password reset
+  requestPasswordReset: (email: string) =>
+    apiClient.post('/auth/password/reset-request', { email }).then((r) => r.data),
+
+  confirmPasswordReset: (token: string, newPassword: string, confirmPassword: string) =>
+    apiClient.post('/auth/password/reset-confirm', { token, newPassword, confirmPassword }).then((r) => r.data),
 }
