@@ -95,7 +95,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="p-8" aria-live="polite">
         <p className="text-gray-500">{t('common.loading')}</p>
       </div>
     )

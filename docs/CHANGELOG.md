@@ -5,6 +5,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Improved
+- **WCAG 2.1 AA accessibility**: Added skip-to-content link in Layout.tsx, ARIA landmark on sidebar, `id="main-content"` on main element, `aria-live="polite"` on DashboardPage loading state, reusable `.focus-ring` CSS utility class, and i18n keys for accessibility labels (EN + DE)
+
 ### Added
 - **Spring caching**: `CacheConfig.kt` with `ConcurrentMapCacheManager` for `publicHolidays` and `systemSettings` caches; `@Cacheable` on `VacationService.getPublicHolidays()` and `AdminService.getSystemSettings()`; `@CacheEvict` on `AdminService.updateSystemSetting()` to invalidate cache on updates
 - **OpenAPI/Swagger annotations**: Added `@Tag`, `@Operation`, `@ApiResponse`, and `@SecurityRequirement` annotations to all 7 backend controllers (AuthController, AdminController, TerminalController, EmployeeConfigController, TimeTrackingController, UserController, VacationController)

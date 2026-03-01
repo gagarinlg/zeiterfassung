@@ -11,7 +11,9 @@
     "admin": "Administration",
     "profile": "Profil",
     "logout": "Abmelden",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "skip_to_content": "Zum Hauptinhalt springen",
+    "sidebar": "Hauptnavigation"
   },
   "auth": {
     "login": "Anmelden",

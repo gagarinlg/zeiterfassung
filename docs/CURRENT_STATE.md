@@ -1,6 +1,6 @@
 # Current Project State
 
-> Last updated: 2026-03-01
+> Last updated: 2025-07-14
 
 ## Quick Summary
 
@@ -63,6 +63,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ TOTP 2FA setup with QR code in UserSettingsPage
 - ✅ LDAP configuration tab in AdminPage
 - ✅ Manager substitute dropdown in user management
+- ✅ WCAG 2.1 AA: skip-to-content link, ARIA landmarks, aria-live loading states, focus-visible utility
 - ✅ 25 new backend unit tests (TotpService, PasswordResetService, LdapService, EmailService)
 - ✅ 8 additional backend unit tests (TimeTrackingService break gap detection, VacationService setBalance/triggerCarryOver, NotificationService email dispatch)
 - ✅ Playwright screenshot generation (12 screenshots)
