@@ -20,6 +20,8 @@ export default function UserSettingsPage() {
   const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null)
   const [passwordError, setPasswordError] = useState<string | null>(null)
 
+  if (!user) return null
+
   const handleSavePreferences = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
@@ -46,7 +48,7 @@ export default function UserSettingsPage() {
     setPasswordError(null)
     setPasswordSuccess(null)
     try {
-      await adminService.changeOwnPassword(user!.id, currentPassword, newPassword, confirmPassword)
+      await adminService.changeOwnPassword(user.id, currentPassword, newPassword, confirmPassword)
       setPasswordSuccess(t('settings.password_changed'))
       setCurrentPassword('')
       setNewPassword('')

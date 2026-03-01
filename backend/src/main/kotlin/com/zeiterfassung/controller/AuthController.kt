@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
@@ -81,11 +80,10 @@ class AuthController(
 
     @PostMapping("/totp/enable")
     fun enableTotp(
-        @RequestBody request: TotpVerifyRequest,
+        @Valid @RequestBody request: TotpVerifyRequest,
         @AuthenticationPrincipal userId: String,
-        @RequestParam secret: String,
     ): ResponseEntity<Void> {
-        totpService.enableTotp(UUID.fromString(userId), secret, request.code)
+        totpService.enableTotp(UUID.fromString(userId), request.secret, request.code)
         return ResponseEntity.noContent().build()
     }
 

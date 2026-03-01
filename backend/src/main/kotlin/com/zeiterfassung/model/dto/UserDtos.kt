@@ -74,6 +74,8 @@ data class TotpSetupResponse(
 data class TotpVerifyRequest(
     @field:NotBlank
     val code: String,
+    @field:NotBlank
+    val secret: String,
 )
 
 data class PasswordResetLinkRequest(

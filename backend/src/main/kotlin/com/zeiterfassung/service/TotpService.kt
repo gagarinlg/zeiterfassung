@@ -106,7 +106,7 @@ class TotpService(
                 ((hash[offset + 2].toInt() and 0xFF) shl 8) or
                 (hash[offset + 3].toInt() and 0xFF)
 
-        val code = truncated % Math.pow(10.0, CODE_DIGITS.toDouble()).toInt()
+        val code = truncated % 1_000_000
         return code.toString().padStart(CODE_DIGITS, '0')
     }
 

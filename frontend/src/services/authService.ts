@@ -33,7 +33,7 @@ export const authService = {
     apiClient.post('/auth/totp/setup').then((r) => r.data),
 
   enableTotp: (secret: string, code: string) =>
-    apiClient.post(`/auth/totp/enable?secret=${encodeURIComponent(secret)}`, { code }).then((r) => r.data),
+    apiClient.post('/auth/totp/enable', { secret, code }).then((r) => r.data),
 
   disableTotp: () =>
     apiClient.post('/auth/totp/disable').then((r) => r.data),
