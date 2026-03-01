@@ -25,6 +25,7 @@ import com.zeiterfassung.repository.PublicHolidayRepository
 import com.zeiterfassung.repository.UserRepository
 import com.zeiterfassung.repository.VacationBalanceRepository
 import com.zeiterfassung.repository.VacationRequestRepository
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -379,6 +380,7 @@ class VacationService(
         return getBalance(userId, year)
     }
 
+    @Cacheable("publicHolidays")
     fun getPublicHolidays(
         year: Int,
         stateCode: String?,

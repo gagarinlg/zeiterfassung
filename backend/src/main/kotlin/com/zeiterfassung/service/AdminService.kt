@@ -9,6 +9,8 @@ import com.zeiterfassung.model.dto.UpdateSystemSettingRequest
 import com.zeiterfassung.model.entity.AuditLogEntity
 import com.zeiterfassung.repository.AuditLogRepository
 import com.zeiterfassung.repository.SystemSettingRepository
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -45,8 +47,10 @@ class AdminService(
         )
     }
 
+    @Cacheable("systemSettings")
     fun getSystemSettings(): List<SystemSettingResponse> = systemSettingRepository.findAll().map { it.toResponse() }
 
+    @CacheEvict(value = ["systemSettings"], allEntries = true)
     @Transactional
     fun updateSystemSetting(
         key: String,
