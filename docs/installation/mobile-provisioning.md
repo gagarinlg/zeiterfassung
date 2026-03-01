@@ -14,11 +14,13 @@ This guide covers enterprise provisioning of the Zeiterfassung mobile apps via M
   - [Google Workspace (Google Endpoint Management)](#google-workspace)
   - [VMware Workspace ONE (AirWatch)](#vmware-workspace-one-android)
   - [Microsoft Intune](#microsoft-intune-android)
+  - [AppTech360](#apptech360-android)
 - [iOS Managed App Configuration](#ios-managed-app-configuration)
   - [Configuration Mechanism](#ios-configuration-mechanism)
   - [Jamf Pro](#jamf-pro)
   - [Microsoft Intune](#microsoft-intune-ios)
   - [VMware Workspace ONE](#vmware-workspace-one-ios)
+  - [AppTech360](#apptech360-ios)
 - [Testing Provisioning Locally](#testing-provisioning-locally)
   - [Android](#testing-android)
   - [iOS](#testing-ios)
@@ -165,6 +167,69 @@ Alternatively, use JSON format:
 
 5. Assign the policy to the target device groups.
 
+<a id="apptech360-android"></a>
+
+### AppTech360 (Android)
+
+[AppTech360](https://www.apptech360.com) supports Android Enterprise managed configurations for distributing app settings to managed devices.
+
+1. Log in to the **AppTech360 Admin Console**.
+2. Navigate to **App Management → Managed Apps**.
+3. Locate or add the Zeiterfassung app.
+4. Open the app's **Configuration Policy** settings.
+5. Under **Managed Configurations**, add the following key-value pair:
+
+| Configuration Key | Value Type | Value |
+|-------------------|-----------|-------|
+| `server_url`      | String    | `https://zeiterfassung.yourcompany.com/api/` |
+
+6. Click **Save**.
+7. Assign the configuration policy to the target **device groups** or **user groups**.
+
+**Using AppTech360 REST API:**
+
+AppTech360 supports programmatic configuration via its REST API. You can push managed configurations with a POST request:
+
+```json
+{
+  "appPackageName": "com.zeiterfassung.app",
+  "managedConfigurations": [
+    {
+      "key": "server_url",
+      "valueType": "string",
+      "value": "https://zeiterfassung.yourcompany.com/api/"
+    }
+  ],
+  "targetGroups": ["all-employees"]
+}
+```
+
+**Using AppTech360 XML Profile:**
+
+If your AppTech360 deployment uses XML-based configuration profiles, use the following format:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<AppTech360ManagedConfig>
+  <Application packageName="com.zeiterfassung.app">
+    <Configuration>
+      <Setting key="server_url" type="string">
+        https://zeiterfassung.yourcompany.com/api/
+      </Setting>
+    </Configuration>
+  </Application>
+</AppTech360ManagedConfig>
+```
+
+Upload this profile under **App Management → Configuration Profiles → Import**.
+
+**Verification:**
+
+After deployment, verify the configuration was applied:
+1. Go to **Devices → [select device] → Installed Apps → Zeiterfassung → Configuration**.
+2. Confirm that `server_url` shows the expected value.
+3. On the device, open the Zeiterfassung app → Settings → Server Settings. The URL should appear as read-only with the message "Server URL is managed by your organization."
+
 ---
 
 ## iOS Managed App Configuration
@@ -271,6 +336,80 @@ Alternatively, enter the XML property list directly:
 ```
 
 4. Save and publish.
+
+<a id="apptech360-ios"></a>
+
+### AppTech360 (iOS)
+
+[AppTech360](https://www.apptech360.com) supports iOS Managed App Configuration for pushing settings to managed iOS devices.
+
+1. Log in to the **AppTech360 Admin Console**.
+2. Navigate to **App Management → iOS Apps**.
+3. Locate or add the Zeiterfassung app.
+4. Open the app's **Managed App Configuration** settings.
+5. Enter the configuration payload:
+
+```xml
+<dict>
+    <key>server_url</key>
+    <string>https://zeiterfassung.yourcompany.com/api</string>
+</dict>
+```
+
+6. Click **Save**.
+7. Assign the configuration to the target **device groups** or **user groups**.
+
+**Using AppTech360 REST API:**
+
+Push iOS managed app configuration programmatically:
+
+```json
+{
+  "appBundleId": "com.zeiterfassung.app",
+  "managedAppConfiguration": {
+    "server_url": "https://zeiterfassung.yourcompany.com/api"
+  },
+  "targetGroups": ["all-employees"]
+}
+```
+
+**Full AppTech360 Configuration Profile (iOS plist):**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadType</key>
+    <string>com.apple.ManagedApplicationConfiguration</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+    <key>PayloadIdentifier</key>
+    <string>com.zeiterfassung.app.managed-config</string>
+    <key>PayloadUUID</key>
+    <string>A1B2C3D4-E5F6-7890-ABCD-EF1234567890</string>
+    <key>PayloadDisplayName</key>
+    <string>Zeiterfassung Server Configuration</string>
+    <key>Configuration</key>
+    <dict>
+        <key>server_url</key>
+        <string>https://zeiterfassung.yourcompany.com/api</string>
+    </dict>
+</dict>
+</plist>
+```
+
+Upload this profile under **App Management → Configuration Profiles → Import**.
+
+**Verification:**
+
+After deployment, verify the configuration was applied:
+1. Go to **Devices → [select device] → Installed Apps → Zeiterfassung → Configuration**.
+2. Confirm that `server_url` shows the expected value.
+3. On the device, open the Zeiterfassung app → tap the gear icon → Server Settings. The URL should appear as read-only.
+
+> **Note:** For iOS, do **not** include a trailing slash in the URL.
 
 ---
 
