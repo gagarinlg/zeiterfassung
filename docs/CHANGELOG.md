@@ -3,6 +3,19 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Documentation: Installation, Provisioning & Testing Guides
+
+### Added
+- **`docs/installation/mobile-apps.md`**: Comprehensive mobile app installation guide covering Android and iOS build, signing, distribution (APK, Google Play, TestFlight, App Store), server URL configuration, and MDM provisioning overview
+- **`docs/installation/mobile-provisioning.md`**: Detailed MDM/enterprise provisioning guide with configuration examples for Google Workspace, VMware Workspace ONE, Microsoft Intune (Android), Jamf Pro, Microsoft Intune (iOS), VMware Workspace ONE (iOS); includes local testing procedures
+- **`docs/installation/terminal.md`**: Full Raspberry Pi terminal installation guide covering hardware requirements, OS setup, system dependencies, building from source, cross-compilation, `terminal.toml` annotated reference, kiosk mode with cage, RFID reader setup, audio configuration, systemd service file, network/firewall, offline buffering, maintenance, and troubleshooting
+- **`docs/development/testing.md`**: Testing strategies guide covering backend (JUnit 5 + Mockito), frontend (Vitest + Playwright), terminal (cargo test, mock HTTP, virtual RFID, GUI state testing, offline buffer), mobile (JUnit + MockK, XCTest, Compose UI tests, device matrix), E2E overview, CI/CD integration, and coverage reporting
+
+### Changed
+- **`docs/installation/README.md`**: Added links to the new detailed installation guides (mobile-apps.md, mobile-provisioning.md, terminal.md)
+- **`docs/development/setup.md`**: Added cross-reference link to the new testing guide
+- **`docs/CURRENT_STATE.md`**: Added Documentation section listing all new guides; updated summary
+
 ## [Unreleased] — iOS Server URL Configuration
 
 ### Added
