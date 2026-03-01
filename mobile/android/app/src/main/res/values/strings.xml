@@ -31,4 +31,13 @@
     <string name="balance_total">Total</string>
     <string name="balance_used">Used</string>
     <string name="balance_remaining">Remaining</string>
+    <string name="server_settings">Server Settings</string>
+    <string name="server_url">Server URL</string>
+    <string name="server_url_managed">Server URL is managed by your organization and cannot be changed.</string>
+    <string name="server_url_placeholder">https://zeiterfassung.example.com/api/</string>
+    <string name="server_url_saved">Server URL saved. Please restart the app for changes to take effect.</string>
+    <string name="server_url_help">The server URL determines which Zeiterfassung server this app connects to. Contact your administrator if you are unsure about the correct URL.</string>
+    <string name="back">Back</string>
+    <string name="restriction_server_url_title">Server URL</string>
+    <string name="restriction_server_url_description">The Zeiterfassung server URL</string>
 </resources>

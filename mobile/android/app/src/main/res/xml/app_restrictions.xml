@@ -2,8 +2,8 @@
 <restrictions xmlns:android="http://schemas.android.com/apk/res/android">
     <restriction
         android:key="server_url"
-        android:title="Server URL"
-        android:description="The Zeiterfassung server URL"
+        android:title="@string/restriction_server_url_title"
+        android:description="@string/restriction_server_url_description"
         android:restrictionType="string"
         android:defaultValue="https://zeiterfassung.example.com/api/" />
 </restrictions>

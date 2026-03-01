@@ -25,8 +25,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.zeiterfassung.app.R
 import com.zeiterfassung.app.ui.viewmodel.ServerSettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,12 +45,12 @@ fun ServerSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Server Settings") },
+                title = { Text(stringResource(R.string.server_settings)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                         )
                     }
                 },
@@ -64,13 +66,13 @@ fun ServerSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
-                text = "Server URL",
+                text = stringResource(R.string.server_url),
                 style = MaterialTheme.typography.titleMedium,
             )
 
             if (isManaged) {
                 Text(
-                    text = "Server URL is managed by your organization and cannot be changed.",
+                    text = stringResource(R.string.server_url_managed),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -79,8 +81,8 @@ fun ServerSettingsScreen(
             OutlinedTextField(
                 value = editableUrl,
                 onValueChange = { editableUrl = it },
-                label = { Text("Server URL") },
-                placeholder = { Text("https://zeiterfassung.example.com/api/") },
+                label = { Text(stringResource(R.string.server_url)) },
+                placeholder = { Text(stringResource(R.string.server_url_placeholder)) },
                 enabled = !isManaged,
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -91,13 +93,13 @@ fun ServerSettingsScreen(
                     onClick = { viewModel.saveServerUrl(editableUrl) },
                     modifier = Modifier.align(Alignment.End),
                 ) {
-                    Text("Save")
+                    Text(stringResource(R.string.save))
                 }
             }
 
             if (saveSuccess) {
                 Text(
-                    text = "Server URL saved. Please restart the app for changes to take effect.",
+                    text = stringResource(R.string.server_url_saved),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodyMedium,
                 )
@@ -106,9 +108,7 @@ fun ServerSettingsScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text =
-                    "The server URL determines which Zeiterfassung server this app connects to. " +
-                        "Contact your administrator if you are unsure about the correct URL.",
+                text = stringResource(R.string.server_url_help),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
