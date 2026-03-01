@@ -3,6 +3,20 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Backend Unit Test Coverage Expansion
+
+### Added
+- **`BackupServiceTest`** (11 tests): list/get/delete backups, filename validation, path traversal protection, temp dir handling
+- **`EmployeeConfigServiceTest`** (8 tests): get/update config, default config creation, partial updates, invalid JSON fallback
+- **`MonthlyReportSchedulerTest`** (7 tests): personal & team report sending, inactive/deleted user skipping, email failure handling, formatHours
+- **`AuditServiceTest`** (6 tests): login/logout/data-change/permission-change audit logging, exception handling, non-existent user
+- **`TimeTrackingServiceEdgeCasesTest`** (12 tests): break-state conflicts, notes/terminal fields, delete/getTimeSheet errors, CLOCKED_OUT status
+- **`UserServiceEdgeCasesTest`** (18 tests): update/delete edge cases, manager/substitute assignment, password change/reset, recursive subordinates, substitute delegation
+- **`AuthServiceEdgeCasesTest`** (12 tests): successful login, TOTP flows, refresh token reuse detection, logout/logoutAll, getCurrentUser
+
+### Changed
+- Backend test count increased from 136 to 210 tests across 22 test classes
+
 ## [Unreleased] — CI: Mobile Release Builds
 
 ### Added
