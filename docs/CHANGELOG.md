@@ -3,6 +3,13 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — CI: Mobile Release Builds
+
+### Added
+- **`build-mobile.yml`**: `build-android-release` job — builds signed (or unsigned) release APK/AAB on push to main or tags; uses `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` secrets for signing
+- **`build-mobile.yml`**: `build-ios-release` job — builds Swift package in release configuration on push to main or tags
+- **`build-deploy.yml`**: `build-android-release` and `build-ios-release` jobs added to tag-triggered release workflow; Android APK/AAB and iOS release artifacts are downloaded and included in GitHub Releases alongside the terminal binary
+
 ## [Unreleased] — Documentation: Installation, Provisioning & Testing Guides
 
 ### Added
