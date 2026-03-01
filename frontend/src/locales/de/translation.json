@@ -80,7 +80,29 @@
   },
   "vacation": {
     "title": "Urlaub",
-    "request": "Urlaub beantragen",
+    "request": {
+      "new": "Neuer Urlaubsantrag",
+      "edit": "Antrag bearbeiten",
+      "cancel": "Stornieren",
+      "cancel_confirm": "Möchten Sie diesen Antrag wirklich stornieren?",
+      "submit": "Antrag einreichen",
+      "start_date": "Startdatum",
+      "end_date": "Enddatum",
+      "half_day_start": "Halber Tag am Startdatum",
+      "half_day_end": "Halber Tag am Enddatum",
+      "notes": "Anmerkungen",
+      "total_days": "Tage gesamt",
+      "actions": "Aktionen",
+      "calculated_days": "Berechnete Arbeitstage",
+      "no_requests": "Keine Urlaubsanträge gefunden",
+      "see_reason": "Grund anzeigen",
+      "status": {
+        "pending": "Ausstehend",
+        "approved": "Genehmigt",
+        "rejected": "Abgelehnt",
+        "cancelled": "Storniert"
+      }
+    },
     "remaining_days": "Verbleibende Urlaubstage",
     "used_days": "Genommene Urlaubstage",
     "total_days": "Urlaubstage gesamt",
@@ -105,29 +127,6 @@
       "requests": "Meine Anträge",
       "new_request": "Neuer Antrag",
       "calendar": "Kalender"
-    },
-    "request": {
-      "new": "Neuer Urlaubsantrag",
-      "edit": "Antrag bearbeiten",
-      "cancel": "Stornieren",
-      "cancel_confirm": "Möchten Sie diesen Antrag wirklich stornieren?",
-      "submit": "Antrag einreichen",
-      "start_date": "Startdatum",
-      "end_date": "Enddatum",
-      "half_day_start": "Halber Tag am Startdatum",
-      "half_day_end": "Halber Tag am Enddatum",
-      "notes": "Anmerkungen",
-      "total_days": "Tage gesamt",
-      "actions": "Aktionen",
-      "calculated_days": "Berechnete Arbeitstage",
-      "no_requests": "Keine Urlaubsanträge gefunden",
-      "see_reason": "Grund anzeigen",
-      "status": {
-        "pending": "Ausstehend",
-        "approved": "Genehmigt",
-        "rejected": "Abgelehnt",
-        "cancelled": "Storniert"
-      }
     },
     "approval": {
       "title": "Urlaubsgenehmigungen",
@@ -175,9 +174,37 @@
   },
   "admin": {
     "title": "Administration",
-    "users": "Benutzerverwaltung",
-    "settings": "Einstellungen",
-    "reports": "Berichte"
+    "subtitle": "Benutzer verwalten, Systemeinstellungen und Audit-Protokoll einsehen",
+    "users": {
+      "create": "Benutzer erstellen",
+      "edit": "Benutzer bearbeiten",
+      "no_users": "Keine Benutzer gefunden",
+      "update_rfid": "RFID-Tag aktualisieren",
+      "rfid_placeholder": "RFID-Tag-ID scannen oder eingeben",
+      "rfid_hint": "Leer lassen, um den RFID-Tag zu entfernen",
+      "password_reset_success": "Passwort wurde erfolgreich zurückgesetzt"
+    },
+    "audit_log": "Audit-Protokoll",
+    "settings_tab": "Systemeinstellungen",
+    "settings": {
+      "key": "Einstellungsschlüssel",
+      "value": "Wert",
+      "description": "Beschreibung"
+    },
+    "reports": "Berichte",
+    "audit": {
+      "user": "Benutzer",
+      "action": "Aktion",
+      "entity": "Objekt",
+      "ip": "IP-Adresse",
+      "no_entries": "Keine Audit-Einträge gefunden"
+    },
+    "errors": {
+      "load_failed": "Daten konnten nicht geladen werden",
+      "save_failed": "Änderungen konnten nicht gespeichert werden",
+      "delete_failed": "Löschen fehlgeschlagen"
+    },
+    "users_tab": "Benutzerverwaltung"
   },
   "common": {
     "save": "Speichern",
@@ -207,7 +234,9 @@
     "phone": "Telefon",
     "required": "Pflichtfeld",
     "back_to_dashboard": "Zurück zum Dashboard",
-    "unknown": "Unbekannt"
+    "unknown": "Unbekannt",
+    "previous": "Zurück",
+    "next": "Weiter"
   },
   "errors": {
     "not_found": "Nicht gefunden",

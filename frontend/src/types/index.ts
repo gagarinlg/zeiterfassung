@@ -97,3 +97,11 @@ export interface ApiError {
   message: string
   errors?: Record<string, string>
 }
+
+export interface PageResponse<T> {
+  content: T[]
+  totalElements: number
+  totalPages: number
+  pageNumber: number
+  pageSize: number
+}
