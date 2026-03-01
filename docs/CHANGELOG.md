@@ -3,6 +3,19 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — GDPR Data Export & Deletion
+
+### Added
+- **GDPR Data Export** (backend): `GdprService.exportUserData()` gathers all personal data (user info, time entries, vacation requests, sick leaves, business trips, audit log) into a structured `GdprDataExportResponse`
+- **GDPR Account Deletion** (backend): `GdprService.requestDeletion()` performs soft delete, anonymizes personal data (name, email, phone, RFID, employee number, TOTP), and revokes all refresh tokens
+- **GdprController** at `/gdpr`: 4 endpoints with Swagger annotations
+  - `GET /gdpr/export` — export own data (authenticated users)
+  - `POST /gdpr/delete` — request own account deletion (authenticated users)
+  - `GET /gdpr/export/{userId}` — admin export of user data (`admin.users.manage`)
+  - `POST /gdpr/delete/{userId}` — admin delete user data (`admin.users.manage`)
+- **GdprDtos.kt**: `GdprDataExportResponse`, `GdprPersonalInfo`, `GdprTimeEntry`, `GdprVacationRequest`, `GdprSickLeave`, `GdprBusinessTrip`, `GdprAuditEntry`, `GdprDeletionResponse`
+- **Repository methods**: `TimeEntryRepository.findByUserIdOrderByTimestampAsc()`, `AuditLogRepository.findByUserIdOrderByCreatedAtAsc()` for unpaginated GDPR data retrieval
+
 ## [Unreleased] — Phase 14: Sick Leave, Business Trips & Project Time Allocation
 
 ### Added
