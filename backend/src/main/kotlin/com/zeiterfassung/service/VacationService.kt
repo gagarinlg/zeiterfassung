@@ -95,9 +95,13 @@ class VacationService(
             )
         val saved = vacationRequestRepository.save(entity)
         auditService.logDataChange(userId, "VACATION_REQUEST_CREATED", "VacationRequest", saved.id, null, saved.toResponse())
-        // Notify manager(s) — collect direct manager + anyone with vacation.approve over this user
-        val managers = user.manager?.let { listOf(it) } ?: emptyList()
-        notificationService.notifyVacationRequestCreated(saved, managers)
+        // Notify manager(s) and their substitutes
+        val notifyUsers = mutableListOf<com.zeiterfassung.model.entity.UserEntity>()
+        user.manager?.let { manager ->
+            notifyUsers.add(manager)
+            manager.substitute?.let { notifyUsers.add(it) }
+        }
+        notificationService.notifyVacationRequestCreated(saved, notifyUsers)
         return saved.toResponse()
     }
 
@@ -467,6 +471,53 @@ class VacationService(
                 carriedOverDays = carriedOverDays,
             )
         return vacationBalanceRepository.save(balance)
+    }
+
+    /**
+     * Admin-only: manually set vacation balance fields for a user in a given year.
+     * Only non-null fields in the request are updated.
+     */
+    @Transactional
+    fun setBalance(
+        userId: UUID,
+        year: Int,
+        totalDays: BigDecimal?,
+        usedDays: BigDecimal?,
+        carriedOverDays: BigDecimal?,
+        actorId: UUID,
+    ): VacationBalanceResponse {
+        val balance = getOrCreateBalance(userId, year)
+        val oldResponse = balance.toResponse()
+        totalDays?.let { balance.totalDays = it }
+        usedDays?.let { balance.usedDays = it }
+        carriedOverDays?.let { balance.carriedOverDays = it }
+        val saved = vacationBalanceRepository.save(balance)
+        auditService.logDataChange(actorId, "VACATION_BALANCE_SET", "VacationBalance", saved.id, oldResponse, saved.toResponse())
+        val pendingDays = getPendingDays(userId, year)
+        return saved.toResponse(pendingDays)
+    }
+
+    /**
+     * Admin-only: trigger carry-over calculation for a user into the given year.
+     * Re-computes the carriedOverDays from the previous year's balance.
+     */
+    @Transactional
+    fun triggerCarryOver(
+        userId: UUID,
+        year: Int,
+        actorId: UUID,
+    ): VacationBalanceResponse {
+        val config = employeeConfigRepository.findByUserId(userId)
+        val maxCarryOver = config?.vacationCarryOverMax ?: 10
+        val carriedOver = calculateCarryOver(userId, year, maxCarryOver)
+
+        val balance = getOrCreateBalance(userId, year)
+        val oldResponse = balance.toResponse()
+        balance.carriedOverDays = carriedOver
+        val saved = vacationBalanceRepository.save(balance)
+        auditService.logDataChange(actorId, "VACATION_CARRY_OVER", "VacationBalance", saved.id, oldResponse, saved.toResponse())
+        val pendingDays = getPendingDays(userId, year)
+        return saved.toResponse(pendingDays)
     }
 
     fun calculateWorkingDays(

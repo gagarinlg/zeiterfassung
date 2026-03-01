@@ -178,4 +178,38 @@ class VacationController(
         val targetMonth = month ?: today.monthValue
         return ResponseEntity.ok(vacationService.getTeamCalendar(UUID.fromString(userId), targetYear, targetMonth))
     }
+
+    @PutMapping("/balance/{userId}")
+    @PreAuthorize("hasAuthority('admin.users.manage')")
+    fun setBalance(
+        @PathVariable userId: UUID,
+        @RequestParam(required = false) year: Int?,
+        @Valid @RequestBody dto: com.zeiterfassung.model.dto.SetVacationBalanceRequest,
+        @AuthenticationPrincipal actorId: String,
+    ): ResponseEntity<VacationBalanceResponse> {
+        val targetYear = year ?: LocalDate.now().year
+        return ResponseEntity.ok(
+            vacationService.setBalance(
+                userId,
+                targetYear,
+                dto.totalDays,
+                dto.usedDays,
+                dto.carriedOverDays,
+                UUID.fromString(actorId),
+            ),
+        )
+    }
+
+    @PostMapping("/balance/{userId}/carry-over")
+    @PreAuthorize("hasAuthority('admin.users.manage')")
+    fun triggerCarryOver(
+        @PathVariable userId: UUID,
+        @RequestParam(required = false) year: Int?,
+        @AuthenticationPrincipal actorId: String,
+    ): ResponseEntity<VacationBalanceResponse> {
+        val targetYear = year ?: LocalDate.now().year
+        return ResponseEntity.ok(
+            vacationService.triggerCarryOver(userId, targetYear, UUID.fromString(actorId)),
+        )
+    }
 }

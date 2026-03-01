@@ -84,3 +84,10 @@ data class TeamVacationOverviewResponse(
     val pendingCount: Int,
     val pendingRequests: List<VacationRequestResponse>,
 )
+
+data class SetVacationBalanceRequest(
+    @field:NotNull
+    val totalDays: BigDecimal? = null,
+    val usedDays: BigDecimal? = null,
+    val carriedOverDays: BigDecimal? = null,
+)

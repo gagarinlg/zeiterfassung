@@ -492,15 +492,30 @@ class TimeTrackingService(
         var shortBreakMinutes = 0L
         var clockInTime: Instant? = null
         var breakStartTime: Instant? = null
+        var lastClockOutTime: Instant? = null
 
         for (entry in entries) {
             when (entry.entryType) {
-                TimeEntryType.CLOCK_IN -> clockInTime = entry.timestamp
+                TimeEntryType.CLOCK_IN -> {
+                    // When clocking in again after a previous clock-out on the same day,
+                    // the gap is treated as a break if it is >= 15 minutes.
+                    if (lastClockOutTime != null) {
+                        val gapMinutes = ChronoUnit.MINUTES.between(lastClockOutTime, entry.timestamp)
+                        if (gapMinutes >= minQualifyingBreak) {
+                            qualifyingBreakMinutes += gapMinutes
+                        } else if (gapMinutes > 0) {
+                            shortBreakMinutes += gapMinutes
+                        }
+                        lastClockOutTime = null
+                    }
+                    clockInTime = entry.timestamp
+                }
                 TimeEntryType.CLOCK_OUT -> {
                     if (clockInTime != null) {
                         rawWorkMinutes += ChronoUnit.MINUTES.between(clockInTime, entry.timestamp)
                         clockInTime = null
                     }
+                    lastClockOutTime = entry.timestamp
                 }
                 TimeEntryType.BREAK_START -> breakStartTime = entry.timestamp
                 TimeEntryType.BREAK_END -> {
