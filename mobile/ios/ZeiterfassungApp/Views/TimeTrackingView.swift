@@ -5,9 +5,9 @@ struct TimeTrackingView: View {
     @StateObject private var viewModel = TimeTrackingViewModel()
 
     private func formatMinutes(_ minutes: Int) -> String {
-        let h = minutes / 60
-        let m = minutes % 60
-        return String(format: "%dh %02dm", h, m)
+        let hours = minutes / 60
+        let mins = minutes % 60
+        return String(format: "%dh %02dm", hours, mins)
     }
 
     var body: some View {
@@ -58,8 +58,8 @@ struct TimeTrackingView: View {
                             .background(statusColor.opacity(0.12))
                             .clipShape(Capsule())
 
-                        if let s = viewModel.trackingStatus, s.status != "CLOCKED_OUT" {
-                            Text(formatMinutes(s.elapsedWorkMinutes))
+                        if let trackingStatus = viewModel.trackingStatus, trackingStatus.status != "CLOCKED_OUT" {
+                            Text(formatMinutes(trackingStatus.elapsedWorkMinutes))
                                 .font(.system(size: 48, weight: .thin, design: .monospaced))
                         }
 
@@ -134,11 +134,11 @@ struct TimeTrackingView: View {
                         .padding(.bottom, 32)
 
                         // Today totals
-                        if let s = viewModel.trackingStatus {
+                        if let trackingStatus = viewModel.trackingStatus {
                             HStack {
-                                Label("\("time_tracking_today_work".localized): \(formatMinutes(s.todayWorkMinutes))", systemImage: "briefcase")
+                                Label("\("time_tracking_today_work".localized): \(formatMinutes(trackingStatus.todayWorkMinutes))", systemImage: "briefcase")
                                 Spacer()
-                                Label("\("time_tracking_today_break".localized): \(formatMinutes(s.todayBreakMinutes))", systemImage: "cup.and.heat.waves")
+                                Label("\("time_tracking_today_break".localized): \(formatMinutes(trackingStatus.todayBreakMinutes))", systemImage: "cup.and.heat.waves")
                             }
                             .font(.caption)
                             .foregroundColor(.secondary)

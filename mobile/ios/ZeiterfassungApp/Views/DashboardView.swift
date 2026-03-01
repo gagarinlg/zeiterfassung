@@ -5,9 +5,9 @@ struct DashboardView: View {
     @StateObject private var viewModel = DashboardViewModel()
 
     private func formatMinutes(_ minutes: Int) -> String {
-        let h = minutes / 60
-        let m = minutes % 60
-        return String(format: "%dh %02dm", h, m)
+        let hours = minutes / 60
+        let mins = minutes % 60
+        return String(format: "%dh %02dm", hours, mins)
     }
 
     var body: some View {
