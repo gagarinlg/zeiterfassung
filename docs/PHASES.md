@@ -1,7 +1,7 @@
 # Zeiterfassung — Project Phases & Roadmap
 
 > **Last updated:** 2026-02-21
-> **Current phase:** Phase 5 (Dashboard & Reporting) — NEXT UP
+> **Current phase:** Phase 6 (Terminal — Raspberry Pi Full Integration) — NEXT UP
 
 ---
 
@@ -214,22 +214,27 @@
 
 ---
 
-## Phase 5: Dashboard & Reporting 🔲
-- **Status**: PLANNED
+## Phase 5: Dashboard & Reporting ✅
+- **Status**: COMPLETE (partial — charts, admin dashboard, and advanced reports deferred to Phase 10)
 - **Priority**: HIGH
 
-### What needs to be built
-- **DashboardPage**: replace placeholder with real data widgets
-  - Today's work time (live counter)
-  - Weekly/monthly work hours summary
-  - Vacation balance overview
-  - Team status (for managers)
-  - Compliance warnings
-  - Recent activity feed
-- **Reports**: monthly time sheets, overtime reports, vacation usage reports
-- **CSV import/export**: time entries, user data, vacation data
-- **Charts**: work hour trends, overtime trends, vacation usage
-- **Admin dashboard**: system-wide statistics
+### What was delivered
+- **DashboardPage**: real data widgets — today's work time, weekly hours, vacation balance, team presence count (managers), compliance warnings for the week, pending vacation requests count (managers), team status list with employee names
+- **TimeTrackingPage**: full implementation — color-coded status badge (CLOCKED_IN/ON_BREAK/CLOCKED_OUT), clock-in/out/break action buttons, drift-free elapsed timer (recalculates from `clockedInSince` on each tick), today's entries list, monthly timesheet table with compliance badges, CSV export button
+- **CSV export endpoint**: `GET /api/time/export/csv?start=<date>&end=<date>` — returns RFC 4180-compliant CSV with CSV-injection protection
+- **timeService.ts fix**: all API endpoints corrected to match actual backend paths (`/time/clock-in`, `/time/break/start`, etc.)
+- **TypeScript types**: `TrackingStatus`, `TrackingStatusResponse`, `TimeSheetResponse`
+- **i18n**: new keys for time tracking status, elapsed timer, timesheet, export, compliance, errors (DE + EN)
+- **`common.total`** translation key added (DE + EN)
+
+### Key files changed
+- `frontend/src/services/timeService.ts` — complete rewrite with correct endpoints
+- `frontend/src/types/index.ts` — added `TrackingStatus`, `TrackingStatusResponse`, `TimeSheetResponse`
+- `frontend/src/pages/DashboardPage.tsx` — real API data, team member names, compliance warnings
+- `frontend/src/pages/TimeTrackingPage.tsx` — full 359-line implementation
+- `backend/src/main/kotlin/com/zeiterfassung/controller/TimeTrackingController.kt` — CSV export endpoint
+- `frontend/src/locales/de/translation.json` — new i18n keys
+- `frontend/src/locales/en/translation.json` — new i18n keys
 
 ### Depends on
 - Phase 3 (time tracking) ✅

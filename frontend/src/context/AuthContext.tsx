@@ -18,10 +18,25 @@ export interface AuthContextValue {
 export const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [tokens, setTokens] = useState<AuthTokens | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  // Use lazy initialization to read auth state from localStorage synchronously.
+  // This avoids calling setState inside a useEffect (react-hooks/set-state-in-effect).
+  const [user, setUser] = useState<User | null>(() => {
+    const stored = localStorage.getItem('auth_user')
+    return stored ? (JSON.parse(stored) as User) : null
+  })
+  const [tokens, setTokens] = useState<AuthTokens | null>(() => {
+    const stored = localStorage.getItem('auth_tokens')
+    return stored ? (JSON.parse(stored) as AuthTokens) : null
+  })
+  // Auth state is known immediately via lazy init — no async loading phase needed.
+  // Using useState rather than a constant preserves the AuthContextValue API shape
+  // and allows future async initialization without changing the interface.
+  const [isLoading] = useState(false)
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Ref to hold the latest scheduleTokenRefresh so the timer callback can call
+  // it recursively without violating react-hooks/immutability. Initialized to
+  // null; the useEffect below sets it before any timer can fire.
+  const scheduleTokenRefreshRef = useRef<((expiresInSeconds: number) => void) | null>(null)
 
   const scheduleTokenRefresh = useCallback((expiresInSeconds: number) => {
     if (refreshTimerRef.current) {
@@ -37,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const newTokens = await authService.refreshToken(storedTokens.refreshToken)
         localStorage.setItem('auth_tokens', JSON.stringify(newTokens))
         setTokens(newTokens)
-        scheduleTokenRefresh(newTokens.expiresIn)
+        scheduleTokenRefreshRef.current?.(newTokens.expiresIn)
       } catch {
         setTokens(null)
         setUser(null)
@@ -46,20 +61,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }, refreshIn)
   }, [])
-
+  // Keep the ref in sync whenever scheduleTokenRefresh changes (stable, runs once).
   useEffect(() => {
-    const storedTokens = localStorage.getItem('auth_tokens')
-    const storedUser = localStorage.getItem('auth_user')
-    if (storedTokens && storedUser) {
-      const parsedTokens = JSON.parse(storedTokens) as AuthTokens
-      const parsedUser = JSON.parse(storedUser) as User
-      setTokens(parsedTokens)
-      setUser(parsedUser)
-      if (parsedTokens.expiresIn) {
-        scheduleTokenRefresh(parsedTokens.expiresIn)
+    scheduleTokenRefreshRef.current = scheduleTokenRefresh
+  }, [scheduleTokenRefresh])
+
+  // Start the refresh timer on mount using the tokens already loaded via lazy init.
+  // No setState calls here — satisfies react-hooks/set-state-in-effect.
+  useEffect(() => {
+    const stored = localStorage.getItem('auth_tokens')
+    if (stored) {
+      const parsed = JSON.parse(stored) as AuthTokens
+      if (parsed.expiresIn) {
+        scheduleTokenRefresh(parsed.expiresIn)
       }
     }
-    setIsLoading(false)
 
     return () => {
       if (refreshTimerRef.current) {

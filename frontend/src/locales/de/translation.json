@@ -36,7 +36,12 @@
     "vacation_remaining": "Verbleibender Urlaub",
     "team_present": "Team anwesend",
     "pending_requests": "Ausstehende Anfragen",
-    "overtime_balance": "Überstundenkonto"
+    "overtime_balance": "Überstundenkonto",
+    "clocked_in_since": "Eingestempelt seit",
+    "on_break_since": "Pause seit",
+    "compliance_warning": "Arbeitszeitwarnung",
+    "team_status": "Team-Status",
+    "no_team": "Kein Teammitglied anwesend"
   },
   "time_tracking": {
     "title": "Zeiterfassung",
@@ -48,7 +53,30 @@
     "today_summary": "Heutige Zusammenfassung",
     "work_time": "Arbeitszeit",
     "break_time": "Pausenzeit",
-    "entries": "Einträge"
+    "entries": "Einträge",
+    "status": {
+      "clocked_in": "Eingestempelt",
+      "clocked_out": "Ausgestempelt",
+      "on_break": "In der Pause"
+    },
+    "elapsed": "Vergangene Zeit",
+    "timesheet": "Stundenzettel",
+    "export_csv": "CSV exportieren",
+    "no_entries_today": "Heute noch keine Einträge",
+    "total_work": "Gesamtarbeitszeit",
+    "total_break": "Gesamtpausenzeit",
+    "overtime": "Überstunden",
+    "compliant": "Konform",
+    "non_compliant": "Nicht konform",
+    "week": "Woche",
+    "month": "Monat",
+    "errors": {
+      "load_failed": "Zeiterfassungsdaten konnten nicht geladen werden",
+      "clock_in_failed": "Einstempeln fehlgeschlagen",
+      "clock_out_failed": "Ausstempeln fehlgeschlagen",
+      "break_start_failed": "Pause starten fehlgeschlagen",
+      "break_end_failed": "Pause beenden fehlgeschlagen"
+    }
   },
   "vacation": {
     "title": "Urlaub",
@@ -173,6 +201,7 @@
     "date": "Datum",
     "time": "Zeit",
     "duration": "Dauer",
+    "total": "Gesamt",
     "name": "Name",
     "email": "E-Mail",
     "phone": "Telefon",

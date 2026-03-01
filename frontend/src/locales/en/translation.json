@@ -36,7 +36,12 @@
     "vacation_remaining": "Remaining Vacation",
     "team_present": "Team Present",
     "pending_requests": "Pending Requests",
-    "overtime_balance": "Overtime Balance"
+    "overtime_balance": "Overtime Balance",
+    "clocked_in_since": "Clocked in since",
+    "on_break_since": "On break since",
+    "compliance_warning": "Work Time Warning",
+    "team_status": "Team Status",
+    "no_team": "No team members present"
   },
   "time_tracking": {
     "title": "Time Tracking",
@@ -48,7 +53,30 @@
     "today_summary": "Today's Summary",
     "work_time": "Work Time",
     "break_time": "Break Time",
-    "entries": "Entries"
+    "entries": "Entries",
+    "status": {
+      "clocked_in": "Clocked In",
+      "clocked_out": "Clocked Out",
+      "on_break": "On Break"
+    },
+    "elapsed": "Elapsed Time",
+    "timesheet": "Timesheet",
+    "export_csv": "Export CSV",
+    "no_entries_today": "No entries today",
+    "total_work": "Total Work Time",
+    "total_break": "Total Break Time",
+    "overtime": "Overtime",
+    "compliant": "Compliant",
+    "non_compliant": "Non-Compliant",
+    "week": "Week",
+    "month": "Month",
+    "errors": {
+      "load_failed": "Failed to load time tracking data",
+      "clock_in_failed": "Failed to clock in",
+      "clock_out_failed": "Failed to clock out",
+      "break_start_failed": "Failed to start break",
+      "break_end_failed": "Failed to end break"
+    }
   },
   "vacation": {
     "title": "Vacation",
@@ -173,6 +201,7 @@
     "date": "Date",
     "time": "Time",
     "duration": "Duration",
+    "total": "Total",
     "name": "Name",
     "email": "Email",
     "phone": "Phone",

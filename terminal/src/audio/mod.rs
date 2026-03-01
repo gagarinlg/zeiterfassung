@@ -1,5 +1,5 @@
 use log::{debug, warn};
-use rodio::{Decoder, OutputStream, Sink};
+use rodio::{Decoder, Player};
 use std::fs::File;
 use std::io::BufReader;
 
@@ -30,17 +30,18 @@ impl AudioPlayer {
         let path = path.to_string();
         let volume = self.config.volume;
 
-        std::thread::spawn(move || match OutputStream::try_default() {
-            Ok((_stream, stream_handle)) => match Sink::try_new(&stream_handle) {
-                Ok(sink) => {
-                    sink.set_volume(volume);
+        std::thread::spawn(
+            move || match rodio::DeviceSinkBuilder::open_default_sink() {
+                Ok(handle) => {
+                    let player = Player::connect_new(handle.mixer());
+                    player.set_volume(volume);
                     match File::open(&path) {
                         Ok(file) => {
                             let reader = BufReader::new(file);
                             match Decoder::new(reader) {
                                 Ok(source) => {
-                                    sink.append(source);
-                                    sink.sleep_until_end();
+                                    player.append(source);
+                                    player.sleep_until_end();
                                     debug!("Played sound: {}", path);
                                 }
                                 Err(e) => warn!("Failed to decode audio {}: {}", path, e),
@@ -49,9 +50,8 @@ impl AudioPlayer {
                         Err(e) => warn!("Failed to open audio file {}: {}", path, e),
                     }
                 }
-                Err(e) => warn!("Failed to create audio sink: {}", e),
+                Err(e) => warn!("Failed to initialize audio output: {}", e),
             },
-            Err(e) => warn!("Failed to initialize audio output: {}", e),
-        });
+        );
     }
 }

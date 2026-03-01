@@ -1,10 +1,10 @@
 # Current Project State
 
-> Last updated: 2026-02-21
+> Last updated: 2026-03-01
 
 ## Quick Summary
 
-Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–4 are complete.** The backend has working auth, user management, time tracking, and a full vacation management system with email notifications and DSGVO-compliant data isolation. The frontend has login, navigation, time tracking, and vacation pages implemented. Mobile apps and terminal are scaffolded but not fully implemented.
+Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–5 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, and CSV export. The frontend has fully implemented login, navigation, dashboard, time tracking, and vacation pages. Mobile apps and terminal are scaffolded but not fully implemented.
 
 ## What Works Right Now
 
@@ -31,8 +31,8 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Navigation with role-based menu items
 - ✅ Vacation page: balance card, request list, new-request form, monthly calendar
 - ✅ Vacation approval page: manager queue with approve/reject-with-reason modal
-- ⚠️ Dashboard: placeholder (shows static data)
-- ⚠️ Time Tracking page: placeholder (shows title only)
+- ✅ Dashboard: real data widgets (today hours, weekly hours, vacation balance, team status, compliance warnings)
+- ✅ Time Tracking page: full implementation (status, clock in/out/break, live timer, today's entries list, monthly timesheet, CSV export)
 - ⚠️ Admin page: placeholder
 
 ### Mobile (Scaffolded Only)
@@ -45,16 +45,14 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ⚠️ API client and buffer modules exist but need backend integration
 
 ## Tech Debt / Known Issues
-- Dashboard page is still a placeholder — needs real data widgets
-- Time Tracking page is a placeholder — needs full implementation
-- Admin page is a placeholder
+- Admin page is a placeholder (Phase 8)
 - Backend test coverage targets (≥90%) not yet fully verified
 - Frontend test coverage targets (≥85%) not yet fully verified
 - E2E Playwright tests need expansion
-- Mobile apps are scaffold-only
-- Terminal needs backend API endpoint for RFID-based clock in/out
+- Mobile apps are scaffold-only (Phase 7)
+- Terminal needs full iced screen implementation and backend integration (Phase 6)
 
 ## Next Steps
-1. **Phase 5: Dashboard & Reporting** — replace placeholder dashboard with real data widgets, time sheet reports, CSV export
+1. **Phase 6: Terminal (Raspberry Pi) Full Integration** — complete terminal API endpoint, full iced screens, offline buffering
 2. **Phase 8: Admin Panel** — replace admin placeholder with full user/role/settings management UI
 3. Continue dependency updates (review and merge Dependabot PRs)

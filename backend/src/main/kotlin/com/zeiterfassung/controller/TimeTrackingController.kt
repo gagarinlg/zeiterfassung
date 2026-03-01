@@ -184,4 +184,39 @@ class TimeTrackingController(
         @AuthenticationPrincipal actorId: String,
     ): ResponseEntity<Map<UUID, TrackingStatusResponse>> =
         ResponseEntity.ok(timeTrackingService.getTeamCurrentStatus(UUID.fromString(actorId)))
+
+    @GetMapping("/export/csv", produces = ["text/csv"])
+    @PreAuthorize("hasAuthority('time.view.own')")
+    fun exportCsv(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) start: LocalDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) end: LocalDate,
+        @AuthenticationPrincipal actorId: String,
+        response: jakarta.servlet.http.HttpServletResponse,
+    ) {
+        val userId = UUID.fromString(actorId)
+        val sheet = timeTrackingService.getTimeSheet(userId, start, end)
+        response.setHeader("Content-Disposition", "attachment; filename=\"timesheet_$start-$end.csv\"")
+        val writer = response.writer
+        writer.println("Date,Work Minutes,Break Minutes,Overtime Minutes,Compliant,Notes")
+        sheet.dailySummaries.forEach { summary ->
+            // Sanitise the notes field to prevent CSV injection attacks:
+            // - Escape existing double-quotes by doubling them (RFC 4180).
+            // - Neutralise formula-injection prefixes (=, +, -, @, TAB, CR/LF) by
+            //   prepending a space, so spreadsheet applications won't interpret the
+            //   cell value as a formula.
+            val rawNotes = summary.complianceNotes ?: ""
+            val escapedNotes = rawNotes.replace("\"", "\"\"")
+            val safeNotes =
+                if (escapedNotes.isNotEmpty() && escapedNotes[0] in setOf('=', '+', '-', '@', '\t', '\r', '\n')) {
+                    " $escapedNotes"
+                } else {
+                    escapedNotes
+                }
+            writer.println(
+                "${summary.date},${summary.totalWorkMinutes},${summary.totalBreakMinutes}," +
+                    "${summary.overtimeMinutes},${summary.isCompliant},\"$safeNotes\"",
+            )
+        }
+        writer.flush()
+    }
 }

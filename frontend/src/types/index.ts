@@ -33,6 +33,29 @@ export interface DailySummary {
   complianceNotes?: string
 }
 
+export type TrackingStatus = 'CLOCKED_OUT' | 'CLOCKED_IN' | 'ON_BREAK'
+
+export interface TrackingStatusResponse {
+  status: TrackingStatus
+  clockedInSince: string | null
+  breakStartedAt: string | null
+  elapsedWorkMinutes: number
+  elapsedBreakMinutes: number
+  todayWorkMinutes: number
+  todayBreakMinutes: number
+}
+
+export interface TimeSheetResponse {
+  userId: string
+  startDate: string
+  endDate: string
+  dailySummaries: DailySummary[]
+  totalWorkMinutes: number
+  totalBreakMinutes: number
+  totalOvertimeMinutes: number
+  entries: TimeEntry[]
+}
+
 export interface VacationRequest {
   id: string
   userId: string
