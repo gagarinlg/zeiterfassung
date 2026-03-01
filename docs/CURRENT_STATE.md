@@ -1,10 +1,10 @@
 # Current Project State
 
-> Last updated: 2025-07-14
+> Last updated: 2026-03-01
 
 ## Quick Summary
 
-Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–11 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, admin endpoints, TOTP 2FA, password reset flow, LDAP configuration, and manager substitute/deputy feature. The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright across all 7 frontend pages (62+ tests). Documentation includes user guide, administration guide, and 12 auto-generated screenshots.
+Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–12 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, admin endpoints, TOTP 2FA, password reset flow, LDAP configuration, manager substitute/deputy feature, Spring caching, and full OpenAPI/Swagger documentation. The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization, WCAG 2.1 AA accessibility, and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright across Chromium, Firefox, and WebKit. Documentation includes user guide, administration guide, 12 auto-generated screenshots, and 5 architecture decision records.
 
 ## What Works Right Now
 
@@ -85,6 +85,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - iOS: push notifications, Face ID / Touch ID — not yet implemented
 
 ## Next Steps
-1. **Phase 12: Performance, Accessibility & API Documentation** — performance optimization, WCAG 2.1 AA accessibility, cross-browser testing, OpenAPI/Swagger annotations, architecture decision records
-2. Continue dependency updates (review and merge Dependabot PRs)
+1. Continue dependency updates (review and merge Dependabot PRs)
+2. Increase backend test coverage toward ≥90% target
+3. Mobile: push notifications, biometric auth, offline caching
 
