@@ -522,5 +522,5 @@
 - **Performance optimization**: database indexing, query optimization, caching
 - **Accessibility**: WCAG 2.1 AA compliance
 - **Cross-browser testing**: compatibility verification across major browsers
-- **OpenAPI/Swagger annotations**: complete API documentation with annotations on all endpoints
+- **OpenAPI/Swagger annotations**: ✅ COMPLETE — `@Tag`, `@Operation`, `@ApiResponse`, `@SecurityRequirement` on all 7 controllers; `OpenApiConfig.kt` with `@OpenAPIDefinition` and `@SecurityScheme`
 - **Architecture decision records**: document key technical decisions

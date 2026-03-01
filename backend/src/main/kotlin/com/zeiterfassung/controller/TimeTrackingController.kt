@@ -11,6 +11,10 @@ import com.zeiterfassung.model.dto.TimeEntryResponse
 import com.zeiterfassung.model.dto.TimeSheetResponse
 import com.zeiterfassung.model.dto.TrackingStatusResponse
 import com.zeiterfassung.service.TimeTrackingService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
@@ -34,11 +38,16 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/time")
+@Tag(name = "Time Tracking")
+@SecurityRequirement(name = "bearerAuth")
 class TimeTrackingController(
     private val timeTrackingService: TimeTrackingService,
 ) {
     @PostMapping("/clock-in")
     @PreAuthorize("hasAuthority('time.track.own')")
+    @Operation(summary = "Clock in", description = "Records a clock-in event for the authenticated user.")
+    @ApiResponse(responseCode = "201", description = "Clocked in successfully")
+    @ApiResponse(responseCode = "409", description = "Already clocked in")
     fun clockIn(
         @RequestBody request: ClockInRequest,
         @AuthenticationPrincipal actorId: String,
@@ -49,6 +58,9 @@ class TimeTrackingController(
 
     @PostMapping("/clock-out")
     @PreAuthorize("hasAuthority('time.track.own')")
+    @Operation(summary = "Clock out", description = "Records a clock-out event for the authenticated user.")
+    @ApiResponse(responseCode = "201", description = "Clocked out successfully")
+    @ApiResponse(responseCode = "409", description = "Not currently clocked in")
     fun clockOut(
         @RequestBody request: ClockOutRequest,
         @AuthenticationPrincipal actorId: String,
@@ -59,6 +71,8 @@ class TimeTrackingController(
 
     @PostMapping("/break/start")
     @PreAuthorize("hasAuthority('time.track.own')")
+    @Operation(summary = "Start break", description = "Records the start of a break for the authenticated user.")
+    @ApiResponse(responseCode = "201", description = "Break started")
     fun startBreak(
         @RequestBody request: BreakStartRequest,
         @AuthenticationPrincipal actorId: String,
@@ -69,6 +83,8 @@ class TimeTrackingController(
 
     @PostMapping("/break/end")
     @PreAuthorize("hasAuthority('time.track.own')")
+    @Operation(summary = "End break", description = "Records the end of a break for the authenticated user.")
+    @ApiResponse(responseCode = "201", description = "Break ended")
     fun endBreak(
         @RequestBody request: BreakEndRequest,
         @AuthenticationPrincipal actorId: String,
@@ -79,12 +95,16 @@ class TimeTrackingController(
 
     @GetMapping("/status")
     @PreAuthorize("hasAuthority('time.view.own')")
+    @Operation(summary = "Get current tracking status", description = "Returns the current clock-in/break status of the authenticated user.")
+    @ApiResponse(responseCode = "200", description = "Current status returned")
     fun getStatus(
         @AuthenticationPrincipal actorId: String,
     ): ResponseEntity<TrackingStatusResponse> = ResponseEntity.ok(timeTrackingService.getCurrentStatus(UUID.fromString(actorId)))
 
     @GetMapping("/today")
     @PreAuthorize("hasAuthority('time.view.own')")
+    @Operation(summary = "Get today's summary", description = "Returns a summary of today's work hours, breaks, and compliance.")
+    @ApiResponse(responseCode = "200", description = "Today's summary returned")
     fun getToday(
         @AuthenticationPrincipal actorId: String,
     ): ResponseEntity<DailySummaryResponse> =
@@ -92,6 +112,8 @@ class TimeTrackingController(
 
     @GetMapping("/entries")
     @PreAuthorize("hasAuthority('time.view.own')")
+    @Operation(summary = "Get time entries", description = "Returns time entries for the authenticated user within the specified date range.")
+    @ApiResponse(responseCode = "200", description = "Time entries returned")
     fun getEntries(
         @RequestParam start: Instant,
         @RequestParam end: Instant,
@@ -101,6 +123,8 @@ class TimeTrackingController(
 
     @GetMapping("/summary/daily/{date}")
     @PreAuthorize("hasAuthority('time.view.own')")
+    @Operation(summary = "Get daily summary", description = "Returns a work summary for a specific date.")
+    @ApiResponse(responseCode = "200", description = "Daily summary returned")
     fun getDailySummary(
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate,
         @AuthenticationPrincipal actorId: String,
@@ -108,6 +132,8 @@ class TimeTrackingController(
 
     @GetMapping("/summary/weekly")
     @PreAuthorize("hasAuthority('time.view.own')")
+    @Operation(summary = "Get weekly summary", description = "Returns a timesheet for the week starting on the specified date.")
+    @ApiResponse(responseCode = "200", description = "Weekly summary returned")
     fun getWeeklySummary(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) weekStart: LocalDate,
         @AuthenticationPrincipal actorId: String,
@@ -118,6 +144,8 @@ class TimeTrackingController(
 
     @GetMapping("/summary/monthly")
     @PreAuthorize("hasAuthority('time.view.own')")
+    @Operation(summary = "Get monthly summary", description = "Returns a timesheet for the specified month.")
+    @ApiResponse(responseCode = "200", description = "Monthly summary returned")
     fun getMonthlySummary(
         @RequestParam year: Int,
         @RequestParam month: Int,
@@ -132,6 +160,8 @@ class TimeTrackingController(
 
     @GetMapping("/timesheet")
     @PreAuthorize("hasAuthority('time.view.own')")
+    @Operation(summary = "Get timesheet", description = "Returns a timesheet for a custom date range.")
+    @ApiResponse(responseCode = "200", description = "Timesheet returned")
     fun getTimeSheet(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) start: LocalDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) end: LocalDate,
@@ -140,6 +170,9 @@ class TimeTrackingController(
 
     @GetMapping("/manage/team/entries")
     @PreAuthorize("hasAuthority('time.view.team')")
+    @Operation(summary = "Get team member entries", description = "Returns time entries for a specific team member. Requires team view permission.")
+    @ApiResponse(responseCode = "200", description = "Team member entries returned")
+    @ApiResponse(responseCode = "403", description = "Not authorized to view this team member")
     fun getTeamEntries(
         @RequestParam userId: UUID,
         @RequestParam start: Instant,
@@ -150,6 +183,8 @@ class TimeTrackingController(
 
     @PostMapping("/manage/entry")
     @PreAuthorize("hasAuthority('time.edit.team')")
+    @Operation(summary = "Add manual time entry", description = "Creates a manual time entry for a team member. Requires team edit permission.")
+    @ApiResponse(responseCode = "201", description = "Manual entry created")
     fun addManualEntry(
         @Valid @RequestBody request: ManualTimeEntryRequest,
         @RequestParam userId: UUID,
@@ -161,6 +196,9 @@ class TimeTrackingController(
 
     @PutMapping("/manage/entry/{id}")
     @PreAuthorize("hasAuthority('time.edit.team')")
+    @Operation(summary = "Edit time entry", description = "Edits an existing time entry for a team member.")
+    @ApiResponse(responseCode = "200", description = "Time entry updated")
+    @ApiResponse(responseCode = "404", description = "Time entry not found")
     fun editTimeEntry(
         @PathVariable id: UUID,
         @Valid @RequestBody request: EditTimeEntryRequest,
@@ -169,6 +207,9 @@ class TimeTrackingController(
 
     @DeleteMapping("/manage/entry/{id}")
     @PreAuthorize("hasAuthority('time.edit.team')")
+    @Operation(summary = "Delete time entry", description = "Soft-deletes a time entry with a mandatory reason.")
+    @ApiResponse(responseCode = "204", description = "Time entry deleted")
+    @ApiResponse(responseCode = "404", description = "Time entry not found")
     fun deleteTimeEntry(
         @PathVariable id: UUID,
         @RequestParam reason: String,
@@ -180,6 +221,8 @@ class TimeTrackingController(
 
     @GetMapping("/manage/team/status")
     @PreAuthorize("hasAuthority('time.view.team')")
+    @Operation(summary = "Get team status", description = "Returns the current clock-in/break status of all team members.")
+    @ApiResponse(responseCode = "200", description = "Team status returned")
     fun getTeamStatus(
         @AuthenticationPrincipal actorId: String,
     ): ResponseEntity<Map<UUID, TrackingStatusResponse>> =
@@ -187,6 +230,8 @@ class TimeTrackingController(
 
     @GetMapping("/export/csv", produces = ["text/csv"])
     @PreAuthorize("hasAuthority('time.view.own')")
+    @Operation(summary = "Export timesheet as CSV", description = "Exports the timesheet for a date range as a CSV file download.")
+    @ApiResponse(responseCode = "200", description = "CSV file returned")
     fun exportCsv(
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) start: LocalDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) end: LocalDate,
@@ -199,11 +244,8 @@ class TimeTrackingController(
         val writer = response.writer
         writer.println("Date,Work Minutes,Break Minutes,Overtime Minutes,Compliant,Notes")
         sheet.dailySummaries.forEach { summary ->
-            // Sanitise the notes field to prevent CSV injection attacks:
-            // - Escape existing double-quotes by doubling them (RFC 4180).
-            // - Neutralise formula-injection prefixes (=, +, -, @, TAB, CR/LF) by
-            //   prepending a space, so spreadsheet applications won't interpret the
-            //   cell value as a formula.
+            // Sanitise notes to prevent CSV injection: escape quotes (RFC 4180)
+            // and neutralise formula-injection prefixes (=, +, -, @, TAB, CR/LF).
             val rawNotes = summary.complianceNotes ?: ""
             val escapedNotes = rawNotes.replace("\"", "\"\"")
             val safeNotes =

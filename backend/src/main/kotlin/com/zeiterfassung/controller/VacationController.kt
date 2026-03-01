@@ -12,6 +12,10 @@ import com.zeiterfassung.model.dto.VacationCalendarResponse
 import com.zeiterfassung.model.dto.VacationRequestResponse
 import com.zeiterfassung.model.enums.VacationStatus
 import com.zeiterfassung.service.VacationService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -33,11 +37,17 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/vacation")
+@Tag(name = "Vacation")
+@SecurityRequirement(name = "bearerAuth")
 class VacationController(
     private val vacationService: VacationService,
 ) {
     @PostMapping("/requests")
     @PreAuthorize("hasAuthority('vacation.request.own')")
+    @Operation(summary = "Create vacation request", description = "Creates a new vacation request for the authenticated user.")
+    @ApiResponse(responseCode = "201", description = "Vacation request created")
+    @ApiResponse(responseCode = "400", description = "Invalid dates or insufficient balance")
+    @ApiResponse(responseCode = "409", description = "Overlapping vacation request exists")
     fun createRequest(
         @Valid @RequestBody dto: CreateVacationRequest,
         @AuthenticationPrincipal userId: String,
@@ -48,6 +58,8 @@ class VacationController(
 
     @GetMapping("/requests")
     @PreAuthorize("hasAuthority('vacation.request.own')")
+    @Operation(summary = "Get my vacation requests", description = "Returns a paginated list of the authenticated user's vacation requests.")
+    @ApiResponse(responseCode = "200", description = "Vacation requests returned")
     fun getMyRequests(
         @AuthenticationPrincipal userId: String,
         @RequestParam(required = false) year: Int?,
@@ -70,6 +82,9 @@ class VacationController(
 
     @GetMapping("/requests/{id}")
     @PreAuthorize("hasAuthority('vacation.request.own')")
+    @Operation(summary = "Get vacation request", description = "Returns a specific vacation request by ID.")
+    @ApiResponse(responseCode = "200", description = "Vacation request returned")
+    @ApiResponse(responseCode = "404", description = "Vacation request not found")
     fun getRequest(
         @PathVariable id: UUID,
         @AuthenticationPrincipal userId: String,
@@ -77,6 +92,9 @@ class VacationController(
 
     @PutMapping("/requests/{id}")
     @PreAuthorize("hasAuthority('vacation.request.own')")
+    @Operation(summary = "Update vacation request", description = "Updates a pending vacation request.")
+    @ApiResponse(responseCode = "200", description = "Vacation request updated")
+    @ApiResponse(responseCode = "400", description = "Cannot update non-pending request")
     fun updateRequest(
         @PathVariable id: UUID,
         @Valid @RequestBody dto: UpdateVacationRequest,
@@ -85,6 +103,8 @@ class VacationController(
 
     @DeleteMapping("/requests/{id}")
     @PreAuthorize("hasAuthority('vacation.request.own')")
+    @Operation(summary = "Cancel vacation request", description = "Cancels a pending or approved vacation request.")
+    @ApiResponse(responseCode = "204", description = "Vacation request cancelled")
     fun cancelRequest(
         @PathVariable id: UUID,
         @AuthenticationPrincipal userId: String,
@@ -95,6 +115,8 @@ class VacationController(
 
     @PostMapping("/requests/{id}/approve")
     @PreAuthorize("hasAuthority('vacation.approve')")
+    @Operation(summary = "Approve vacation request", description = "Approves a pending vacation request. Requires approval permission.")
+    @ApiResponse(responseCode = "200", description = "Vacation request approved")
     fun approveRequest(
         @PathVariable id: UUID,
         @RequestBody(required = false) dto: ApproveVacationRequest?,
@@ -104,6 +126,8 @@ class VacationController(
 
     @PostMapping("/requests/{id}/reject")
     @PreAuthorize("hasAuthority('vacation.approve')")
+    @Operation(summary = "Reject vacation request", description = "Rejects a pending vacation request with a mandatory reason.")
+    @ApiResponse(responseCode = "200", description = "Vacation request rejected")
     fun rejectRequest(
         @PathVariable id: UUID,
         @Valid @RequestBody dto: RejectVacationRequest,
@@ -112,6 +136,8 @@ class VacationController(
 
     @GetMapping("/pending")
     @PreAuthorize("hasAuthority('vacation.approve')")
+    @Operation(summary = "Get pending requests", description = "Returns pending vacation requests for approval. Optionally returns all pending requests.")
+    @ApiResponse(responseCode = "200", description = "Pending requests returned")
     fun getPendingRequests(
         @AuthenticationPrincipal userId: String,
         @RequestParam(defaultValue = "0") page: Int,
@@ -138,6 +164,8 @@ class VacationController(
 
     @GetMapping("/balance")
     @PreAuthorize("hasAuthority('vacation.request.own')")
+    @Operation(summary = "Get my vacation balance", description = "Returns the vacation balance for the authenticated user.")
+    @ApiResponse(responseCode = "200", description = "Vacation balance returned")
     fun getMyBalance(
         @AuthenticationPrincipal userId: String,
         @RequestParam(required = false) year: Int?,
@@ -148,6 +176,8 @@ class VacationController(
 
     @GetMapping("/balance/{userId}")
     @PreAuthorize("hasAuthority('vacation.view.team')")
+    @Operation(summary = "Get user vacation balance", description = "Returns the vacation balance for a specific user. Requires team view permission.")
+    @ApiResponse(responseCode = "200", description = "Vacation balance returned")
     fun getUserBalance(
         @PathVariable userId: UUID,
         @RequestParam(required = false) year: Int?,
@@ -159,6 +189,8 @@ class VacationController(
 
     @GetMapping("/holidays")
     @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get public holidays", description = "Returns public holidays for the specified year, optionally filtered by German state.")
+    @ApiResponse(responseCode = "200", description = "Public holidays returned")
     fun getPublicHolidays(
         @RequestParam(required = false) year: Int?,
         @RequestParam(required = false) stateCode: String?,
@@ -169,6 +201,8 @@ class VacationController(
 
     @GetMapping("/calendar")
     @PreAuthorize("hasAuthority('vacation.view.team')")
+    @Operation(summary = "Get team vacation calendar", description = "Returns a vacation calendar showing team member absences for the specified month.")
+    @ApiResponse(responseCode = "200", description = "Vacation calendar returned")
     fun getTeamCalendar(
         @AuthenticationPrincipal userId: String,
         @RequestParam(required = false) year: Int?,
@@ -182,6 +216,8 @@ class VacationController(
 
     @PutMapping("/balance/{userId}")
     @PreAuthorize("hasAuthority('admin.users.manage')")
+    @Operation(summary = "Set vacation balance", description = "Manually sets the vacation balance for a user. Requires admin permission.")
+    @ApiResponse(responseCode = "200", description = "Vacation balance updated")
     fun setBalance(
         @PathVariable userId: UUID,
         @RequestParam(required = false) year: Int?,
@@ -203,6 +239,8 @@ class VacationController(
 
     @PostMapping("/balance/{userId}/carry-over")
     @PreAuthorize("hasAuthority('admin.users.manage')")
+    @Operation(summary = "Trigger vacation carry-over", description = "Triggers the vacation balance carry-over calculation for a user.")
+    @ApiResponse(responseCode = "200", description = "Carry-over calculated")
     fun triggerCarryOver(
         @PathVariable userId: UUID,
         @RequestParam(required = false) year: Int?,

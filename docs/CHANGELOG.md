@@ -6,6 +6,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Added
+- **OpenAPI/Swagger annotations**: Added `@Tag`, `@Operation`, `@ApiResponse`, and `@SecurityRequirement` annotations to all 7 backend controllers (AuthController, AdminController, TerminalController, EmployeeConfigController, TimeTrackingController, UserController, VacationController)
+- **OpenApiConfig.kt**: New configuration class with `@OpenAPIDefinition` (title, description, version, tags) and `@SecurityScheme` for JWT Bearer authentication
 - **Break gap detection**: Gaps ≥15 min between CLOCK_OUT and next CLOCK_IN on the same day are now treated as qualifying breaks (ArbZG §4)
 - **Vacation balance management**: Admin can manually set vacation balance via PUT /vacation/balance/{userId} (totalDays, usedDays, carriedOverDays)
 - **Vacation carry-over endpoint**: Admin can trigger carry-over calculation via POST /vacation/balance/{userId}/carry-over
