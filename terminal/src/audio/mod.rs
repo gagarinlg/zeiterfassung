@@ -30,26 +30,28 @@ impl AudioPlayer {
         let path = path.to_string();
         let volume = self.config.volume;
 
-        std::thread::spawn(move || match rodio::DeviceSinkBuilder::open_default_sink() {
-            Ok(handle) => {
-                let player = Player::connect_new(handle.mixer());
-                player.set_volume(volume);
-                match File::open(&path) {
-                    Ok(file) => {
-                        let reader = BufReader::new(file);
-                        match Decoder::new(reader) {
-                            Ok(source) => {
-                                player.append(source);
-                                player.sleep_until_end();
-                                debug!("Played sound: {}", path);
+        std::thread::spawn(
+            move || match rodio::DeviceSinkBuilder::open_default_sink() {
+                Ok(handle) => {
+                    let player = Player::connect_new(handle.mixer());
+                    player.set_volume(volume);
+                    match File::open(&path) {
+                        Ok(file) => {
+                            let reader = BufReader::new(file);
+                            match Decoder::new(reader) {
+                                Ok(source) => {
+                                    player.append(source);
+                                    player.sleep_until_end();
+                                    debug!("Played sound: {}", path);
+                                }
+                                Err(e) => warn!("Failed to decode audio {}: {}", path, e),
                             }
-                            Err(e) => warn!("Failed to decode audio {}: {}", path, e),
                         }
+                        Err(e) => warn!("Failed to open audio file {}: {}", path, e),
                     }
-                    Err(e) => warn!("Failed to open audio file {}: {}", path, e),
                 }
-            }
-            Err(e) => warn!("Failed to initialize audio output: {}", e),
-        });
+                Err(e) => warn!("Failed to initialize audio output: {}", e),
+            },
+        );
     }
 }
