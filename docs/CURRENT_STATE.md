@@ -1,6 +1,6 @@
 # Current Project State
 
-> Last updated: 2026-03-02
+> Last updated: 2026-03-01
 
 ## Quick Summary
 
@@ -36,6 +36,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Recursive subordinate listing: `GET /api/users/{id}/all-subordinates`
 - ✅ Manager substitute/deputy feature: configurable substitute with same rights for subordinates
 - ✅ Test email fix: proper mailEnabled check, dev profile uses env vars, SMTP timeouts
+- ✅ Spring caching: `CacheConfig.kt` with `ConcurrentMapCacheManager` for `publicHolidays` and `systemSettings` caches; `@Cacheable` on `VacationService.getPublicHolidays()` and `AdminService.getSystemSettings()`; `@CacheEvict` on `AdminService.updateSystemSetting()`
 - ✅ OpenAPI/Swagger: all 7 controllers annotated with `@Tag`, `@Operation`, `@ApiResponse`, `@SecurityRequirement`; `OpenApiConfig.kt` with API metadata and JWT security scheme
 
 ### Frontend (Fully Implemented)

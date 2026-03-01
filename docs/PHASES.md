@@ -520,6 +520,7 @@
 
 ### What needs to be built
 - **Performance optimization**: database indexing, query optimization, caching
+  - ✅ Spring caching: `CacheConfig.kt` with `ConcurrentMapCacheManager` for `publicHolidays` and `systemSettings` caches; `@Cacheable` on `VacationService.getPublicHolidays()` and `AdminService.getSystemSettings()`; `@CacheEvict` on `AdminService.updateSystemSetting()`
 - **Accessibility**: WCAG 2.1 AA compliance
 - **Cross-browser testing**: compatibility verification across major browsers
 - **OpenAPI/Swagger annotations**: ✅ COMPLETE — `@Tag`, `@Operation`, `@ApiResponse`, `@SecurityRequirement` on all 7 controllers; `OpenApiConfig.kt` with `@OpenAPIDefinition` and `@SecurityScheme`
