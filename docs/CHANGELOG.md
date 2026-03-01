@@ -44,9 +44,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - **i18n**: TOTP, LDAP, and substitute keys in both DE and EN
 
 ### Fixed
-- **Test email 500 error**: `sendTestMail()` now checks `mailEnabled` flag before attempting to send
+- **Test email 500 error**: `sendTestMail()` now checks `mailEnabled` flag before attempting to send; returns 400 (not 500) for configuration errors
+- **Docker Compose missing MAIL_* env vars**: All `MAIL_*`, `SEED_ADMIN_PASSWORD`, and `FRONTEND_URL` environment variables are now passed to the backend container from `.env`
 - **Dev profile mail config**: Changed hardcoded SMTP values to env var placeholders so MAIL_HOST, MAIL_PORT etc. work in development
 - **SMTP timeouts**: Added 5-second connection/read/write timeouts to prevent hanging connections
+- **Frontend error display**: Test mail errors now show the actual server error message instead of generic "Request failed"
 
 ## [Unreleased] — Phase 9: Testing & Security Hardening (COMPLETE)
 
