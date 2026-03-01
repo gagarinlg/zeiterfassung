@@ -390,9 +390,19 @@
 - **`playwright.config.ts`**: updated to always capture screenshots (`screenshot: 'on'`)
 - **`@types/node`** added as devDependency for Node.js type support in E2E config
 
+#### Frontend Unit Tests
+- **`dateUtils.test.ts`**: 18 tests covering `formatDate` (DD.MM.YYYY, YYYY-MM-DD, MM/DD/YYYY, empty, invalid, ISO timestamp, locale default), `formatTime` (24h, 12h, empty), `formatDateTime` (combined, empty), `formatMonthYear` (German, English), `getFirstDayOfWeek` (German=1, English=0)
+
+#### CI/CD
+- **`frontend-e2e` job** added to `.github/workflows/ci.yml` — installs Playwright + Chromium, runs E2E tests, uploads test results and screenshots as artifacts
+- **`build` job** now depends on `frontend-e2e` in addition to all other lint/test jobs
+
+#### Documentation
+- **`docs/installation/README.md`**: comprehensive installation guide covering Docker deployment, development setup, production deployment, Raspberry Pi terminal setup, mobile apps, configuration reference, and troubleshooting
+
 ### What still needs to be built
 - **Backend unit tests**: ≥90% coverage for all services and controllers
-- **Frontend unit tests**: ≥85% coverage with Vitest
+- **Frontend unit tests**: expand to ≥85% coverage with Vitest
 - **Penetration testing**: OWASP ZAP automated scans, manual testing checklist
 - **Security headers**: verify CSP, HSTS, X-Frame-Options, X-Content-Type-Options
 - **Input validation**: comprehensive server-side validation on all endpoints
@@ -409,7 +419,7 @@
 - **User documentation**: with Playwright screenshots
 - **Admin documentation**: configuration guide
 - **API documentation**: complete OpenAPI/Swagger annotations
-- **Installation guide**: complete with all scenarios
+- **Installation guide**: complete with Docker, development, production, terminal, and mobile setup
 - **Architecture decision records**: document key technical decisions
 - **Performance optimization**: database indexing, query optimization, caching
 - **Accessibility**: WCAG 2.1 AA compliance

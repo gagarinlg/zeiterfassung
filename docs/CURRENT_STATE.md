@@ -4,7 +4,7 @@
 
 ## Quick Summary
 
-Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–8 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, and admin endpoints (audit log + system settings). The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization. Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests.
+Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–8 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, and admin endpoints (audit log + system settings). The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright.
 
 ## What Works Right Now
 
@@ -39,6 +39,8 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Time Tracking page: full implementation (status, clock in/out/break, live timer, today's entries list, monthly timesheet, CSV export)
 - ✅ Admin page: 3-tab UI (User Management, Audit Log, System Settings) with full CRUD, search, modals
 - ✅ Date/calendar localization: `dateUtils.ts` utility with `formatDate`, `formatTime`, `formatDateTime`, `formatMonthYear` using date-fns locales; `DateFormatContext` for per-user date/time format preferences; all pages (Dashboard, TimeTracking, Vacation) use localized date formatting
+- ✅ Unit tests: 59 tests total (LoginPage, AuthContext, ProtectedRoute, AdminPage, dateUtils)
+- ✅ CI: E2E testing with Playwright (Chromium) integrated into GitHub Actions workflow
 
 ### Mobile (Fully Implemented)
 - ✅ **Android**: real API integration with Retrofit + Moshi + Hilt; LoginScreen, DashboardScreen, TimeTrackingScreen (state-aware buttons), VacationScreen (balance + requests); 24 ViewModel unit tests

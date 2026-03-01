@@ -6,6 +6,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Added
+- Frontend unit tests for `dateUtils.ts` (18 tests)
+  - `formatDate`: DD.MM.YYYY, YYYY-MM-DD, MM/DD/YYYY, empty, invalid, ISO timestamp, locale default
+  - `formatTime`: 24h, 12h, empty
+  - `formatDateTime`: combined, empty
+  - `formatMonthYear`: German and English locale-aware month names
+  - `getFirstDayOfWeek`: German (Monday=1) and English (Sunday=0)
+- E2E testing job in CI workflow (`.github/workflows/ci.yml`)
+  - `frontend-e2e` job: installs Playwright + Chromium, runs E2E tests, uploads results/screenshots
+  - `build` job now depends on `frontend-e2e`
+- Comprehensive installation guide (`docs/installation/README.md`)
+  - Docker deployment, development setup, production deployment
+  - Raspberry Pi terminal setup, mobile apps, configuration reference, troubleshooting
+
+### Changed
 - Date/calendar localization across the frontend
   - `frontend/src/utils/dateUtils.ts`: `formatDate`, `formatTime`, `formatDateTime`, `formatMonthYear`, `getFirstDayOfWeek`, `getWeekdayHeaders` utilities using date-fns with locale support (de, en)
   - `frontend/src/context/DateFormatContext.tsx`: React context providing per-user date/time format preferences
