@@ -27,7 +27,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class AuthControllerIntegrationTest {
-
     @Autowired
     lateinit var mockMvc: MockMvc
 
@@ -66,13 +65,14 @@ class AuthControllerIntegrationTest {
 
         val superAdminRole = roleRepository.save(RoleEntity(name = "SUPER_ADMIN", description = "Super Admin"))
 
-        val admin = UserEntity(
-            email = ADMIN_EMAIL,
-            passwordHash = passwordEncoder.encode(ADMIN_PASSWORD),
-            firstName = "Super",
-            lastName = "Admin",
-            employeeNumber = "ADMIN-001",
-        )
+        val admin =
+            UserEntity(
+                email = ADMIN_EMAIL,
+                passwordHash = passwordEncoder.encode(ADMIN_PASSWORD),
+                firstName = "Super",
+                lastName = "Admin",
+                employeeNumber = "ADMIN-001",
+            )
         admin.roles.add(superAdminRole)
         userRepository.save(admin)
     }
@@ -81,56 +81,57 @@ class AuthControllerIntegrationTest {
 
     @Test
     fun corsPreflightFromAllowedOriginShouldSucceed() {
-        mockMvc.perform(
-            options("/api/auth/login")
-                .contextPath(CONTEXT_PATH)
-                .header("Origin", ALLOWED_ORIGIN)
-                .header("Access-Control-Request-Method", "POST")
-                .header("Access-Control-Request-Headers", "Content-Type"),
-        )
-            .andExpect(status().isOk)
+        mockMvc
+            .perform(
+                options("/api/auth/login")
+                    .contextPath(CONTEXT_PATH)
+                    .header("Origin", ALLOWED_ORIGIN)
+                    .header("Access-Control-Request-Method", "POST")
+                    .header("Access-Control-Request-Headers", "Content-Type"),
+            ).andExpect(status().isOk)
             .andExpect(header().string("Access-Control-Allow-Origin", ALLOWED_ORIGIN))
     }
 
     @Test
     fun corsPreflightFromDisallowedOriginShouldBeForbidden() {
-        mockMvc.perform(
-            options("/api/auth/login")
-                .contextPath(CONTEXT_PATH)
-                .header("Origin", DISALLOWED_ORIGIN)
-                .header("Access-Control-Request-Method", "POST")
-                .header("Access-Control-Request-Headers", "Content-Type"),
-        )
-            .andExpect(status().isForbidden)
+        mockMvc
+            .perform(
+                options("/api/auth/login")
+                    .contextPath(CONTEXT_PATH)
+                    .header("Origin", DISALLOWED_ORIGIN)
+                    .header("Access-Control-Request-Method", "POST")
+                    .header("Access-Control-Request-Headers", "Content-Type"),
+            ).andExpect(status().isForbidden)
     }
 
     @Test
     fun corsActualRequestFromAllowedOriginShouldIncludeHeaders() {
-        val loginJson = objectMapper.writeValueAsString(
-            mapOf("email" to ADMIN_EMAIL, "password" to ADMIN_PASSWORD),
-        )
+        val loginJson =
+            objectMapper.writeValueAsString(
+                mapOf("email" to ADMIN_EMAIL, "password" to ADMIN_PASSWORD),
+            )
 
-        mockMvc.perform(
-            post("/api/auth/login")
-                .contextPath(CONTEXT_PATH)
-                .header("Origin", ALLOWED_ORIGIN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(loginJson),
-        )
-            .andExpect(status().isOk)
+        mockMvc
+            .perform(
+                post("/api/auth/login")
+                    .contextPath(CONTEXT_PATH)
+                    .header("Origin", ALLOWED_ORIGIN)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(loginJson),
+            ).andExpect(status().isOk)
             .andExpect(header().string("Access-Control-Allow-Origin", ALLOWED_ORIGIN))
     }
 
     @Test
     fun corsCredentialsShouldBeAllowed() {
-        mockMvc.perform(
-            options("/api/auth/login")
-                .contextPath(CONTEXT_PATH)
-                .header("Origin", ALLOWED_ORIGIN)
-                .header("Access-Control-Request-Method", "POST")
-                .header("Access-Control-Request-Headers", "Content-Type"),
-        )
-            .andExpect(status().isOk)
+        mockMvc
+            .perform(
+                options("/api/auth/login")
+                    .contextPath(CONTEXT_PATH)
+                    .header("Origin", ALLOWED_ORIGIN)
+                    .header("Access-Control-Request-Method", "POST")
+                    .header("Access-Control-Request-Headers", "Content-Type"),
+            ).andExpect(status().isOk)
             .andExpect(header().string("Access-Control-Allow-Credentials", "true"))
     }
 
@@ -138,17 +139,18 @@ class AuthControllerIntegrationTest {
 
     @Test
     fun loginWithValidCredentialsShouldSucceed() {
-        val loginJson = objectMapper.writeValueAsString(
-            mapOf("email" to ADMIN_EMAIL, "password" to ADMIN_PASSWORD),
-        )
+        val loginJson =
+            objectMapper.writeValueAsString(
+                mapOf("email" to ADMIN_EMAIL, "password" to ADMIN_PASSWORD),
+            )
 
-        mockMvc.perform(
-            post("/api/auth/login")
-                .contextPath(CONTEXT_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(loginJson),
-        )
-            .andExpect(status().isOk)
+        mockMvc
+            .perform(
+                post("/api/auth/login")
+                    .contextPath(CONTEXT_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(loginJson),
+            ).andExpect(status().isOk)
             .andExpect(jsonPath("$.accessToken").isNotEmpty)
             .andExpect(jsonPath("$.refreshToken").isNotEmpty)
             .andExpect(jsonPath("$.expiresIn").isNumber)
@@ -157,69 +159,73 @@ class AuthControllerIntegrationTest {
 
     @Test
     fun loginWithInvalidCredentialsShouldReturn401() {
-        val loginJson = objectMapper.writeValueAsString(
-            mapOf("email" to ADMIN_EMAIL, "password" to "WrongPassword!"),
-        )
+        val loginJson =
+            objectMapper.writeValueAsString(
+                mapOf("email" to ADMIN_EMAIL, "password" to "WrongPassword!"),
+            )
 
-        mockMvc.perform(
-            post("/api/auth/login")
-                .contextPath(CONTEXT_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(loginJson),
-        )
-            .andExpect(status().isUnauthorized)
+        mockMvc
+            .perform(
+                post("/api/auth/login")
+                    .contextPath(CONTEXT_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(loginJson),
+            ).andExpect(status().isUnauthorized)
     }
 
     @Test
     fun loginWithBlankEmailShouldReturn400() {
-        val loginJson = objectMapper.writeValueAsString(
-            mapOf("email" to "", "password" to ADMIN_PASSWORD),
-        )
+        val loginJson =
+            objectMapper.writeValueAsString(
+                mapOf("email" to "", "password" to ADMIN_PASSWORD),
+            )
 
-        mockMvc.perform(
-            post("/api/auth/login")
-                .contextPath(CONTEXT_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(loginJson),
-        )
-            .andExpect(status().isBadRequest)
+        mockMvc
+            .perform(
+                post("/api/auth/login")
+                    .contextPath(CONTEXT_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(loginJson),
+            ).andExpect(status().isBadRequest)
     }
 
     @Test
     fun accessProtectedEndpointWithoutTokenShouldReturn401() {
         // Spring Security returns 403 by default for unauthenticated stateless requests
         // when no custom AuthenticationEntryPoint is configured
-        mockMvc.perform(
-            get("/api/auth/me")
-                .contextPath(CONTEXT_PATH),
-        )
-            .andExpect(status().isForbidden)
+        mockMvc
+            .perform(
+                get("/api/auth/me")
+                    .contextPath(CONTEXT_PATH),
+            ).andExpect(status().isForbidden)
     }
 
     @Test
     fun accessProtectedEndpointWithValidTokenShouldSucceed() {
-        val loginJson = objectMapper.writeValueAsString(
-            mapOf("email" to ADMIN_EMAIL, "password" to ADMIN_PASSWORD),
-        )
+        val loginJson =
+            objectMapper.writeValueAsString(
+                mapOf("email" to ADMIN_EMAIL, "password" to ADMIN_PASSWORD),
+            )
 
-        val loginResult = mockMvc.perform(
-            post("/api/auth/login")
-                .contextPath(CONTEXT_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(loginJson),
-        )
-            .andExpect(status().isOk)
-            .andReturn()
+        val loginResult =
+            mockMvc
+                .perform(
+                    post("/api/auth/login")
+                        .contextPath(CONTEXT_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(loginJson),
+                ).andExpect(status().isOk)
+                .andReturn()
 
         val responseBody = objectMapper.readTree(loginResult.response.contentAsString)
         val accessToken = responseBody["accessToken"].asText()
 
-        mockMvc.perform(
-            get("/api/auth/me")
-                .contextPath(CONTEXT_PATH)
-                .header("Authorization", "Bearer $accessToken"),
-        )
-            .andExpect(status().isOk)
+        mockMvc
+            .perform(
+                get("/api/auth/me")
+                    .contextPath(CONTEXT_PATH)
+                    .header("Authorization", "Bearer $accessToken"),
+            ).andExpect(status().isOk)
             .andExpect(jsonPath("$.email").value(ADMIN_EMAIL))
             .andExpect(jsonPath("$.firstName").value("Super"))
             .andExpect(jsonPath("$.lastName").value("Admin"))
@@ -229,18 +235,19 @@ class AuthControllerIntegrationTest {
 
     @Test
     fun responsesShouldIncludeSecurityHeaders() {
-        val loginJson = objectMapper.writeValueAsString(
-            mapOf("email" to ADMIN_EMAIL, "password" to ADMIN_PASSWORD),
-        )
+        val loginJson =
+            objectMapper.writeValueAsString(
+                mapOf("email" to ADMIN_EMAIL, "password" to ADMIN_PASSWORD),
+            )
 
-        mockMvc.perform(
-            post("/api/auth/login")
-                .contextPath(CONTEXT_PATH)
-                .secure(true)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(loginJson),
-        )
-            .andExpect(status().isOk)
+        mockMvc
+            .perform(
+                post("/api/auth/login")
+                    .contextPath(CONTEXT_PATH)
+                    .secure(true)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(loginJson),
+            ).andExpect(status().isOk)
             .andExpect(header().exists("X-Content-Type-Options"))
             .andExpect(header().exists("X-Frame-Options"))
             .andExpect(header().exists("Strict-Transport-Security"))
