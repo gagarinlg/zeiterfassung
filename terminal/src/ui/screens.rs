@@ -1,3 +1,7 @@
+// NOTE: User-facing strings are intentionally hardcoded in German for this implementation phase.
+// Full i18n via fluent (.ftl files in terminal/locales/) is planned for a future phase.
+// All strings are candidates for extraction — do not add new hardcoded strings.
+
 use chrono::{DateTime, Utc};
 use iced::widget::{column, container, row, text, Column, Space};
 use iced::{Alignment, Color, Element, Length};

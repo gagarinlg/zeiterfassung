@@ -27,7 +27,7 @@ pub enum Message {
     /// An RFID tag was scanned.
     RfidScanned(String),
     /// API response received after a scan.
-    ScanResult(Result<ClockResponse, String>),
+    ScanResult(Result<ClockResponse, ApiError>),
     /// Background sync completed; contains the number of events synced.
     SyncComplete(u32),
 }
@@ -236,19 +236,16 @@ impl TerminalApp {
         self.state = AppState::Loading { rfid: tag_id.clone() };
 
         let api = self.api_client.clone();
+        let rfid = tag_id.clone();
         let terminal_id = self.terminal_id.clone();
 
         Command::perform(
-            async move {
-                api.clock_in_out(&tag_id, &terminal_id)
-                    .await
-                    .map_err(|e| e.to_string())
-            },
+            async move { api.clock_in_out(&rfid, &terminal_id).await },
             Message::ScanResult,
         )
     }
 
-    fn handle_scan_result(&mut self, result: Result<ClockResponse, String>) -> Command<Message> {
+    fn handle_scan_result(&mut self, result: Result<ClockResponse, ApiError>) -> Command<Message> {
         // Extract the RFID from the loading state; ignore results that arrive late.
         let rfid = match &self.state {
             AppState::Loading { rfid } => rfid.clone(),
@@ -271,7 +268,7 @@ impl TerminalApp {
                 let ts = response.timestamp.format("%H:%M:%S").to_string();
                 let timeout = self.config.display.idle_timeout_seconds;
 
-                if response.entry_type.to_uppercase().contains("IN") {
+                if response.entry_type == "CLOCK_IN" {
                     self.state = AppState::ClockIn {
                         data: ClockInData {
                             employee_name: name,
@@ -297,47 +294,46 @@ impl TerminalApp {
                 }
             }
 
-            Err(err) => {
-                let is_network_error = err.contains("Network error")
-                    || err.contains("timed out")
-                    || err.contains("Timeout")
-                    || err.contains("connection");
-
-                if is_network_error {
-                    // Store event locally and show optimistic offline confirmation.
-                    if let Ok(buf) = self.event_buffer.lock() {
-                        let _ = buf.push(&rfid, &self.terminal_id);
-                        self.pending_count = buf.pending_count().unwrap_or(0);
-                    }
-                    self.is_online = false;
-                    self.audio.play_success(); // Optimistic feedback.
-
-                    self.state = AppState::OfflineConfirm {
-                        data: ClockInData {
-                            employee_name: String::new(),
-                            timestamp: Utc::now().format("%H:%M:%S").to_string(),
-                            scheduled_hours: 0.0,
-                        },
-                        seconds_left: self.config.display.idle_timeout_seconds,
-                    };
-                } else {
-                    self.audio.play_error();
-                    warn!("Scan error: {}", err);
-
-                    let error_type = if err.contains("Not found") || err.contains("404") {
-                        ErrorType::BadgeNotRecognized
-                    } else {
-                        ErrorType::ServerUnavailable
-                    };
-
-                    self.state = AppState::Error {
-                        data: ErrorData {
-                            message: err,
-                            error_type,
-                        },
-                        seconds_left: self.config.display.error_timeout_seconds,
-                    };
+            Err(ApiError::NetworkError(_)) | Err(ApiError::Timeout) => {
+                // Store event locally and show optimistic offline confirmation.
+                if let Ok(buf) = self.event_buffer.lock() {
+                    let _ = buf.push(&rfid, &self.terminal_id);
+                    self.pending_count = buf.pending_count().unwrap_or(0);
                 }
+                self.is_online = false;
+                self.audio.play_success(); // Optimistic feedback.
+
+                self.state = AppState::OfflineConfirm {
+                    data: ClockInData {
+                        employee_name: String::new(),
+                        timestamp: Utc::now().format("%H:%M:%S").to_string(),
+                        scheduled_hours: 0.0,
+                    },
+                    seconds_left: self.config.display.idle_timeout_seconds,
+                };
+            }
+
+            Err(ApiError::NotFound(_)) => {
+                self.audio.play_error();
+                self.state = AppState::Error {
+                    data: ErrorData {
+                        message: "Ausweis nicht registriert".to_string(),
+                        error_type: ErrorType::BadgeNotRecognized,
+                    },
+                    seconds_left: self.config.display.error_timeout_seconds,
+                };
+            }
+
+            Err(err) => {
+                self.audio.play_error();
+                warn!("Scan error: {}", err);
+                self.state = AppState::Error {
+                    data: ErrorData {
+                        message: err.to_string(),
+                        error_type: ErrorType::ServerUnavailable,
+                    },
+                    seconds_left: self.config.display.error_timeout_seconds,
+                };
             }
         }
 

@@ -7,6 +7,7 @@ import com.zeiterfassung.model.dto.TrackingStatus
 import com.zeiterfassung.model.enums.TimeEntrySource
 import com.zeiterfassung.model.enums.TimeEntryType
 import com.zeiterfassung.repository.UserRepository
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.LocalDate
@@ -19,6 +20,7 @@ class TerminalService(
     private val timeTrackingService: TimeTrackingService,
     private val vacationService: VacationService,
 ) {
+    private val log = LoggerFactory.getLogger(TerminalService::class.java)
     /**
      * Processes an RFID scan from a terminal device.
      *
@@ -75,7 +77,8 @@ class TerminalService(
         val year = LocalDate.now(ZoneOffset.UTC).year
         return try {
             vacationService.getBalance(userId, year).remainingDays.toFloat()
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            log.warn("Failed to fetch vacation balance for user {} year {}: {}", userId, year, e.message)
             0f
         }
     }

@@ -41,7 +41,7 @@ pub struct ApiClient {
     retry_attempts: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ApiError {
     NotFound(String),
     Unauthorized,
