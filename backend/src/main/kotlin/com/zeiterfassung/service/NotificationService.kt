@@ -27,6 +27,8 @@ class NotificationService(
         vararg args: Any,
     ): String = messageSource.getMessage(key, args.toList().toTypedArray(), locale)
 
+    private val noNotes by lazy { msg("common.not_specified") }
+
     // ---- Vacation request events -----------------------------------------------
 
     /**
@@ -48,7 +50,7 @@ class NotificationService(
                 request.startDate,
                 request.endDate,
                 request.totalDays,
-                request.notes ?: "-",
+                request.notes ?: noNotes,
             )
         managers.filter { it.email.isNotBlank() }.forEach { manager ->
             emailService.sendAsync(manager.email, subject, body)
@@ -139,7 +141,7 @@ class NotificationService(
                 employee.lastName,
                 sickLeave.startDate,
                 sickLeave.endDate,
-                sickLeave.notes ?: "-",
+                sickLeave.notes ?: noNotes,
             )
         emailService.sendAsync(manager.email, subject, body)
     }

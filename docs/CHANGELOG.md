@@ -3,6 +3,22 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Unit Tests & Code Quality
+
+### Added
+- **`SickLeaveServiceTest`** (12 tests): report, update, cancel, certificate, validation, authorization
+- **`BusinessTripServiceTest`** (16 tests): create, update, cancel, approve, reject, complete, validation, authorization
+- **`ProjectServiceTest`** (14 tests): project CRUD, time allocation CRUD, validation, authorization
+- **`GdprServiceTest`** (7 tests): data export, anonymization, deletion flags, token revocation
+
+### Fixed
+- All ktlint issues across the entire codebase (unused imports, expression body formatting)
+- Hardcoded fallback value in `NotificationService` replaced with localized `common.not_specified` message key
+- Fully qualified `Page.empty()` call replaced with short form in `BusinessTripService`
+
+### Changed
+- Backend test count increased from 210 to 260 tests across 26 test classes
+
 ## [Unreleased] — Phase 13: Database Backup Frontend Tab
 
 ### Added

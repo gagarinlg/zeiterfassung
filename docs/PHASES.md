@@ -2,11 +2,11 @@
 
 > Last updated: 2026-03-01
 >
-> **Current phase:** Phase 14 — Sick Leave, Business Trips & Project Time Allocation 🚧
+> **Current phase:** Phase 14 — Sick Leave, Business Trips, Projects & GDPR 🚧
 
 ---
 
-## Phase 14: Sick Leave, Business Trips & Project Time Allocation 🚧
+## Phase 14: Sick Leave, Business Trips, Projects & GDPR 🚧
 - **Status**: IN PROGRESS (backend complete, frontend pending)
 
 ### What was delivered
@@ -52,6 +52,21 @@
 - `backend/src/main/kotlin/com/zeiterfassung/service/NotificationService.kt` — added sick leave and business trip notification methods
 - `backend/src/main/resources/messages_de.properties` — added German email templates
 - `backend/src/main/resources/messages_en.properties` — added English email templates
+
+### GDPR Compliance (Art. 15 & Art. 17)
+- **GdprService**: Data export (all personal data, time entries, vacation requests, sick leaves, business trips, audit log) and account deletion/anonymization (soft delete + data anonymization + token revocation)
+- **GdprController** at `/gdpr`: Self-service export/delete endpoints + admin-only export/delete endpoints
+
+### Key GDPR files created
+- `backend/src/main/kotlin/com/zeiterfassung/model/dto/GdprDtos.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/GdprService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/controller/GdprController.kt`
+
+### Unit Tests (49 tests)
+- `SickLeaveServiceTest` (12 tests)
+- `BusinessTripServiceTest` (16 tests)
+- `ProjectServiceTest` (14 tests)
+- `GdprServiceTest` (7 tests)
 
 ---
 
