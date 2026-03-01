@@ -57,8 +57,10 @@ class EmailServiceTest {
 
     @Test
     fun `sendAsync should not throw when mail is enabled but send fails`() {
-        org.mockito.Mockito.doThrow(RuntimeException("SMTP error"))
-            .`when`(mailSender).send(any(SimpleMailMessage::class.java))
+        org.mockito.Mockito
+            .doThrow(RuntimeException("SMTP error"))
+            .`when`(mailSender)
+            .send(any(SimpleMailMessage::class.java))
 
         // Should not throw – error is swallowed
         enabledService.sendAsync("user@example.com", "Subject", "Body")

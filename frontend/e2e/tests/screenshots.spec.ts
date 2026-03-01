@@ -6,7 +6,6 @@ import {
   MOCK_USER,
   MOCK_TRACKING_STATUS_CLOCKED_IN,
   MOCK_VACATION_BALANCE,
-  MOCK_MONTHLY_SUMMARY,
 } from './helpers'
 
 const SCREENSHOT_DIR = '../docs/screenshots'

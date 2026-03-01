@@ -102,11 +102,12 @@ class PasswordResetServiceTest {
                 tokenHash = "hashed-token",
                 expiresAt = Instant.now().plusSeconds(3600),
             )
-        val request = PasswordResetConfirmRequest(
-            token = "raw-token",
-            newPassword = "newPassword1",
-            confirmPassword = "newPassword1",
-        )
+        val request =
+            PasswordResetConfirmRequest(
+                token = "raw-token",
+                newPassword = "newPassword1",
+                confirmPassword = "newPassword1",
+            )
         `when`(jwtService.hashToken("raw-token")).thenReturn("hashed-token")
         `when`(passwordResetTokenRepository.findByTokenHash("hashed-token")).thenReturn(Optional.of(resetToken))
         `when`(passwordEncoder.encode("newPassword1")).thenReturn("encoded-hash")
@@ -123,11 +124,12 @@ class PasswordResetServiceTest {
 
     @Test
     fun `confirmPasswordReset should throw UnauthorizedException when passwords do not match`() {
-        val request = PasswordResetConfirmRequest(
-            token = "raw-token",
-            newPassword = "password1",
-            confirmPassword = "password2",
-        )
+        val request =
+            PasswordResetConfirmRequest(
+                token = "raw-token",
+                newPassword = "password1",
+                confirmPassword = "password2",
+            )
 
         assertThrows<UnauthorizedException> {
             passwordResetService.confirmPasswordReset(request)
@@ -136,11 +138,12 @@ class PasswordResetServiceTest {
 
     @Test
     fun `confirmPasswordReset should throw UnauthorizedException for invalid token`() {
-        val request = PasswordResetConfirmRequest(
-            token = "invalid-token",
-            newPassword = "newPassword1",
-            confirmPassword = "newPassword1",
-        )
+        val request =
+            PasswordResetConfirmRequest(
+                token = "invalid-token",
+                newPassword = "newPassword1",
+                confirmPassword = "newPassword1",
+            )
         `when`(jwtService.hashToken("invalid-token")).thenReturn("hashed-invalid")
         `when`(passwordResetTokenRepository.findByTokenHash("hashed-invalid")).thenReturn(Optional.empty())
 
@@ -158,11 +161,12 @@ class PasswordResetServiceTest {
                 tokenHash = "hashed-token",
                 expiresAt = Instant.now().minusSeconds(60),
             )
-        val request = PasswordResetConfirmRequest(
-            token = "raw-token",
-            newPassword = "newPassword1",
-            confirmPassword = "newPassword1",
-        )
+        val request =
+            PasswordResetConfirmRequest(
+                token = "raw-token",
+                newPassword = "newPassword1",
+                confirmPassword = "newPassword1",
+            )
         `when`(jwtService.hashToken("raw-token")).thenReturn("hashed-token")
         `when`(passwordResetTokenRepository.findByTokenHash("hashed-token")).thenReturn(Optional.of(resetToken))
 
@@ -180,11 +184,12 @@ class PasswordResetServiceTest {
                 tokenHash = "hashed-token",
                 expiresAt = Instant.now().plusSeconds(3600),
             ).apply { used = true }
-        val request = PasswordResetConfirmRequest(
-            token = "raw-token",
-            newPassword = "newPassword1",
-            confirmPassword = "newPassword1",
-        )
+        val request =
+            PasswordResetConfirmRequest(
+                token = "raw-token",
+                newPassword = "newPassword1",
+                confirmPassword = "newPassword1",
+            )
         `when`(jwtService.hashToken("raw-token")).thenReturn("hashed-token")
         `when`(passwordResetTokenRepository.findByTokenHash("hashed-token")).thenReturn(Optional.of(resetToken))
 

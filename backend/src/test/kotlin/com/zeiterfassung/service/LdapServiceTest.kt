@@ -11,8 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
 import org.mockito.Mockito.atLeastOnce
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import java.util.Optional
 
@@ -54,7 +54,10 @@ class LdapServiceTest {
         `when`(systemSettingRepository.findByKey(key)).thenReturn(Optional.of(entity))
     }
 
-    private fun stubAllSettings(value: String = "", includeManagerPassword: Boolean = false) {
+    private fun stubAllSettings(
+        value: String = "",
+        includeManagerPassword: Boolean = false,
+    ) {
         for (key in ldapKeys) {
             stubSetting(key, value)
         }

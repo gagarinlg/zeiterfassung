@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
 import org.mockito.Mockito.verify
@@ -120,10 +119,11 @@ class TotpServiceTest {
     @Test
     fun `disableTotp should clear totp fields`() {
         val userId = UUID.randomUUID()
-        val user = makeUser(userId).apply {
-            totpSecret = "JBSWY3DPEHPK3PXP"
-            totpEnabled = true
-        }
+        val user =
+            makeUser(userId).apply {
+                totpSecret = "JBSWY3DPEHPK3PXP"
+                totpEnabled = true
+            }
         `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
         `when`(userRepository.save(any<UserEntity>())).thenReturn(user)
 
