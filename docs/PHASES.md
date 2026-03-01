@@ -1,7 +1,7 @@
 # Zeiterfassung — Project Phases & Roadmap
 
 > **Last updated:** 2026-02-21
-> **Current phase:** Phase 5 (Dashboard & Reporting) — NEXT UP
+> **Current phase:** Phase 5 (Dashboard & Reporting) — IN PROGRESS
 
 ---
 
@@ -214,8 +214,8 @@
 
 ---
 
-## Phase 5: Dashboard & Reporting 🔲
-- **Status**: PLANNED
+## Phase 5: Dashboard & Reporting 🚧
+- **Status**: IN PROGRESS
 - **Priority**: HIGH
 
 ### What needs to be built

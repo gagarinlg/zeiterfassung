@@ -1,6 +1,6 @@
 # Current Project State
 
-> Last updated: 2026-02-21
+> Last updated: 2026-02-22
 
 ## Quick Summary
 
@@ -31,8 +31,8 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Navigation with role-based menu items
 - ✅ Vacation page: balance card, request list, new-request form, monthly calendar
 - ✅ Vacation approval page: manager queue with approve/reject-with-reason modal
-- ⚠️ Dashboard: placeholder (shows static data)
-- ⚠️ Time Tracking page: placeholder (shows title only)
+- ✅ Dashboard: real data widgets (today hours, weekly hours, vacation balance, team status, compliance warnings)
+- ✅ Time Tracking page: full implementation (status, clock in/out/break, live timer, today's entries list, monthly timesheet, CSV export)
 - ⚠️ Admin page: placeholder
 
 ### Mobile (Scaffolded Only)
@@ -45,8 +45,8 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ⚠️ API client and buffer modules exist but need backend integration
 
 ## Tech Debt / Known Issues
-- Dashboard page is still a placeholder — needs real data widgets
-- Time Tracking page is a placeholder — needs full implementation
+- Dashboard page is fully implemented with real API data
+- Time Tracking page is fully implemented with clock-in/out/break controls and monthly timesheet
 - Admin page is a placeholder
 - Backend test coverage targets (≥90%) not yet fully verified
 - Frontend test coverage targets (≥85%) not yet fully verified

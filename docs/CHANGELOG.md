@@ -6,9 +6,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Planned
-- Phase 5: Dashboard & Reporting
+- Phase 5 (continued): Charts, admin dashboard, reports page
 - Phase 6: Terminal (Raspberry Pi) Full Integration
 - Phase 7: Mobile Apps Full Implementation
+
+## [Phase 5 - partial] - 2026-02-22
+
+### Added
+- `GET /api/time/export/csv` endpoint: exports monthly timesheet as CSV (`TimeTrackingController`)
+- `TrackingStatusResponse`, `TimeSheetResponse`, `TrackingStatus` TypeScript types (`frontend/src/types/index.ts`)
+- Full `timeService.ts` rewrite with correct API endpoints matching backend (`/time/clock-in`, `/time/clock-out`, `/time/break/start`, `/time/break/end`, `/time/status`, `/time/today`, `/time/entries`, `/time/summary/daily/{date}`, `/time/summary/weekly`, `/time/summary/monthly`, `/time/timesheet`, `/time/manage/team/status`, `/time/export/csv`)
+- `DashboardPage`: real data widgets — today work time, weekly hours, vacation balance, team presence count (managers), compliance warnings, pending vacation requests (managers), team status list
+- `TimeTrackingPage`: full implementation — status badge, clock-in/out/break buttons, live elapsed timer (updates every minute), today's entries list, monthly timesheet table with compliance badges, CSV export button
+- i18n keys: `time_tracking.status.*`, `time_tracking.elapsed`, `time_tracking.timesheet`, `time_tracking.export_csv`, `time_tracking.no_entries_today`, `time_tracking.total_work`, `time_tracking.total_break`, `time_tracking.overtime`, `time_tracking.compliant`, `time_tracking.non_compliant`, `time_tracking.week`, `time_tracking.month`, `time_tracking.errors.*`, `dashboard.clocked_in_since`, `dashboard.on_break_since`, `dashboard.compliance_warning`, `dashboard.team_status`, `dashboard.no_team` (DE + EN)
 
 ## [Phase 4] - 2026-02-21
 

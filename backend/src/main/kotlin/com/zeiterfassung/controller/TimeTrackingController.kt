@@ -184,4 +184,26 @@ class TimeTrackingController(
         @AuthenticationPrincipal actorId: String,
     ): ResponseEntity<Map<UUID, TrackingStatusResponse>> =
         ResponseEntity.ok(timeTrackingService.getTeamCurrentStatus(UUID.fromString(actorId)))
+
+    @GetMapping("/export/csv", produces = ["text/csv"])
+    @PreAuthorize("hasAuthority('time.view.own')")
+    fun exportCsv(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) start: LocalDate,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) end: LocalDate,
+        @AuthenticationPrincipal actorId: String,
+        response: jakarta.servlet.http.HttpServletResponse,
+    ) {
+        val userId = UUID.fromString(actorId)
+        val sheet = timeTrackingService.getTimeSheet(userId, start, end)
+        response.setHeader("Content-Disposition", "attachment; filename=\"timesheet_${start}_${end}.csv\"")
+        val writer = response.writer
+        writer.println("Date,Work Minutes,Break Minutes,Overtime Minutes,Compliant,Notes")
+        sheet.dailySummaries.forEach { summary ->
+            val notes = (summary.complianceNotes ?: "")
+                .replace("\"", "\"\"")
+                .let { if (it.isNotEmpty() && it[0] in setOf('=', '+', '-', '@', '\t', '\r', '\n')) " $it" else it }
+            writer.println("${summary.date},${summary.totalWorkMinutes},${summary.totalBreakMinutes},${summary.overtimeMinutes},${summary.isCompliant},\"$notes\"")
+        }
+        writer.flush()
+    }
 }
