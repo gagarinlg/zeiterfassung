@@ -43,10 +43,18 @@ pub struct ApiClient {
 
 #[derive(Debug, Clone)]
 pub enum ApiError {
+    /// 404 — no employee is registered for this RFID tag.
     NotFound(String),
+    /// 401 — terminal is not authorised.
     Unauthorized,
+    /// 409 — another terminal processed a scan for this employee at the same moment.
+    /// The terminal should ask the user to scan again.
+    Conflict,
+    /// Any other non-2xx HTTP response.
     ServerError(String),
+    /// TCP/DNS-level failure.
     NetworkError(String),
+    /// Request timed out.
     Timeout,
 }
 
@@ -55,6 +63,7 @@ impl std::fmt::Display for ApiError {
         match self {
             ApiError::NotFound(msg) => write!(f, "Not found: {}", msg),
             ApiError::Unauthorized => write!(f, "Unauthorized"),
+            ApiError::Conflict => write!(f, "Scan conflict — please scan again"),
             ApiError::ServerError(msg) => write!(f, "Server error: {}", msg),
             ApiError::NetworkError(msg) => write!(f, "Network error: {}", msg),
             ApiError::Timeout => write!(f, "Request timed out"),
@@ -101,6 +110,10 @@ impl ApiClient {
                         return Err(ApiError::NotFound("RFID tag not registered".to_string()));
                     } else if status.as_u16() == 401 {
                         return Err(ApiError::Unauthorized);
+                    } else if status.as_u16() == 409 {
+                        // Race condition: another terminal already toggled this employee's
+                        // state between our status-check and our clock action.
+                        return Err(ApiError::Conflict);
                     } else {
                         last_error = ApiError::ServerError(format!("HTTP {}", status));
                     }
@@ -144,6 +157,7 @@ mod tests {
             base_url: base_url.to_string(),
             timeout_seconds: 5,
             retry_attempts: 1,
+            terminal_id: "test-terminal".to_string(),
         })
     }
 
@@ -165,6 +179,7 @@ mod tests {
     fn test_api_error_display() {
         assert!(ApiError::NotFound("x".to_string()).to_string().contains("Not found"));
         assert!(ApiError::Unauthorized.to_string().contains("Unauthorized"));
+        assert!(ApiError::Conflict.to_string().contains("scan again"));
         assert!(ApiError::ServerError("500".to_string()).to_string().contains("Server error"));
         assert!(ApiError::NetworkError("conn".to_string()).to_string().contains("Network error"));
         assert!(ApiError::Timeout.to_string().contains("timed out"));

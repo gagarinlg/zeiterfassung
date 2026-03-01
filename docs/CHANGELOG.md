@@ -6,11 +6,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Planned
-- Phase 5 (continued): Charts, admin dashboard, reports page
-- Phase 6: Terminal backend endpoint (`POST /api/terminal/scan`)
 - Phase 7: Mobile Apps Full Implementation
+- Phase 8: Admin Panel & Settings UI
 
-## [Phase 6 - terminal Rust app] - 2026-03-01
+## [Phase 6 - multi-terminal support] - 2026-03-01
+
+### Added (backend)
+- `TerminalService`: extracted business logic from `TerminalController`; `remainingVacationDays` now uses real `VacationService.getBalance()` instead of a TODO placeholder
+- `@Transactional` on `TerminalService.scan()` — makes `getCurrentStatus` + `clockIn/clockOut` atomic; concurrent scans from two terminals cannot both succeed with the same action — the loser receives HTTP 409
+- `GET /api/terminal/heartbeat` — terminals poll this to detect backend connectivity
+- Renamed `TerminalScanResponse.action` → `entryType` for consistency with Rust struct
+- `TerminalServiceTest`: 9 unit tests including race-condition scenario and per-terminal ID attribution
+
+### Added (terminal/)
+- `terminal_id` added to `[api]` section of `terminal.toml` and `ApiConfig` — each physical terminal must set a unique value so clock entries are attributed to the correct device
+- `ApiError::Conflict` (HTTP 409) — distinguished from generic errors; shown as "Bitte erneut scannen" on screen
+- Offline-sync loop now explicitly discards stale/conflicted events (409, 404) instead of blocking the queue
+- New config test: `test_each_terminal_has_unique_id_in_config`
+- Updated `test_load_from_toml_string` to include and assert `terminal_id`
+- Updated `test_api_error_display` to cover `ApiError::Conflict`
+- 15 total unit tests (terminal)
+
 
 ### Added (terminal/)
 - `src/ui/mod.rs`: Full iced 0.12.1 `Application` implementation

@@ -9,6 +9,7 @@ import com.zeiterfassung.model.enums.TimeEntryType
 import com.zeiterfassung.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -24,11 +25,15 @@ class TerminalService(
     /**
      * Processes an RFID scan from a terminal device.
      *
-     * Looks up the employee by RFID tag, toggles their clock-in/out state,
-     * and returns a response with today's summary and vacation balance.
+     * The entire read-check-write sequence runs inside a single transaction so that
+     * two terminals scanning the same badge simultaneously cannot both succeed with the
+     * same action (e.g. both clock-in). One will succeed; the other will receive a 409
+     * ConflictException from [TimeTrackingService], which propagates to the terminal as
+     * an HTTP 409 so the terminal can display a "please rescan" message.
      *
      * @throws ResourceNotFoundException if no employee is registered for the given RFID tag
      */
+    @Transactional
     fun scan(
         rfidTagId: String,
         terminalId: String,

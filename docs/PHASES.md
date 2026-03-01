@@ -1,7 +1,7 @@
 # Zeiterfassung — Project Phases & Roadmap
 
-> **Last updated:** 2026-02-21
-> **Current phase:** Phase 6 (Terminal — Raspberry Pi Full Integration) — NEXT UP
+> **Last updated:** 2026-03-01
+> **Current phase:** Phase 7 (Mobile Apps) — NEXT UP
 
 ---
 
@@ -242,28 +242,47 @@
 
 ---
 
-## Phase 6: Terminal (Raspberry Pi) Full Integration 🚧
-- **Status**: IN PROGRESS
+## Phase 6: Terminal (Raspberry Pi) Full Integration ✅
+- **Status**: COMPLETE
+- **PR**: #58 (copilot/do-next-project-phase)
+- **Merged**: 2026-03-01
 - **Priority**: MEDIUM
 
-### What was delivered (terminal Rust app — this PR)
-- **Full iced 0.12.1 Application**: `terminal/src/ui/mod.rs` — complete state machine
-  (Idle → Loading → ClockIn/ClockOut/OfflineConfirm/Error → Idle) with auto-return timers
-- **Screen views**: `terminal/src/ui/screens.rs` — all 6 screens with colour-coded layouts
-  (green clock-in, red clock-out, amber offline/error)
-- **RFID subscription**: async iced subscription polling `RfidReader` at 50 ms intervals
-- **API fix**: `#[serde(rename_all = "camelCase")]` on all request/response structs;
-  endpoint corrected to `POST /terminal/scan`
-- **Offline buffering**: network errors trigger SQLite buffer; auto-sync every
-  `sync_interval_seconds` via `iced::time::every` subscription
-- **Audio**: rodio 0.22 `DeviceSinkBuilder` + `Player` wired in for success/error sounds
-- **Tests**: 14 tests — api serialisation, buffer CRUD & max-size, config TOML parsing
+### What was delivered
 
-### Still needs to be built
-- **Backend endpoint**: POST /api/terminal/scan (RFID-based clock in/out)
-- **Backend service**: look up user by RFID tag, create time entry, return employee info
-- **Terminal admin UI**: web page for managing terminals and viewing heartbeat status
-- **Terminal health monitoring**: heartbeat endpoint, admin status view
+#### Backend
+- **`TerminalService`**: extracted business logic from `TerminalController`
+  - `scan(rfidTagId, terminalId)` — looks up user by RFID, toggles clock state, returns full response
+  - `@Transactional` — `getCurrentStatus` + `clockIn/clockOut` are atomic; concurrent scans from two terminals result in HTTP 409 for the loser
+  - `remainingVacationDays` uses real `VacationService.getBalance()` (fixes TODO placeholder)
+- **`TerminalController`**: slim; delegates entirely to `TerminalService`
+  - `POST /api/terminal/scan` — RFID scan → clock toggle
+  - `GET /api/terminal/heartbeat` — terminals poll this to detect connectivity
+- **`TerminalScanResponse.entryType`**: renamed from `action` for consistency with Rust struct
+- **`TerminalServiceTest`**: 9 unit tests including:
+  - Clock-in when CLOCKED_OUT, clock-out when CLOCKED_IN, clock-out when ON_BREAK
+  - Unknown RFID → `ResourceNotFoundException`
+  - Vacation service failure → graceful 0-days fallback
+  - Concurrent scan conflict → `ConflictException` propagates (HTTP 409)
+  - Two terminals with different IDs — correct `terminalId` attributed to each entry
+
+#### Terminal (Rust)
+- **Multi-terminal `terminal_id`**: moved from env-var fallback into `terminal.toml` / `ApiConfig`; every physical device configures a unique `terminal_id`
+- **`ApiError::Conflict` (HTTP 409)**: new variant; shown as "Bitte erneut scannen" — prompts the user to scan again after a race condition
+- **Offline sync loop**: explicitly discards stale/conflicted events (409, 404) so the queue never blocks
+- **Full iced 0.12 Application**: state machine (Idle → Loading → ClockIn/ClockOut/OfflineConfirm/Error → Idle)
+- **Screen views**: 6 colour-coded screens (green, red, amber)
+- **RFID subscription**: async `iced::subscription::channel` at 50 ms
+- **Audio**: rodio success/error sounds
+- **15 unit tests**: api (5), buffer (5), config (5)
+
+### Key files
+- `backend/src/main/kotlin/com/zeiterfassung/service/TerminalService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/controller/TerminalController.kt`
+- `backend/src/test/kotlin/com/zeiterfassung/service/TerminalServiceTest.kt`
+- `terminal/src/ui/mod.rs`, `terminal/src/ui/screens.rs`
+- `terminal/src/api/mod.rs`, `terminal/src/config.rs`
+- `terminal/terminal.toml`
 
 ### Depends on
 - Phase 2 (auth/users — RFID management) ✅

@@ -144,6 +144,46 @@ class TerminalServiceTest {
         assertThat(result.overtimeMinutes).isEqualTo(120)
     }
 
+    @Test
+    fun `scan should propagate ConflictException when another terminal already toggled status`() {
+        // Simulates the race condition: Terminal A and Terminal B both read CLOCKED_OUT, then
+        // Terminal A wins and clocks the employee in. Terminal B's clockIn() then throws
+        // ConflictException (HTTP 409), which must propagate so the terminal shows "please rescan".
+        `when`(userRepository.findByRfidTagId(rfidTagId)).thenReturn(Optional.of(user))
+        `when`(timeTrackingService.getCurrentStatus(userId)).thenReturn(clockedOutStatus())
+        `when`(
+            timeTrackingService.clockIn(userId, TimeEntrySource.TERMINAL, terminalId = terminalId),
+        ).thenThrow(com.zeiterfassung.exception.ConflictException("Already clocked in"))
+
+        assertThrows<com.zeiterfassung.exception.ConflictException> {
+            service.scan(rfidTagId, terminalId)
+        }
+    }
+
+    @Test
+    fun `scan uses terminalId from request so entries from different terminals are distinguishable`() {
+        val terminalA = "TERMINAL-A"
+        val terminalB = "TERMINAL-B"
+
+        // Terminal A clocks in
+        `when`(userRepository.findByRfidTagId(rfidTagId)).thenReturn(Optional.of(user))
+        `when`(timeTrackingService.getCurrentStatus(userId)).thenReturn(clockedOutStatus())
+        `when`(vacationService.getBalance(userId, LocalDate.now().year)).thenReturn(balanceResponse(10.0))
+        `when`(timeTrackingService.getDailySummary(userId, LocalDate.now())).thenReturn(emptySummary())
+
+        val resultA = service.scan(rfidTagId, terminalA)
+        assertThat(resultA.entryType).isEqualTo(TimeEntryType.CLOCK_IN.name)
+        verify(timeTrackingService).clockIn(userId, TimeEntrySource.TERMINAL, terminalId = terminalA)
+
+        // Terminal B sees CLOCKED_IN and clocks out
+        `when`(timeTrackingService.getCurrentStatus(userId)).thenReturn(clockedInStatus())
+        `when`(timeTrackingService.getDailySummary(userId, LocalDate.now())).thenReturn(summaryWith(480, 30, 0))
+
+        val resultB = service.scan(rfidTagId, terminalB)
+        assertThat(resultB.entryType).isEqualTo(TimeEntryType.CLOCK_OUT.name)
+        verify(timeTrackingService).clockOut(userId, TimeEntrySource.TERMINAL, terminalId = terminalB)
+    }
+
     // region helpers
 
     private fun clockedOutStatus() =

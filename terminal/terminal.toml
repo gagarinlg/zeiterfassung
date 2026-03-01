@@ -11,6 +11,9 @@ error_timeout_seconds = 5
 base_url = "https://zeiterfassung.example.com/api"
 timeout_seconds = 10
 retry_attempts = 3
+# Each physical terminal must have a unique ID so clock entries can be attributed
+# to the correct device and multi-terminal clock-in/out works correctly.
+terminal_id = "terminal-01"
 
 [offline]
 buffer_path = "/var/lib/zeiterfassung/buffer.db"

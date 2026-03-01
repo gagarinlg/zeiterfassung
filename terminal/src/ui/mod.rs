@@ -93,8 +93,7 @@ impl Application for TerminalApp {
             config.rfid.debounce_ms,
         )));
 
-        let terminal_id = std::env::var("TERMINAL_ID")
-            .unwrap_or_else(|_| "terminal-1".to_string());
+        let terminal_id = config.api.terminal_id.clone();
 
         let app = TerminalApp {
             state: AppState::Idle { now: Utc::now() },
@@ -324,6 +323,20 @@ impl TerminalApp {
                 };
             }
 
+            // 409 — another terminal toggled this employee's status at the same instant.
+            // Tell the user to scan once more; the next scan will succeed.
+            Err(ApiError::Conflict) => {
+                self.audio.play_error();
+                warn!("Scan conflict for RFID {}: another terminal processed the same badge simultaneously", rfid);
+                self.state = AppState::Error {
+                    data: ErrorData {
+                        message: "Bitte erneut scannen".to_string(),
+                        error_type: ErrorType::Other,
+                    },
+                    seconds_left: self.config.display.error_timeout_seconds,
+                };
+            }
+
             Err(err) => {
                 self.audio.play_error();
                 warn!("Scan error: {}", err);
@@ -383,6 +396,15 @@ fn rfid_subscription(reader: Arc<Mutex<RfidReader>>) -> Subscription<Message> {
 
 /// Attempts to sync all pending buffered events with the API.
 /// Returns the number of events successfully synced.
+///
+/// Offline events are replayed in FIFO order.  Three outcomes are possible for each event:
+///
+/// * **Success** — the server accepted it; mark synced.
+/// * **Network/timeout** — backend still unreachable; stop and retry on the next tick.
+/// * **409 Conflict** — another terminal already changed this employee's status while this
+///   terminal was offline.  The event is stale; discard it so it is never retried.
+/// * **404 Not found** — the RFID tag was deregistered while offline; discard.
+/// * **Other server error** — discard to avoid blocking the queue indefinitely.
 async fn sync_buffered_events(
     api: ApiClient,
     buffer: Arc<Mutex<EventBuffer>>,
@@ -402,9 +424,14 @@ async fn sync_buffered_events(
                     }
                     synced += 1;
                 }
+                // Backend unreachable — stop and retry later.
                 Err(ApiError::NetworkError(_)) | Err(ApiError::Timeout) => break,
-                Err(_) => {
-                    // Non-network errors: mark synced to avoid retrying bad events.
+                // Stale or invalid events — discard to keep the queue moving.
+                Err(ApiError::Conflict) | Err(ApiError::NotFound(_)) | Err(_) => {
+                    warn!(
+                        "Discarding buffered event id={} rfid={}: already processed or invalid",
+                        id, event.rfid_tag_id
+                    );
                     if let Ok(buf) = buffer.lock() {
                         let _ = buf.mark_synced(id);
                     }

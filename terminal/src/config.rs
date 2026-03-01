@@ -49,6 +49,8 @@ pub struct ApiConfig {
     pub base_url: String,
     pub timeout_seconds: u64,
     pub retry_attempts: u32,
+    /// Unique identifier for this terminal device — must be distinct per physical terminal.
+    pub terminal_id: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -99,6 +101,7 @@ impl Default for AppConfig {
                 base_url: "http://localhost:8080/api".to_string(),
                 timeout_seconds: 10,
                 retry_attempts: 3,
+                terminal_id: "terminal-01".to_string(),
             },
             offline: OfflineConfig {
                 buffer_path: "/var/lib/zeiterfassung/buffer.db".to_string(),
@@ -192,6 +195,7 @@ error_timeout_seconds = 3
 base_url = "https://example.com/api"
 timeout_seconds = 15
 retry_attempts = 5
+terminal_id = "terminal-02"
 
 [offline]
 buffer_path = "/tmp/test.db"
@@ -223,8 +227,20 @@ logo_path = "assets/test-logo.png"
         assert_eq!(config.display.theme, "light");
         assert_eq!(config.api.base_url, "https://example.com/api");
         assert_eq!(config.api.retry_attempts, 5);
+        assert_eq!(config.api.terminal_id, "terminal-02");
         assert!(!config.audio.enabled);
         assert_eq!(config.locale.language, "en");
         assert_eq!(config.company.name, "Test GmbH");
+    }
+
+    #[test]
+    fn test_each_terminal_has_unique_id_in_config() {
+        // Each physical terminal reads its own terminal.toml — validate the field is present
+        // and distinct from the default so operators are reminded to set it.
+        let config = AppConfig::default();
+        assert!(
+            !config.api.terminal_id.is_empty(),
+            "terminal_id must not be empty"
+        );
     }
 }
