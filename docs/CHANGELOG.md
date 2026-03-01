@@ -6,9 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Added
+- **Break gap detection**: Gaps ≥15 min between CLOCK_OUT and next CLOCK_IN on the same day are now treated as qualifying breaks (ArbZG §4)
+- **Vacation balance management**: Admin can manually set vacation balance via PUT /vacation/balance/{userId} (totalDays, usedDays, carriedOverDays)
+- **Vacation carry-over endpoint**: Admin can trigger carry-over calculation via POST /vacation/balance/{userId}/carry-over
+- **Vacation emails to substitutes**: Manager substitutes now receive notification emails when subordinates request vacation
+- **Mobile build CI**: New `build-mobile.yml` GitHub Actions workflow builds Android APK and iOS app with downloadable artifacts
 - **TimeTrackingServiceTest**: 2 new tests for break gap detection (qualifying ≥15 min and short <15 min gaps between CLOCK_OUT/CLOCK_IN)
 - **VacationServiceTest**: 4 new tests for `setBalance` (update totalDays, update carriedOverDays) and `triggerCarryOver` (carry over remaining, cap at max)
 - **NotificationServiceTest**: new test class with 2 tests for `notifyVacationRequestCreated` (sends to all managers, skips blank emails)
+
+### Fixed
+- **CI: Backend ktlint failures** in EmailServiceTest, LdapServiceTest, PasswordResetServiceTest, TotpServiceTest
+- **CI: Frontend ESLint failure** — removed unused MOCK_MONTHLY_SUMMARY import from screenshots.spec.ts
 
 ## [Unreleased] — Phase 11: Documentation & Polish (COMPLETE)
 
