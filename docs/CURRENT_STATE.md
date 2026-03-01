@@ -4,7 +4,7 @@
 
 ## Quick Summary
 
-Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–12 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, admin endpoints, TOTP 2FA, password reset flow, LDAP configuration, manager substitute/deputy feature, Spring caching, and full OpenAPI/Swagger documentation. The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization, WCAG 2.1 AA accessibility, and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright across Chromium, Firefox, and WebKit. Documentation includes user guide, administration guide, 12 auto-generated screenshots, and 5 architecture decision records.
+Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–12 are complete.** Phase 13 (Database Backup & Restore) is in progress. The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, admin endpoints, TOTP 2FA, password reset flow, LDAP configuration, manager substitute/deputy feature, Spring caching, full OpenAPI/Swagger documentation, and database backup/restore system. The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization, WCAG 2.1 AA accessibility, and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright across Chromium, Firefox, and WebKit. Documentation includes user guide, administration guide, 12 auto-generated screenshots, and 5 architecture decision records.
 
 ## What Works Right Now
 
@@ -38,6 +38,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Test email fix: proper mailEnabled check, dev profile uses env vars, SMTP timeouts
 - ✅ Spring caching: `CacheConfig.kt` with `ConcurrentMapCacheManager` for `publicHolidays` and `systemSettings` caches; `@Cacheable` on `VacationService.getPublicHolidays()` and `AdminService.getSystemSettings()`; `@CacheEvict` on `AdminService.updateSystemSetting()`
 - ✅ OpenAPI/Swagger: all 7 controllers annotated with `@Tag`, `@Operation`, `@ApiResponse`, `@SecurityRequirement`; `OpenApiConfig.kt` with API metadata and JWT security scheme
+- ✅ Database backup/restore: `BackupService` with scheduled daily backups, configurable retention, `BackupController` at `/admin/backups` with list/create/download/restore/upload/delete endpoints, audit logging, path traversal protection
 
 ### Frontend (Fully Implemented)
 - ✅ Login page with validation and error handling

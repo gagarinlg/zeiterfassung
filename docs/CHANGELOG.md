@@ -3,6 +3,19 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Phase 13: Database Backup & Restore (IN PROGRESS)
+
+### Added
+- **BackupService**: scheduled daily backups at 2 AM via `@Scheduled(cron)`, configurable retention limit (default 31), `pg_dump`/`psql` via `ProcessBuilder`, gzip compression, audit logging for all operations
+- **BackupController** (`/api/admin/backups`): `GET /` (list), `POST /` (create), `GET /{filename}` (download), `POST /restore/{filename}` (restore), `POST /restore/upload` (restore from upload), `DELETE /{filename}` (delete) — all `@PreAuthorize("hasAuthority('admin.users.manage')")`
+- **BackupDtos.kt**: `BackupInfo(filename, sizeBytes, createdAt)`, `RestoreResponse(status, message)`
+- **application.yml**: `app.backup.directory` and `app.backup.max-count` configuration properties with env var support
+
+### Security
+- Path traversal prevention: filename regex validation (`^[a-zA-Z0-9._-]+$`), canonical path check
+- Uploaded files saved to temp location before restore
+- All operations logged via `AuditService`
+
 ## [Unreleased] — Phase 12: Performance, Accessibility & API Documentation (COMPLETE)
 
 ### Improved

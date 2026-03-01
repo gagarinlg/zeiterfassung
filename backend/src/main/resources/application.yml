@@ -74,6 +74,9 @@ app:
     from: ${MAIL_FROM:noreply@zeiterfassung.local}
     enabled: ${MAIL_ENABLED:false}
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  backup:
+    directory: ${BACKUP_DIRECTORY:/var/lib/zeiterfassung/backups}
+    max-count: ${BACKUP_MAX_COUNT:31}
 
 ---
 spring:

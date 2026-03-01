@@ -2,7 +2,27 @@
 
 > Last updated: 2026-03-01
 >
-> **Current phase:** Phase 12 — Complete
+> **Current phase:** Phase 13 — Database Backup & Restore 🚧
+
+---
+
+## Phase 13: Database Backup & Restore 🚧
+- **Status**: IN PROGRESS
+
+### What was delivered
+- `BackupService` with scheduled daily backups (cron at 2 AM), configurable retention (default 31)
+- `BackupController` at `/admin/backups` with full CRUD + restore endpoints
+- `BackupDtos.kt` with `BackupInfo` and `RestoreResponse` DTOs
+- `pg_dump`/`psql`-based backup/restore via `ProcessBuilder`
+- Path traversal protection and filename validation
+- Audit logging for all backup/restore/delete operations
+- Configurable backup directory and max backup count via `application.yml`
+
+### Key files created/modified
+- `backend/src/main/kotlin/com/zeiterfassung/service/BackupService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/controller/BackupController.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/dto/BackupDtos.kt`
+- `backend/src/main/resources/application.yml` — added `app.backup.*` properties
 
 ---
 
