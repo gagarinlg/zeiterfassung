@@ -5,7 +5,6 @@ import com.zeiterfassung.audit.AuditService
 import com.zeiterfassung.exception.ConflictException
 import com.zeiterfassung.exception.ResourceNotFoundException
 import com.zeiterfassung.model.dto.TrackingStatus
-import com.zeiterfassung.model.entity.DailySummaryEntity
 import com.zeiterfassung.model.entity.TimeEntryEntity
 import com.zeiterfassung.model.entity.UserEntity
 import com.zeiterfassung.model.enums.TimeEntrySource
@@ -22,7 +21,6 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.any
-import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import java.time.Instant

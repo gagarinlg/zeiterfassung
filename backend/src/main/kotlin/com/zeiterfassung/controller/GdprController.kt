@@ -66,7 +66,8 @@ class GdprController(
     fun deleteUserData(
         @PathVariable userId: UUID,
         @AuthenticationPrincipal actorId: String,
-    ): ResponseEntity<GdprDeletionResponse> = ResponseEntity.ok(
-        gdprService.requestDeletion(userId, UUID.fromString(actorId)),
-    )
+    ): ResponseEntity<GdprDeletionResponse> =
+        ResponseEntity.ok(
+            gdprService.requestDeletion(userId, UUID.fromString(actorId)),
+        )
 }

@@ -73,8 +73,7 @@ class SickLeaveController(
         @PathVariable id: UUID,
         @Valid @RequestBody dto: UpdateSickLeaveRequest,
         @AuthenticationPrincipal userId: String,
-    ): ResponseEntity<SickLeaveResponse> =
-        ResponseEntity.ok(sickLeaveService.updateSickLeave(id, UUID.fromString(userId), dto))
+    ): ResponseEntity<SickLeaveResponse> = ResponseEntity.ok(sickLeaveService.updateSickLeave(id, UUID.fromString(userId), dto))
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('time.edit.own')")
@@ -127,6 +126,5 @@ class SickLeaveController(
     fun submitCertificate(
         @PathVariable id: UUID,
         @AuthenticationPrincipal userId: String,
-    ): ResponseEntity<SickLeaveResponse> =
-        ResponseEntity.ok(sickLeaveService.submitCertificate(id, UUID.fromString(userId)))
+    ): ResponseEntity<SickLeaveResponse> = ResponseEntity.ok(sickLeaveService.submitCertificate(id, UUID.fromString(userId)))
 }

@@ -60,8 +60,7 @@ class BusinessTripController(
         @PathVariable id: UUID,
         @Valid @RequestBody dto: UpdateBusinessTripRequest,
         @AuthenticationPrincipal userId: String,
-    ): ResponseEntity<BusinessTripResponse> =
-        ResponseEntity.ok(businessTripService.updateTrip(id, UUID.fromString(userId), dto))
+    ): ResponseEntity<BusinessTripResponse> = ResponseEntity.ok(businessTripService.updateTrip(id, UUID.fromString(userId), dto))
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('time.edit.own')")
@@ -125,8 +124,7 @@ class BusinessTripController(
         @PathVariable id: UUID,
         @Valid @RequestBody dto: RejectBusinessTripRequest,
         @AuthenticationPrincipal approverId: String,
-    ): ResponseEntity<BusinessTripResponse> =
-        ResponseEntity.ok(businessTripService.rejectTrip(id, UUID.fromString(approverId), dto))
+    ): ResponseEntity<BusinessTripResponse> = ResponseEntity.ok(businessTripService.rejectTrip(id, UUID.fromString(approverId), dto))
 
     @PostMapping("/{id}/complete")
     @PreAuthorize("hasAuthority('time.edit.own')")
@@ -136,8 +134,7 @@ class BusinessTripController(
         @PathVariable id: UUID,
         @AuthenticationPrincipal userId: String,
         @RequestParam(required = false) actualCost: BigDecimal?,
-    ): ResponseEntity<BusinessTripResponse> =
-        ResponseEntity.ok(businessTripService.completeTrip(id, UUID.fromString(userId), actualCost))
+    ): ResponseEntity<BusinessTripResponse> = ResponseEntity.ok(businessTripService.completeTrip(id, UUID.fromString(userId), actualCost))
 
     @GetMapping("/pending")
     @PreAuthorize("hasAuthority('vacation.approve')")

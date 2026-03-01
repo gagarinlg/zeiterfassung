@@ -230,7 +230,8 @@ class BusinessTripService(
             subordinateIds.addAll(m.subordinates.map { it.id })
         }
         if (subordinateIds.isEmpty()) {
-            return org.springframework.data.domain.Page.empty(pageable)
+            return org.springframework.data.domain.Page
+                .empty(pageable)
         }
         return businessTripRepository
             .findByStatusAndUserIdIn(BusinessTripStatus.REQUESTED, subordinateIds, pageable)

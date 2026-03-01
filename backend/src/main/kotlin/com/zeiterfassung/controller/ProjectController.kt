@@ -61,8 +61,7 @@ class ProjectController(
         @PathVariable id: UUID,
         @Valid @RequestBody dto: UpdateProjectRequest,
         @AuthenticationPrincipal actorId: String,
-    ): ResponseEntity<ProjectResponse> =
-        ResponseEntity.ok(projectService.updateProject(id, dto, UUID.fromString(actorId)))
+    ): ResponseEntity<ProjectResponse> = ResponseEntity.ok(projectService.updateProject(id, dto, UUID.fromString(actorId)))
 
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
@@ -118,8 +117,7 @@ class ProjectController(
         @PathVariable id: UUID,
         @Valid @RequestBody dto: UpdateTimeAllocationRequest,
         @AuthenticationPrincipal userId: String,
-    ): ResponseEntity<TimeAllocationResponse> =
-        ResponseEntity.ok(projectService.updateTimeAllocation(id, UUID.fromString(userId), dto))
+    ): ResponseEntity<TimeAllocationResponse> = ResponseEntity.ok(projectService.updateTimeAllocation(id, UUID.fromString(userId), dto))
 
     @DeleteMapping("/allocations/{id}")
     @PreAuthorize("hasAuthority('time.edit.own')")
