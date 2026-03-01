@@ -37,6 +37,8 @@ jobs:
 
       - name: Build debug APK
         run: ./gradlew assembleDebug --no-daemon
+        env:
+          GRADLE_OPTS: -Xmx4g
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v6
