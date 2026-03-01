@@ -308,18 +308,23 @@ export default function TimeTrackingPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  {['date', 'work_time', 'break_time', 'overtime', 'status'].map((col) => (
-                    <th
-                      key={col}
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      {col === 'date' ? t('common.date') :
-                       col === 'work_time' ? t('time_tracking.work_time') :
-                       col === 'break_time' ? t('time_tracking.break_time') :
-                       col === 'overtime' ? t('time_tracking.overtime') :
-                       t('common.status')}
-                    </th>
-                  ))}
+                  {(() => {
+                    const colLabels: Record<string, string> = {
+                      date: t('common.date'),
+                      work_time: t('time_tracking.work_time'),
+                      break_time: t('time_tracking.break_time'),
+                      overtime: t('time_tracking.overtime'),
+                      status: t('common.status'),
+                    }
+                    return ['date', 'work_time', 'break_time', 'overtime', 'status'].map((col) => (
+                      <th
+                        key={col}
+                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        {colLabels[col]}
+                      </th>
+                    ))
+                  })()}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -341,7 +346,7 @@ export default function TimeTrackingPage() {
               </tbody>
               <tfoot className="bg-gray-50">
                 <tr>
-                  <td className="px-4 py-3 text-sm font-semibold text-gray-900">{t('common.duration')}</td>
+                  <td className="px-4 py-3 text-sm font-semibold text-gray-900">{t('common.total')}</td>
                   <td className="px-4 py-3 text-sm font-semibold text-gray-900">{formatMinutes(monthSheet.totalWorkMinutes)}</td>
                   <td className="px-4 py-3 text-sm font-semibold text-gray-900">{formatMinutes(monthSheet.totalBreakMinutes)}</td>
                   <td className={`px-4 py-3 text-sm font-semibold ${overtimeColorClass(monthSheet.totalOvertimeMinutes)}`}>

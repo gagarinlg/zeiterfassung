@@ -199,6 +199,11 @@ class TimeTrackingController(
         val writer = response.writer
         writer.println("Date,Work Minutes,Break Minutes,Overtime Minutes,Compliant,Notes")
         sheet.dailySummaries.forEach { summary ->
+            // Sanitise the notes field to prevent CSV injection attacks:
+            // - Escape existing double-quotes by doubling them (RFC 4180).
+            // - Neutralise formula-injection prefixes (=, +, -, @, TAB, CR/LF) by
+            //   prepending a space, so spreadsheet applications won't interpret the
+            //   cell value as a formula.
             val notes = (summary.complianceNotes ?: "")
                 .replace("\"", "\"\"")
                 .let { if (it.isNotEmpty() && it[0] in setOf('=', '+', '-', '@', '\t', '\r', '\n')) " $it" else it }

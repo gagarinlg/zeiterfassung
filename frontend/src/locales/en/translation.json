@@ -201,6 +201,7 @@
     "date": "Date",
     "time": "Time",
     "duration": "Duration",
+    "total": "Total",
     "name": "Name",
     "email": "Email",
     "phone": "Phone",

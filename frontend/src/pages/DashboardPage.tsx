@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { timeService } from '../services/timeService'
 import { vacationService } from '../services/vacationService'
-import type { TrackingStatusResponse, TimeSheetResponse, VacationBalance } from '../types'
+import apiClient from '../services/apiClient'
+import type { TrackingStatusResponse, TimeSheetResponse, VacationBalance, User } from '../types'
 
 function formatMinutes(minutes: number): string {
   const h = Math.floor(minutes / 60)
@@ -39,6 +40,7 @@ export default function DashboardPage() {
   const [weekSheet, setWeekSheet] = useState<TimeSheetResponse | null>(null)
   const [balance, setBalance] = useState<(VacationBalance & { pendingDays: number }) | null>(null)
   const [teamStatus, setTeamStatus] = useState<Record<string, TrackingStatusResponse> | null>(null)
+  const [teamMembers, setTeamMembers] = useState<Record<string, string>>({})
   const [pendingCount, setPendingCount] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -60,19 +62,25 @@ export default function DashboardPage() {
       setBalance(bal)
 
       if (isManager) {
-        const [ts, pending] = await Promise.all([
+        const [ts, pending, members] = await Promise.all([
           timeService.getTeamStatus(),
           vacationService.getPendingRequests({ size: 1 }),
+          user?.id
+            ? apiClient.get<User[]>(`/users/${user.id}/team`).then((r) => r.data)
+            : Promise.resolve([] as User[]),
         ])
         setTeamStatus(ts)
         setPendingCount(pending.totalElements)
+        const nameMap: Record<string, string> = {}
+        members.forEach((m) => { nameMap[m.id] = `${m.firstName} ${m.lastName}` })
+        setTeamMembers(nameMap)
       }
     } catch {
       setError(t('time_tracking.errors.load_failed'))
     } finally {
       setLoading(false)
     }
-  }, [currentYear, isManager, t])
+  }, [currentYear, isManager, user?.id, t])
 
   useEffect(() => {
     loadData()
@@ -188,7 +196,9 @@ export default function DashboardPage() {
             <div className="space-y-2">
               {Object.entries(teamStatus).map(([uid, ts]) => (
                 <div key={uid} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                  <span className="text-sm text-gray-700">{uid}</span>
+                  <span className="text-sm text-gray-700">
+                    {teamMembers[uid] ?? uid}
+                  </span>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                     ts.status === 'CLOCKED_IN' ? 'bg-green-100 text-green-800' :
                     ts.status === 'ON_BREAK' ? 'bg-yellow-100 text-yellow-800' :
