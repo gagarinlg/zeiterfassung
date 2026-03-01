@@ -1,7 +1,8 @@
 # Zeiterfassung — Project Phases & Roadmap
 
-> **Last updated:** 2026-03-01
-> **Current phase:** Phase 9 (Testing & Security Hardening) — NEXT UP
+> Last updated: 2026-03-01
+>
+> **Current phase:** Phase 9 (Testing & Security Hardening) — IN PROGRESS
 
 ---
 
@@ -373,14 +374,25 @@
 
 ---
 
-## Phase 9: Testing & Security Hardening 🔲
-- **Status**: PLANNED
+## Phase 9: Testing & Security Hardening 🚧
+- **Status**: IN PROGRESS
 - **Priority**: HIGH
 
-### What needs to be built
+### What has been delivered so far
+
+#### Playwright E2E Test Suite
+- **`e2e/tests/helpers.ts`**: shared mock data (user, tokens, tracking status, summaries, vacation balance) and reusable mock setup functions (`mockAuthenticatedUser`, `mockDashboardApis`, `mockTimeTrackingApis`)
+- **`e2e/tests/login.spec.ts`**: 12 tests — form rendering, language toggle, redirect from all protected routes, Zod client-side validation (empty fields, invalid email, empty password), successful login with mocked API, failed login (401/423/429 error messages)
+- **`e2e/tests/navigation.spec.ts`**: 6 tests — sidebar links for admin user, route navigation to time tracking and vacation, protected route redirect, logout flow
+- **`e2e/tests/dashboard.spec.ts`**: 8 tests — page rendering with title and user name, today's hours / weekly hours / vacation balance / team present widgets, clocked-in status banner, weekly summary values, error handling
+- **`e2e/tests/time-tracking.spec.ts`**: 14 tests — clocked-out/clocked-in/on-break states with correct buttons, status badges, today summary, no-entries message, monthly timesheet table (heading, column headers, daily entries, total row, compliance badges, CSV export button), error handling
+- **`e2e/tsconfig.json`**: TypeScript config for E2E tests
+- **`playwright.config.ts`**: updated to always capture screenshots (`screenshot: 'on'`)
+- **`@types/node`** added as devDependency for Node.js type support in E2E config
+
+### What still needs to be built
 - **Backend unit tests**: ≥90% coverage for all services and controllers
 - **Frontend unit tests**: ≥85% coverage with Vitest
-- **E2E tests**: comprehensive Playwright test suite with screenshots for docs
 - **Penetration testing**: OWASP ZAP automated scans, manual testing checklist
 - **Security headers**: verify CSP, HSTS, X-Frame-Options, X-Content-Type-Options
 - **Input validation**: comprehensive server-side validation on all endpoints

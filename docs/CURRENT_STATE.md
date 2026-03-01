@@ -52,12 +52,12 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 
 ## Tech Debt / Known Issues
 - Backend test coverage targets (≥90%) not yet fully verified for all services
-- E2E Playwright tests need expansion (Phase 9)
+- E2E Playwright tests cover login, navigation, dashboard, time tracking — vacation and admin E2E tests still needed
 - Android: push notifications, biometric auth, offline caching — not yet implemented
 - iOS: push notifications, Face ID / Touch ID — not yet implemented
 
 ## Next Steps
-1. **Phase 9: Testing & Security Hardening** — E2E Playwright tests, penetration testing, OWASP ZAP scans, coverage enforcement
+1. **Phase 9: Testing & Security Hardening (continued)** — expand E2E tests for vacation/admin pages, backend unit test coverage, penetration testing, OWASP ZAP scans
 2. **Phase 10: Documentation & Polish** — Playwright screenshots, full user docs, API reference
 3. Continue dependency updates (review and merge Dependabot PRs)
 

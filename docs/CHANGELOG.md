@@ -5,8 +5,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added
+- Comprehensive Playwright E2E test suite (Phase 9)
+  - `e2e/tests/helpers.ts`: shared mock data and auth/API mock helpers
+  - `e2e/tests/login.spec.ts`: 12 tests covering form rendering, language toggle, validation, login flows (success/401/423/429)
+  - `e2e/tests/navigation.spec.ts`: 6 tests for sidebar, route navigation, protected routes, logout
+  - `e2e/tests/dashboard.spec.ts`: 8 tests for widgets, status banners, error handling
+  - `e2e/tests/time-tracking.spec.ts`: 14 tests for all clock states, buttons, timesheet table, CSV export, errors
+  - `e2e/tsconfig.json`: TypeScript configuration for E2E tests
+  - `@types/node` devDependency for Node.js types in E2E config
+
+### Changed
+- `playwright.config.ts`: screenshot mode changed from `only-on-failure` to `on` (always capture for docs)
+
 ### Planned
-- Phase 9: Testing & Security Hardening
+- Phase 9: Testing & Security Hardening (continued)
 - Phase 10: Documentation & Polish
 
 ## [Phase 7+8 - Mobile Apps + Admin Panel] - 2026-03-01
