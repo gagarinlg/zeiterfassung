@@ -28,4 +28,7 @@
     <string name="today_break">Break Today</string>
     <string name="vacation_requests">Vacation Requests</string>
     <string name="days">days</string>
+    <string name="balance_total">Total</string>
+    <string name="balance_used">Used</string>
+    <string name="balance_remaining">Remaining</string>
 </resources>

@@ -170,6 +170,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Install SwiftLint
+        run: brew install swiftlint
+
       - name: Run SwiftLint
         run: swiftlint lint ZeiterfassungApp/
 

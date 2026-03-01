@@ -28,4 +28,7 @@
     <string name="today_break">Pause heute</string>
     <string name="vacation_requests">Urlaubsanträge</string>
     <string name="days">Tage</string>
+    <string name="balance_total">Gesamt</string>
+    <string name="balance_used">Verwendet</string>
+    <string name="balance_remaining">Verbleibend</string>
 </resources>

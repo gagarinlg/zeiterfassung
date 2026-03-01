@@ -82,10 +82,10 @@ fun VacationScreen(
                                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                     ) {
-                                        BalanceItem(label = "Total", value = "%.1f d".format(balance.totalDays))
-                                        BalanceItem(label = "Used", value = "%.1f d".format(balance.usedDays))
+                                        BalanceItem(label = stringResource(R.string.balance_total), value = "%.1f d".format(balance.totalDays))
+                                        BalanceItem(label = stringResource(R.string.balance_used), value = "%.1f d".format(balance.usedDays))
                                         BalanceItem(
-                                            label = "Remaining",
+                                            label = stringResource(R.string.balance_remaining),
                                             value = "%.1f d".format(balance.remainingDays),
                                             color = if (balance.remainingDays < 5) MaterialTheme.colorScheme.error else Color.Unspecified,
                                         )
