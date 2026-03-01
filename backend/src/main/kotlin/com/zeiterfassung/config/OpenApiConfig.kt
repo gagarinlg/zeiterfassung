@@ -10,14 +10,13 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @OpenAPIDefinition(
-    info = Info(
-        title = "Zeiterfassung API",
-        description = "Time tracking system compliant with German labor law (ArbZG). " +
-            "Provides endpoints for authentication, time tracking, vacation management, " +
-            "user administration, terminal RFID scanning, and employee configuration.",
-        version = "1.0.0",
-        contact = Contact(name = "Zeiterfassung Team"),
-    ),
+    info =
+        Info(
+            title = "Zeiterfassung API",
+            description = "Time tracking system compliant with German labor law (ArbZG).",
+            version = "1.0.0",
+            contact = Contact(name = "Zeiterfassung Team"),
+        ),
     tags = [
         Tag(name = "Authentication", description = "Login, logout, token refresh, TOTP 2FA, and password reset"),
         Tag(name = "Time Tracking", description = "Clock in/out, breaks, daily summaries, timesheets, and CSV export"),

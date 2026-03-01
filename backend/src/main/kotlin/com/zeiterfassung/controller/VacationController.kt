@@ -58,7 +58,10 @@ class VacationController(
 
     @GetMapping("/requests")
     @PreAuthorize("hasAuthority('vacation.request.own')")
-    @Operation(summary = "Get my vacation requests", description = "Returns a paginated list of the authenticated user's vacation requests.")
+    @Operation(
+        summary = "Get my vacation requests",
+        description = "Returns a paginated list of the authenticated user's vacation requests.",
+    )
     @ApiResponse(responseCode = "200", description = "Vacation requests returned")
     fun getMyRequests(
         @AuthenticationPrincipal userId: String,
@@ -136,7 +139,10 @@ class VacationController(
 
     @GetMapping("/pending")
     @PreAuthorize("hasAuthority('vacation.approve')")
-    @Operation(summary = "Get pending requests", description = "Returns pending vacation requests for approval. Optionally returns all pending requests.")
+    @Operation(
+        summary = "Get pending requests",
+        description = "Returns pending vacation requests for approval. Optionally returns all pending requests.",
+    )
     @ApiResponse(responseCode = "200", description = "Pending requests returned")
     fun getPendingRequests(
         @AuthenticationPrincipal userId: String,
@@ -176,7 +182,10 @@ class VacationController(
 
     @GetMapping("/balance/{userId}")
     @PreAuthorize("hasAuthority('vacation.view.team')")
-    @Operation(summary = "Get user vacation balance", description = "Returns the vacation balance for a specific user. Requires team view permission.")
+    @Operation(
+        summary = "Get user vacation balance",
+        description = "Returns the vacation balance for a specific user. Requires team view permission.",
+    )
     @ApiResponse(responseCode = "200", description = "Vacation balance returned")
     fun getUserBalance(
         @PathVariable userId: UUID,
@@ -189,7 +198,10 @@ class VacationController(
 
     @GetMapping("/holidays")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get public holidays", description = "Returns public holidays for the specified year, optionally filtered by German state.")
+    @Operation(
+        summary = "Get public holidays",
+        description = "Returns public holidays for the specified year, optionally filtered by German state.",
+    )
     @ApiResponse(responseCode = "200", description = "Public holidays returned")
     fun getPublicHolidays(
         @RequestParam(required = false) year: Int?,
@@ -201,7 +213,10 @@ class VacationController(
 
     @GetMapping("/calendar")
     @PreAuthorize("hasAuthority('vacation.view.team')")
-    @Operation(summary = "Get team vacation calendar", description = "Returns a vacation calendar showing team member absences for the specified month.")
+    @Operation(
+        summary = "Get team vacation calendar",
+        description = "Returns a vacation calendar showing team member absences for the specified month.",
+    )
     @ApiResponse(responseCode = "200", description = "Vacation calendar returned")
     fun getTeamCalendar(
         @AuthenticationPrincipal userId: String,

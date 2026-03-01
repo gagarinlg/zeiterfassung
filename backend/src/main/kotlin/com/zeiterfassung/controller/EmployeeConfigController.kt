@@ -36,7 +36,10 @@ class EmployeeConfigController(
 
     @PutMapping("/{userId}")
     @PreAuthorize("hasAuthority('admin.users.manage')")
-    @Operation(summary = "Update employee configuration", description = "Updates work hours, vacation days, and other configuration for an employee.")
+    @Operation(
+        summary = "Update employee configuration",
+        description = "Updates work hours, vacation days, and other configuration for an employee.",
+    )
     @ApiResponse(responseCode = "200", description = "Employee configuration updated")
     fun updateConfig(
         @PathVariable userId: UUID,

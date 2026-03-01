@@ -20,7 +20,10 @@ class TerminalController(
     private val terminalService: TerminalService,
 ) {
     @PostMapping("/scan")
-    @Operation(summary = "Process RFID scan", description = "Processes an RFID tag scan from a terminal device. Toggles clock-in/out state.")
+    @Operation(
+        summary = "Process RFID scan",
+        description = "Processes an RFID tag scan from a terminal device. Toggles clock-in/out state.",
+    )
     @ApiResponse(responseCode = "200", description = "Scan processed successfully")
     @ApiResponse(responseCode = "404", description = "RFID tag not recognized")
     @ApiResponse(responseCode = "409", description = "Concurrent scan conflict — retry")
@@ -29,7 +32,10 @@ class TerminalController(
     ): ResponseEntity<TerminalScanResponse> = ResponseEntity.ok(terminalService.scan(request.rfidTagId, request.terminalId))
 
     @GetMapping("/heartbeat")
-    @Operation(summary = "Terminal heartbeat", description = "Simple health check endpoint polled by terminals to detect backend connectivity.")
+    @Operation(
+        summary = "Terminal heartbeat",
+        description = "Simple health check endpoint polled by terminals to detect backend connectivity.",
+    )
     @ApiResponse(responseCode = "200", description = "Backend is reachable")
     fun heartbeat(): ResponseEntity<Map<String, String>> = ResponseEntity.ok(mapOf("status" to "ok"))
 }

@@ -95,7 +95,10 @@ class TimeTrackingController(
 
     @GetMapping("/status")
     @PreAuthorize("hasAuthority('time.view.own')")
-    @Operation(summary = "Get current tracking status", description = "Returns the current clock-in/break status of the authenticated user.")
+    @Operation(
+        summary = "Get current tracking status",
+        description = "Returns the current clock-in/break status of the authenticated user.",
+    )
     @ApiResponse(responseCode = "200", description = "Current status returned")
     fun getStatus(
         @AuthenticationPrincipal actorId: String,
@@ -112,7 +115,10 @@ class TimeTrackingController(
 
     @GetMapping("/entries")
     @PreAuthorize("hasAuthority('time.view.own')")
-    @Operation(summary = "Get time entries", description = "Returns time entries for the authenticated user within the specified date range.")
+    @Operation(
+        summary = "Get time entries",
+        description = "Returns time entries for the authenticated user within the specified date range.",
+    )
     @ApiResponse(responseCode = "200", description = "Time entries returned")
     fun getEntries(
         @RequestParam start: Instant,
@@ -170,7 +176,10 @@ class TimeTrackingController(
 
     @GetMapping("/manage/team/entries")
     @PreAuthorize("hasAuthority('time.view.team')")
-    @Operation(summary = "Get team member entries", description = "Returns time entries for a specific team member. Requires team view permission.")
+    @Operation(
+        summary = "Get team member entries",
+        description = "Returns time entries for a specific team member. Requires team view permission.",
+    )
     @ApiResponse(responseCode = "200", description = "Team member entries returned")
     @ApiResponse(responseCode = "403", description = "Not authorized to view this team member")
     fun getTeamEntries(
@@ -183,7 +192,10 @@ class TimeTrackingController(
 
     @PostMapping("/manage/entry")
     @PreAuthorize("hasAuthority('time.edit.team')")
-    @Operation(summary = "Add manual time entry", description = "Creates a manual time entry for a team member. Requires team edit permission.")
+    @Operation(
+        summary = "Add manual time entry",
+        description = "Creates a manual time entry for a team member. Requires team edit permission.",
+    )
     @ApiResponse(responseCode = "201", description = "Manual entry created")
     fun addManualEntry(
         @Valid @RequestBody request: ManualTimeEntryRequest,
