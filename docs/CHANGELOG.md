@@ -47,6 +47,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - **GdprDtos.kt**: `GdprDataExportResponse`, `GdprPersonalInfo`, `GdprTimeEntry`, `GdprVacationRequest`, `GdprSickLeave`, `GdprBusinessTrip`, `GdprAuditEntry`, `GdprDeletionResponse`
 - **Repository methods**: `TimeEntryRepository.findByUserIdOrderByTimestampAsc()`, `AuditLogRepository.findByUserIdOrderByCreatedAtAsc()` for unpaginated GDPR data retrieval
 
+## [Unreleased] — Phase 14: Frontend Pages for Sick Leave, Business Trips & Projects
+
+### Added
+- **Sick Leave Page** (frontend): `SickLeavePage.tsx` with list/report tabs, cancel action, certificate submission
+- **Business Trip Page** (frontend): `BusinessTripPage.tsx` with list/new request tabs, cancel, complete with actual cost modal
+- **Business Trip Approval Page** (frontend): `BusinessTripApprovalPage.tsx` manager view with approve/reject workflow
+- **Projects Page** (frontend): `ProjectsPage.tsx` with allocations list, new allocation form, admin project management
+- **API services**: `sickLeaveService.ts`, `businessTripService.ts`, `projectService.ts`
+- **Routes**: `/sick-leave`, `/business-trips`, `/business-trips/approvals`, `/projects`
+- **Navigation**: Sidebar links with icons (Thermometer, Plane, CheckCircle, FolderKanban)
+- **i18n**: Full `sick_leave`, `business_trip`, `projects` sections in EN + DE translation files
+- **Screenshots**: 4 new auto-generated screenshots (sick-leave, business-trips, business-trip-approvals, projects)
+- **E2E screenshot tests**: 5 new tests in `screenshots.spec.ts` with mock data
+- **User guide**: Added documentation sections for Sick Leave, Business Trips, Trip Approvals, Projects with screenshots
+
 ## [Unreleased] — Phase 14: Sick Leave, Business Trips & Project Time Allocation
 
 ### Added

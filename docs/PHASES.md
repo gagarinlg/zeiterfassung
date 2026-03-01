@@ -2,12 +2,12 @@
 
 > Last updated: 2026-03-01
 >
-> **Current phase:** Phase 14 — Sick Leave, Business Trips, Projects & GDPR 🚧
+> **Current phase:** Phase 14 — Sick Leave, Business Trips, Projects & GDPR ✅
 
 ---
 
-## Phase 14: Sick Leave, Business Trips, Projects & GDPR 🚧
-- **Status**: IN PROGRESS (backend complete, frontend pending)
+## Phase 14: Sick Leave, Business Trips, Projects & GDPR ✅
+- **Status**: COMPLETE
 
 ### What was delivered
 - **Sick Leave Tracking**: Full backend with entity, repository, service, controller at `/sick-leave`
@@ -67,6 +67,37 @@
 - `BusinessTripServiceTest` (16 tests)
 - `ProjectServiceTest` (14 tests)
 - `GdprServiceTest` (7 tests)
+
+### Frontend (Complete)
+- **Sick Leave Page** (`SickLeavePage.tsx`): List sick leaves, report new sick leave, cancel, submit certificate
+- **Business Trip Page** (`BusinessTripPage.tsx`): List trips, create request, cancel, complete with actual cost modal
+- **Business Trip Approval Page** (`BusinessTripApprovalPage.tsx`): Manager view for approving/rejecting trip requests
+- **Projects Page** (`ProjectsPage.tsx`): List time allocations, create new allocation, admin project management
+- **API services**: `sickLeaveService.ts`, `businessTripService.ts`, `projectService.ts`
+- **Routing**: New routes in `App.tsx` for `/sick-leave`, `/business-trips`, `/business-trips/approvals`, `/projects`
+- **Navigation**: New sidebar items with icons (Thermometer, Plane, CheckCircle, FolderKanban)
+- **i18n**: Full German and English translations for all new pages (`sick_leave`, `business_trip`, `projects` sections)
+- **Screenshots**: 4 new auto-generated screenshots (`sick-leave.png`, `business-trips.png`, `business-trip-approvals.png`, `projects.png`)
+- **E2E screenshot tests**: 5 new screenshot tests in `screenshots.spec.ts`
+
+### Frontend key files created
+- `frontend/src/services/sickLeaveService.ts`
+- `frontend/src/services/businessTripService.ts`
+- `frontend/src/services/projectService.ts`
+- `frontend/src/pages/SickLeavePage.tsx`
+- `frontend/src/pages/BusinessTripPage.tsx`
+- `frontend/src/pages/BusinessTripApprovalPage.tsx`
+- `frontend/src/pages/ProjectsPage.tsx`
+
+### Frontend key files modified
+- `frontend/src/App.tsx` — added routes for sick leave, business trips, projects
+- `frontend/src/components/Layout.tsx` — added navigation items for new pages
+- `frontend/src/locales/en/translation.json` — added `sick_leave`, `business_trip`, `projects` i18n sections
+- `frontend/src/locales/de/translation.json` — added `sick_leave`, `business_trip`, `projects` i18n sections
+- `frontend/e2e/tests/screenshots.spec.ts` — added 5 new screenshot tests
+
+### Documentation updated
+- `docs/user-guide/README.md` — added sections for Sick Leave, Business Trips, Business Trip Approvals, Projects & Time Allocation with screenshots
 
 ---
 
