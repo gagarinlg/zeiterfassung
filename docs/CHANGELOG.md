@@ -3,9 +3,19 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased]
+## [Unreleased] — Phase 9: Testing & Security Hardening
+
+### Fixed
+- **CORS**: Changed `allowedOrigins` to `allowedOriginPatterns` in SecurityConfig, fixing "Invalid CORS request" on localhost
+- **Date localization**: Dates now display in locale-correct format (DD.MM.YYYY for German) instead of US format; calendar uses Monday as first day of week for German locale
+- **JwtAuthenticationFilter**: Added `/terminal/` to publicPaths for consistency with SecurityConfig permitAll rules
 
 ### Added
+- **V7 migration**: `date_format` and `time_format` columns on users table; system settings for `display.date_format`, `display.time_format`, `display.first_day_of_week`
+- **Per-user date/time preferences**: UserEntity, UserResponse, UpdateUserRequest extended with dateFormat/timeFormat; falls back to global system settings
+- **`dateUtils.ts`**: locale-aware date formatting utility using date-fns (formatDate, formatTime, formatDateTime, formatMonthYear, getFirstDayOfWeek, getWeekdayHeaders)
+- **`DateFormatContext`**: React context providing user's date/time format preferences to all components
+- **AuthControllerIntegrationTest**: 10 integration tests (CORS preflight, credentials, auth login/logout, security headers)
 - Frontend unit tests for `dateUtils.ts` (18 tests)
   - `formatDate`: DD.MM.YYYY, YYYY-MM-DD, MM/DD/YYYY, empty, invalid, ISO timestamp, locale default
   - `formatTime`: 24h, 12h, empty
