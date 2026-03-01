@@ -265,5 +265,20 @@
     "reset_password": "Passwort zurücksetzen",
     "current_password": "Aktuelles Passwort",
     "new_password": "Neues Passwort"
+  },
+  "settings": {
+    "date_format": "Datumsformat",
+    "time_format": "Zeitformat",
+    "date_format_options": {
+      "DD.MM.YYYY": "DD.MM.YYYY (deutsch)",
+      "YYYY-MM-DD": "YYYY-MM-DD (ISO)",
+      "MM/DD/YYYY": "MM/DD/YYYY (US)"
+    },
+    "time_format_options": {
+      "24h": "24-Stunden",
+      "12h": "12-Stunden"
+    },
+    "preferences": "Einstellungen",
+    "preferences_saved": "Einstellungen gespeichert"
   }
 }

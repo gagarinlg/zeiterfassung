@@ -183,6 +183,8 @@ class AuthService(
             isActive = this.isActive,
             roles = roles,
             permissions = permissions,
+            dateFormat = this.dateFormat,
+            timeFormat = this.timeFormat,
         )
     }
 }

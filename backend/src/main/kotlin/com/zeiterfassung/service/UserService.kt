@@ -100,6 +100,8 @@ class UserService(
         request.lastName?.let { user.lastName = it }
         request.phone?.let { user.phone = it }
         request.isActive?.let { user.isActive = it }
+        request.dateFormat?.let { user.dateFormat = it }
+        request.timeFormat?.let { user.timeFormat = it }
         request.managerId?.let { managerIdStr ->
             val manager =
                 userRepository
@@ -215,6 +217,8 @@ class UserService(
             isActive = this.isActive,
             roles = roles,
             permissions = permissions,
+            dateFormat = this.dateFormat,
+            timeFormat = this.timeFormat,
         )
     }
 }

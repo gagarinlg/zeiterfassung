@@ -6,6 +6,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Added
+- Date/calendar localization across the frontend
+  - `frontend/src/utils/dateUtils.ts`: `formatDate`, `formatTime`, `formatDateTime`, `formatMonthYear`, `getFirstDayOfWeek`, `getWeekdayHeaders` utilities using date-fns with locale support (de, en)
+  - `frontend/src/context/DateFormatContext.tsx`: React context providing per-user date/time format preferences
+  - Translation keys for date/time format settings in both German and English locale files
+- Per-user date/time format preferences in backend
+  - `V7__add_user_date_preferences.sql`: adds `date_format` and `time_format` columns to users table; seeds system-wide display defaults
+  - `UserEntity.kt`: new `dateFormat` and `timeFormat` fields
+  - `UserResponse` DTO: includes `dateFormat` and `timeFormat`
+  - `UpdateUserRequest`: supports updating `dateFormat` and `timeFormat`
+  - `UserService` and `AuthService`: `toUserResponse()` includes new fields
 - Comprehensive Playwright E2E test suite (Phase 9)
   - `e2e/tests/helpers.ts`: shared mock data and auth/API mock helpers
   - `e2e/tests/login.spec.ts`: 12 tests covering form rendering, language toggle, validation, login flows (success/401/423/429)

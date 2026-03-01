@@ -5,6 +5,8 @@ import { timeService } from '../services/timeService'
 import { vacationService } from '../services/vacationService'
 import apiClient from '../services/apiClient'
 import type { TrackingStatusResponse, TimeSheetResponse, VacationBalance, User } from '../types'
+import { formatTime, formatDate } from '../utils/dateUtils'
+import { useDateFormat } from '../context/DateFormatContext'
 
 function formatMinutes(minutes: number): string {
   const h = Math.floor(minutes / 60)
@@ -34,6 +36,7 @@ function getMonday(date: Date): string {
 export default function DashboardPage() {
   const { t } = useTranslation()
   const { user, hasPermission } = useAuth()
+  const { dateFormat, timeFormat } = useDateFormat()
   const currentYear = new Date().getFullYear()
 
   const [status, setStatus] = useState<TrackingStatusResponse | null>(null)
@@ -116,8 +119,8 @@ export default function DashboardPage() {
         <div className={`mb-6 p-4 rounded-lg border ${status.status === 'ON_BREAK' ? 'bg-yellow-50 border-yellow-200' : 'bg-green-50 border-green-200'}`}>
           <p className={`text-sm font-medium ${status.status === 'ON_BREAK' ? 'text-yellow-800' : 'text-green-800'}`}>
             {status.status === 'ON_BREAK'
-              ? `${t('dashboard.on_break_since')} ${status.breakStartedAt ? new Date(status.breakStartedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}`
-              : `${t('dashboard.clocked_in_since')} ${status.clockedInSince ? new Date(status.clockedInSince).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}`}
+              ? `${t('dashboard.on_break_since')} ${status.breakStartedAt ? formatTime(status.breakStartedAt, timeFormat) : ''}`
+              : `${t('dashboard.clocked_in_since')} ${status.clockedInSince ? formatTime(status.clockedInSince, timeFormat) : ''}`}
           </p>
         </div>
       )}
@@ -171,7 +174,7 @@ export default function DashboardPage() {
               .filter((d) => !d.isCompliant)
               .map((d) => (
                 <li key={d.date} className="text-sm text-yellow-700">
-                  {d.date}: {d.complianceNotes}
+                  {formatDate(d.date, dateFormat)}: {d.complianceNotes}
                 </li>
               ))}
           </ul>

@@ -35,4 +35,6 @@ data class UserResponse(
     val isActive: Boolean,
     val roles: List<String>,
     val permissions: List<String>,
+    val dateFormat: String?,
+    val timeFormat: String?,
 )

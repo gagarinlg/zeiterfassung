@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { vacationService, type CreateVacationRequestData, type PublicHoliday } from '../services/vacationService'
 import type { VacationRequest, VacationBalance } from '../types'
+import { formatDate, formatMonthYear } from '../utils/dateUtils'
+import { useDateFormat } from '../context/DateFormatContext'
 
 type Tab = 'requests' | 'new_request' | 'calendar'
 
@@ -28,6 +30,7 @@ function StatusBadge({ status }: { status: VacationRequest['status'] }) {
 export default function VacationPage() {
   const { t } = useTranslation()
   const { hasPermission } = useAuth()
+  const { dateFormat } = useDateFormat()
   const currentYear = new Date().getFullYear()
 
   const [activeTab, setActiveTab] = useState<Tab>('requests')
@@ -256,8 +259,8 @@ export default function VacationPage() {
                 <tbody className="divide-y divide-gray-100">
                   {requests.map((req) => (
                     <tr key={req.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm text-gray-900">{req.startDate}</td>
-                      <td className="px-4 py-3 text-sm text-gray-900">{req.endDate}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{formatDate(req.startDate, dateFormat)}</td>
+                      <td className="px-4 py-3 text-sm text-gray-900">{formatDate(req.endDate, dateFormat)}</td>
                       <td className="px-4 py-3 text-sm text-gray-900">{req.totalDays}</td>
                       <td className="px-4 py-3">
                         <StatusBadge status={req.status} />
@@ -390,10 +393,7 @@ export default function VacationPage() {
               ←
             </button>
             <span className="font-medium">
-              {new Date(calendarYear, calendarMonth - 1).toLocaleString('default', {
-                month: 'long',
-                year: 'numeric',
-              })}
+              {formatMonthYear(calendarYear, calendarMonth)}
             </span>
             <button
               onClick={() => {
@@ -418,7 +418,7 @@ export default function VacationPage() {
                   <ul className="space-y-1">
                     {calendarData.publicHolidays.map((h) => (
                       <li key={h.id} className="text-sm text-blue-700">
-                        {h.date} — {h.name}
+                        {formatDate(h.date, dateFormat)} — {h.name}
                       </li>
                     ))}
                   </ul>
@@ -433,7 +433,7 @@ export default function VacationPage() {
                   <ul className="space-y-1">
                     {calendarData.ownRequests.map((r) => (
                       <li key={r.id} className="text-sm text-green-700 flex items-center gap-2">
-                        {r.startDate} — {r.endDate}
+                        {formatDate(r.startDate, dateFormat)} — {formatDate(r.endDate, dateFormat)}
                         <StatusBadge status={r.status} />
                       </li>
                     ))}
@@ -450,7 +450,7 @@ export default function VacationPage() {
                     {calendarData.teamRequests.map((r) => (
                       <li key={r.id} className="text-sm text-purple-700">
                         {(r as VacationRequest & { userName?: string }).userName ?? t('common.unknown')} —{' '}
-                        {r.startDate} — {r.endDate}
+                        {formatDate(r.startDate, dateFormat)} — {formatDate(r.endDate, dateFormat)}
                       </li>
                     ))}
                   </ul>

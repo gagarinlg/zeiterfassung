@@ -10,6 +10,8 @@ export interface User {
   isActive: boolean
   roles: string[]
   permissions: string[]
+  dateFormat?: string
+  timeFormat?: string
 }
 
 export interface TimeEntry {

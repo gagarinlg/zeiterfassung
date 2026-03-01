@@ -27,6 +27,8 @@ data class UpdateUserRequest(
     val phone: String? = null,
     val managerId: String? = null,
     val isActive: Boolean? = null,
+    val dateFormat: String? = null,
+    val timeFormat: String? = null,
 )
 
 data class ChangePasswordRequest(
