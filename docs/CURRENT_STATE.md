@@ -54,7 +54,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Vacation approval page: manager queue with approve/reject-with-reason modal
 - ✅ Dashboard: real data widgets (today hours, weekly hours, vacation balance, team status, compliance warnings)
 - ✅ Time Tracking page: full implementation (status, clock in/out/break, live timer, today's entries list, monthly timesheet, CSV export)
-- ✅ Admin page: 3-tab UI (User Management, Audit Log, System Settings) with full CRUD, search, modals
+- ✅ Admin page: 5-tab UI (User Management, Audit Log, System Settings, LDAP, Backups) with full CRUD, search, modals
 - ✅ Date/calendar localization: `dateUtils.ts` utility with `formatDate`, `formatTime`, `formatDateTime`, `formatMonthYear` using date-fns locales; `DateFormatContext` for per-user date/time format preferences; all pages (Dashboard, TimeTracking, Vacation) use localized date formatting
 - ✅ User Settings page: display preferences (date/time format) and password change with confirmation
 - ✅ Password reset flow: request page and confirm page with token

@@ -66,12 +66,18 @@
 - Path traversal protection and filename validation
 - Audit logging for all backup/restore/delete operations
 - Configurable backup directory and max backup count via `application.yml`
+- **Frontend Backups Tab**: Admin page now has a 5th tab "Backups" with full UI for listing, creating, downloading, restoring, deleting backups, and uploading backup files for restore
+- **i18n**: English and German translations for all backup-related UI strings
 
 ### Key files created/modified
 - `backend/src/main/kotlin/com/zeiterfassung/service/BackupService.kt`
 - `backend/src/main/kotlin/com/zeiterfassung/controller/BackupController.kt`
 - `backend/src/main/kotlin/com/zeiterfassung/model/dto/BackupDtos.kt`
 - `backend/src/main/resources/application.yml` — added `app.backup.*` properties
+- `frontend/src/services/adminService.ts` — added `BackupInfo`, `RestoreResponse` types; backup CRUD methods
+- `frontend/src/pages/AdminPage.tsx` — added `BackupsTab` component and 'backups' tab
+- `frontend/src/locales/en/translation.json` — added `backup` i18n section and `admin.backups_tab`
+- `frontend/src/locales/de/translation.json` — added `backup` i18n section and `admin.backups_tab`
 
 ---
 

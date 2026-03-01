@@ -3,6 +3,21 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Phase 13: Database Backup Frontend Tab
+
+### Added
+- **Admin Backups Tab** (frontend): New "Backups" tab in AdminPage with full backup management UI
+  - List existing backups in a table (filename, human-readable size, date)
+  - Create new backup with loading state
+  - Download backup files
+  - Restore from existing backup with confirmation dialog
+  - Delete backup with confirmation dialog
+  - Upload & restore from a `.sql.gz` file with file input
+  - Success/error banners with auto-clear after 5 seconds
+- **`adminService` backup methods**: `listBackups`, `createBackup`, `downloadBackup`, `restoreBackup`, `restoreFromUpload`, `deleteBackup` with `encodeURIComponent` for safe filenames
+- **`BackupInfo` and `RestoreResponse` types** in `adminService.ts`
+- **i18n translations**: Full English and German translations for all backup UI strings (`backup.*` keys, `admin.backups_tab`)
+
 ## [Unreleased] — GDPR Data Export & Deletion
 
 ### Added

@@ -44,6 +44,17 @@ export interface UpdateUserPayload {
   employeeNumber?: string
 }
 
+export interface BackupInfo {
+  filename: string
+  sizeBytes: number
+  createdAt: string
+}
+
+export interface RestoreResponse {
+  status: string
+  message: string
+}
+
 const adminService = {
   // Audit log
   getAuditLog: (page = 0, size = 50) =>
@@ -96,6 +107,39 @@ const adminService = {
 
   updateLdapConfig: (config: Record<string, unknown>) =>
     apiClient.put('/admin/ldap', config).then((r) => r.data),
+
+  // Backup management
+  listBackups: () =>
+    apiClient.get<BackupInfo[]>('/admin/backups').then((r) => r.data),
+
+  createBackup: () =>
+    apiClient.post<BackupInfo>('/admin/backups').then((r) => r.data),
+
+  downloadBackup: (filename: string) =>
+    apiClient.get(`/admin/backups/${encodeURIComponent(filename)}`, { responseType: 'blob' }).then((r) => {
+      const url = window.URL.createObjectURL(new Blob([r.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', filename)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    }),
+
+  restoreBackup: (filename: string) =>
+    apiClient.post<RestoreResponse>(`/admin/backups/restore/${encodeURIComponent(filename)}`).then((r) => r.data),
+
+  restoreFromUpload: (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return apiClient.post<RestoreResponse>('/admin/backups/restore/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data)
+  },
+
+  deleteBackup: (filename: string) =>
+    apiClient.delete(`/admin/backups/${encodeURIComponent(filename)}`).then((r) => r.data),
 
   // Self-service profile update
   updateOwnProfile: (payload: UpdateUserPayload) =>
