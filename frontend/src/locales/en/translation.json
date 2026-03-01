@@ -220,7 +220,30 @@
       "save_failed": "Failed to save changes",
       "delete_failed": "Failed to delete"
     },
-    "users_tab": "User Management"
+    "users_tab": "User Management",
+    "ldap_tab": "LDAP",
+    "ldap": {
+      "title": "LDAP / Active Directory Configuration",
+      "enabled": "LDAP Enabled",
+      "url": "LDAP URL",
+      "base_dn": "Base DN",
+      "user_search_base": "User Search Base",
+      "user_search_filter": "User Search Filter",
+      "group_search_base": "Group Search Base",
+      "group_search_filter": "Group Search Filter",
+      "manager_dn": "Manager DN",
+      "manager_password": "Manager Password",
+      "ad_mode": "Active Directory Mode",
+      "ad_domain": "Active Directory Domain",
+      "role_mapping": "Role Mapping (JSON)",
+      "email_attribute": "Email Attribute",
+      "first_name_attribute": "First Name Attribute",
+      "last_name_attribute": "Last Name Attribute",
+      "employee_number_attribute": "Employee Number Attribute",
+      "save_success": "LDAP configuration saved",
+      "save_error": "Failed to save LDAP configuration",
+      "load_error": "Failed to load LDAP configuration"
+    }
   },
   "common": {
     "save": "Save",
@@ -274,6 +297,7 @@
     "roles": "Roles",
     "rfid_tag": "RFID Tag",
     "manager": "Manager",
+    "substitute": "Substitute (Deputy)",
     "team": "Team",
     "active": "Active",
     "inactive": "Inactive",
@@ -301,6 +325,17 @@
     "confirm_password": "Confirm Password",
     "passwords_no_match": "Passwords do not match",
     "password_changed": "Password changed successfully",
-    "password_change_failed": "Failed to change password"
+    "password_change_failed": "Failed to change password",
+    "totp_title": "Two-Factor Authentication",
+    "totp_enabled": "Two-factor authentication is enabled.",
+    "totp_disabled": "Two-factor authentication is not enabled.",
+    "totp_setup": "Setup 2FA",
+    "totp_disable": "Disable 2FA",
+    "totp_setup_instructions": "Scan this QR code with your authenticator app, then enter the verification code below.",
+    "totp_verify_code": "Verification Code",
+    "totp_secret_label": "Manual entry key",
+    "totp_enabled_success": "Two-factor authentication enabled successfully",
+    "totp_disabled_success": "Two-factor authentication disabled",
+    "totp_error": "Failed to update two-factor authentication"
   }
 }

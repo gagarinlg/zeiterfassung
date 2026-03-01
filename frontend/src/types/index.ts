@@ -7,6 +7,7 @@ export interface User {
   phone?: string
   photoUrl?: string
   managerId?: string
+  substituteId?: string
   isActive: boolean
   roles: string[]
   permissions: string[]

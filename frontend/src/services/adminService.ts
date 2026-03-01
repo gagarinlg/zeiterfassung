@@ -37,6 +37,7 @@ export interface UpdateUserPayload {
   lastName?: string
   phone?: string
   managerId?: string
+  substituteId?: string
   isActive?: boolean
   dateFormat?: string
   timeFormat?: string
@@ -93,7 +94,7 @@ const adminService = {
   getLdapConfig: () =>
     apiClient.get('/admin/ldap').then((r) => r.data),
 
-  updateLdapConfig: (config: Record<string, unknown>) =>
+  updateLdapConfig: (config: Record<string, unknown> | object) =>
     apiClient.put('/admin/ldap', config).then((r) => r.data),
 
   // Self-service profile update

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import adminService from '../services/adminService'
+import { authService } from '../services/authService'
 
 export default function UserSettingsPage() {
   const { t } = useTranslation()
@@ -11,6 +12,13 @@ export default function UserSettingsPage() {
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  // TOTP 2FA
+  const [totpSetupData, setTotpSetupData] = useState<{ secret: string; otpauthUrl: string } | null>(null)
+  const [totpCode, setTotpCode] = useState('')
+  const [totpSaving, setTotpSaving] = useState(false)
+  const [totpSuccess, setTotpSuccess] = useState<string | null>(null)
+  const [totpError, setTotpError] = useState<string | null>(null)
 
   // Password change
   const [currentPassword, setCurrentPassword] = useState('')
@@ -35,6 +43,54 @@ export default function UserSettingsPage() {
       setError(t('admin.errors.save_failed'))
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleSetupTotp = async () => {
+    setTotpSaving(true)
+    setTotpError(null)
+    setTotpSuccess(null)
+    try {
+      const data = await authService.setupTotp()
+      setTotpSetupData(data)
+    } catch {
+      setTotpError(t('settings.totp_error'))
+    } finally {
+      setTotpSaving(false)
+    }
+  }
+
+  const handleEnableTotp = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!totpSetupData) return
+    setTotpSaving(true)
+    setTotpError(null)
+    setTotpSuccess(null)
+    try {
+      await authService.enableTotp(totpSetupData.secret, totpCode)
+      setTotpSuccess(t('settings.totp_enabled_success'))
+      setTotpSetupData(null)
+      setTotpCode('')
+      if (refreshUser) refreshUser()
+    } catch {
+      setTotpError(t('settings.totp_error'))
+    } finally {
+      setTotpSaving(false)
+    }
+  }
+
+  const handleDisableTotp = async () => {
+    setTotpSaving(true)
+    setTotpError(null)
+    setTotpSuccess(null)
+    try {
+      await authService.disableTotp()
+      setTotpSuccess(t('settings.totp_disabled_success'))
+      if (refreshUser) refreshUser()
+    } catch {
+      setTotpError(t('settings.totp_error'))
+    } finally {
+      setTotpSaving(false)
     }
   }
 
@@ -115,6 +171,85 @@ export default function UserSettingsPage() {
             {saving ? t('common.loading') : t('common.save')}
           </button>
         </form>
+      </div>
+
+      {/* Two-Factor Authentication */}
+      <div className="bg-white rounded-xl border p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('settings.totp_title')}</h2>
+        <p className="text-sm text-gray-600 mb-4">
+          {user.totpEnabled ? t('settings.totp_enabled') : t('settings.totp_disabled')}
+        </p>
+
+        {!user.totpEnabled && !totpSetupData && (
+          <button
+            type="button"
+            onClick={handleSetupTotp}
+            disabled={totpSaving}
+            className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+          >
+            {totpSaving ? t('common.loading') : t('settings.totp_setup')}
+          </button>
+        )}
+
+        {totpSetupData && (
+          <form onSubmit={handleEnableTotp} className="space-y-4">
+            <p className="text-sm text-gray-600">{t('settings.totp_setup_instructions')}</p>
+            <div className="p-3 bg-gray-50 border rounded-lg text-sm font-mono break-all">
+              {totpSetupData.otpauthUrl}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('settings.totp_secret_label')}
+              </label>
+              <div className="text-sm font-mono bg-gray-50 border rounded-lg p-2">
+                {totpSetupData.secret}
+              </div>
+            </div>
+            <div>
+              <label htmlFor="totpCode" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('settings.totp_verify_code')}
+              </label>
+              <input
+                id="totpCode"
+                type="text"
+                value={totpCode}
+                onChange={(e) => setTotpCode(e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                required
+                autoComplete="one-time-code"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={totpSaving}
+              className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+            >
+              {totpSaving ? t('common.loading') : t('common.save')}
+            </button>
+          </form>
+        )}
+
+        {user.totpEnabled && (
+          <button
+            type="button"
+            onClick={handleDisableTotp}
+            disabled={totpSaving}
+            className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+          >
+            {totpSaving ? t('common.loading') : t('settings.totp_disable')}
+          </button>
+        )}
+
+        {totpError && (
+          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700" role="alert">
+            {totpError}
+          </div>
+        )}
+        {totpSuccess && (
+          <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+            {totpSuccess}
+          </div>
+        )}
       </div>
 
       {/* Change Password */}
