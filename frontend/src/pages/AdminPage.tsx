@@ -746,7 +746,15 @@ function SettingsTab() {
       const result = await adminService.sendTestMail(testMailEmail)
       setTestMailResult({ status: 'ok', message: result.message })
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t('admin.errors.save_failed')
+      let msg = t('admin.errors.save_failed')
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response?: { data?: { message?: string } } }
+        if (axiosErr.response?.data?.message) {
+          msg = axiosErr.response.data.message
+        }
+      } else if (err instanceof Error) {
+        msg = err.message
+      }
       setTestMailResult({ status: 'error', message: msg })
     } finally {
       setTestMailSending(false)
@@ -920,7 +928,7 @@ function LdapTab() {
     setError(null)
     setSuccess(null)
     try {
-      await adminService.updateLdapConfig(config)
+      await adminService.updateLdapConfig(config as unknown as Record<string, unknown>)
       setSuccess(t('admin.ldap.save_success'))
     } catch {
       setError(t('admin.ldap.save_error'))

@@ -94,7 +94,7 @@ const adminService = {
   getLdapConfig: () =>
     apiClient.get('/admin/ldap').then((r) => r.data),
 
-  updateLdapConfig: (config: Record<string, unknown> | object) =>
+  updateLdapConfig: (config: Record<string, unknown>) =>
     apiClient.put('/admin/ldap', config).then((r) => r.data),
 
   // Self-service profile update
