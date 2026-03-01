@@ -3,6 +3,32 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Phase 14: Sick Leave, Business Trips & Project Time Allocation
+
+### Added
+- **Sick Leave Tracking** (backend): `SickLeaveEntity`, `SickLeaveRepository`, `SickLeaveService`, `SickLeaveController` at `/sick-leave`
+  - Report, update, cancel sick leave; certificate submission workflow
+  - Manager can report on behalf of employee (`POST /sick-leave/{userId}`)
+  - Overlap detection for non-cancelled sick leaves
+  - Audit logging for all state changes
+  - Email notifications to managers on sick leave report
+- **Business Trip Management** (backend): `BusinessTripEntity`, `BusinessTripRepository`, `BusinessTripService`, `BusinessTripController` at `/business-trips`
+  - Full CRUD + approve/reject/complete workflow (like vacation requests)
+  - Cost tracking (estimated and actual costs, cost center)
+  - Overlap detection for active trips
+  - Pending trips endpoint for managers
+  - Audit logging and email notifications
+- **Project/Cost Center Time Allocation** (backend): `ProjectEntity`, `TimeAllocationEntity`, repositories, `ProjectService`, `ProjectController` at `/projects`
+  - Project CRUD (admin-only create/update, authenticated read)
+  - Time allocation CRUD for employees with date/range queries
+  - Project-level allocation reporting (admin)
+  - Duplicate code/name detection for projects
+- **Database migration** `V10__create_sick_leave_business_trip_projects.sql`: 4 new tables with indexes
+- **Enums**: `SickLeaveStatus`, `BusinessTripStatus`
+- **DTOs**: `SickLeaveDtos.kt`, `BusinessTripDtos.kt`, `ProjectDtos.kt`
+- **Notification methods**: sick leave reported, business trip requested/approved/rejected
+- **i18n messages**: German and English email templates for sick leave and business trip notifications
+
 ## [Unreleased] — Backend Unit Test Coverage Expansion
 
 ### Added

@@ -1,5 +1,7 @@
 package com.zeiterfassung.service
 
+import com.zeiterfassung.model.entity.BusinessTripEntity
+import com.zeiterfassung.model.entity.SickLeaveEntity
 import com.zeiterfassung.model.entity.UserEntity
 import com.zeiterfassung.model.entity.VacationRequestEntity
 import org.springframework.context.MessageSource
@@ -119,5 +121,88 @@ class NotificationService(
                 request.endDate,
             )
         emailService.sendAsync(notifyUser.email, subject, body)
+    }
+
+    // ---- Sick leave events --------------------------------------------------
+
+    @Async
+    fun notifySickLeaveReported(
+        sickLeave: SickLeaveEntity,
+        manager: UserEntity,
+    ) {
+        val employee = sickLeave.user
+        val subject = msg("email.sick_leave.reported.subject", employee.firstName, employee.lastName)
+        val body =
+            msg(
+                "email.sick_leave.reported.body",
+                employee.firstName,
+                employee.lastName,
+                sickLeave.startDate,
+                sickLeave.endDate,
+                sickLeave.notes ?: "-",
+            )
+        emailService.sendAsync(manager.email, subject, body)
+    }
+
+    // ---- Business trip events -----------------------------------------------
+
+    @Async
+    fun notifyBusinessTripRequested(
+        trip: BusinessTripEntity,
+        manager: UserEntity,
+    ) {
+        val employee = trip.user
+        val subject = msg("email.business_trip.requested.subject", employee.firstName, employee.lastName)
+        val body =
+            msg(
+                "email.business_trip.requested.body",
+                employee.firstName,
+                employee.lastName,
+                trip.startDate,
+                trip.endDate,
+                trip.destination,
+                trip.purpose,
+            )
+        emailService.sendAsync(manager.email, subject, body)
+    }
+
+    @Async
+    fun notifyBusinessTripApproved(
+        trip: BusinessTripEntity,
+        approverName: String,
+    ) {
+        val employee = trip.user
+        if (employee.email.isBlank()) return
+        val subject = msg("email.business_trip.approved.subject")
+        val body =
+            msg(
+                "email.business_trip.approved.body",
+                employee.firstName,
+                trip.startDate,
+                trip.endDate,
+                trip.destination,
+                approverName,
+            )
+        emailService.sendAsync(employee.email, subject, body)
+    }
+
+    @Async
+    fun notifyBusinessTripRejected(
+        trip: BusinessTripEntity,
+        rejectionReason: String,
+    ) {
+        val employee = trip.user
+        if (employee.email.isBlank()) return
+        val subject = msg("email.business_trip.rejected.subject")
+        val body =
+            msg(
+                "email.business_trip.rejected.body",
+                employee.firstName,
+                trip.startDate,
+                trip.endDate,
+                trip.destination,
+                rejectionReason,
+            )
+        emailService.sendAsync(employee.email, subject, body)
     }
 }
