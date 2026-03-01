@@ -67,6 +67,7 @@ app:
   mail:
     from: ${MAIL_FROM:noreply@zeiterfassung.local}
     enabled: ${MAIL_ENABLED:true}
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
 
 ---
 spring:

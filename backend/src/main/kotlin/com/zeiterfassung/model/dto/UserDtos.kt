@@ -29,6 +29,7 @@ data class UpdateUserRequest(
     val isActive: Boolean? = null,
     val dateFormat: String? = null,
     val timeFormat: String? = null,
+    val employeeNumber: String? = null,
 )
 
 data class ChangePasswordRequest(
@@ -37,12 +38,16 @@ data class ChangePasswordRequest(
     @field:NotBlank
     @field:Size(min = 8)
     val newPassword: String,
+    @field:NotBlank
+    val confirmPassword: String,
 )
 
 data class ResetPasswordRequest(
     @field:NotBlank
     @field:Size(min = 8)
     val newPassword: String,
+    @field:NotBlank
+    val confirmPassword: String,
 )
 
 data class AssignRolesRequest(
@@ -59,4 +64,67 @@ data class PageResponse<T>(
     val totalPages: Int,
     val pageNumber: Int,
     val pageSize: Int,
+)
+
+data class TotpSetupResponse(
+    val secret: String,
+    val qrCodeUri: String,
+)
+
+data class TotpVerifyRequest(
+    @field:NotBlank
+    val code: String,
+)
+
+data class PasswordResetLinkRequest(
+    @field:NotBlank
+    @field:Email
+    val email: String,
+)
+
+data class PasswordResetConfirmRequest(
+    @field:NotBlank
+    val token: String,
+    @field:NotBlank
+    @field:Size(min = 8)
+    val newPassword: String,
+    @field:NotBlank
+    val confirmPassword: String,
+)
+
+data class LdapConfigResponse(
+    val enabled: Boolean,
+    val url: String,
+    val baseDn: String,
+    val userSearchBase: String,
+    val userSearchFilter: String,
+    val groupSearchBase: String,
+    val groupSearchFilter: String,
+    val managerDn: String,
+    val activeDirectoryMode: Boolean,
+    val activeDirectoryDomain: String,
+    val roleMapping: String,
+    val emailAttribute: String,
+    val firstNameAttribute: String,
+    val lastNameAttribute: String,
+    val employeeNumberAttribute: String,
+)
+
+data class UpdateLdapConfigRequest(
+    val enabled: Boolean? = null,
+    val url: String? = null,
+    val baseDn: String? = null,
+    val userSearchBase: String? = null,
+    val userSearchFilter: String? = null,
+    val groupSearchBase: String? = null,
+    val groupSearchFilter: String? = null,
+    val managerDn: String? = null,
+    val managerPassword: String? = null,
+    val activeDirectoryMode: Boolean? = null,
+    val activeDirectoryDomain: String? = null,
+    val roleMapping: String? = null,
+    val emailAttribute: String? = null,
+    val firstNameAttribute: String? = null,
+    val lastNameAttribute: String? = null,
+    val employeeNumberAttribute: String? = null,
 )

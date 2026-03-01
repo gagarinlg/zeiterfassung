@@ -1,10 +1,13 @@
 package com.zeiterfassung.controller
 
 import com.zeiterfassung.model.dto.AuditLogResponse
+import com.zeiterfassung.model.dto.LdapConfigResponse
 import com.zeiterfassung.model.dto.PageResponse
 import com.zeiterfassung.model.dto.SystemSettingResponse
+import com.zeiterfassung.model.dto.UpdateLdapConfigRequest
 import com.zeiterfassung.model.dto.UpdateSystemSettingRequest
 import com.zeiterfassung.service.AdminService
+import com.zeiterfassung.service.LdapService
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
@@ -24,6 +27,7 @@ import java.util.UUID
 @PreAuthorize("hasAuthority('admin.users.manage')")
 class AdminController(
     private val adminService: AdminService,
+    private val ldapService: LdapService,
 ) {
     @GetMapping("/audit-log")
     fun getAuditLog(
@@ -53,4 +57,14 @@ class AdminController(
         @RequestBody request: UpdateSystemSettingRequest,
         @AuthenticationPrincipal actorId: String,
     ): ResponseEntity<SystemSettingResponse> = ResponseEntity.ok(adminService.updateSystemSetting(key, request, UUID.fromString(actorId)))
+
+    @GetMapping("/ldap")
+    @PreAuthorize("hasAuthority('admin.users.manage')")
+    fun getLdapConfig(): ResponseEntity<LdapConfigResponse> = ResponseEntity.ok(ldapService.getLdapConfig())
+
+    @PutMapping("/ldap")
+    @PreAuthorize("hasAuthority('admin.users.manage')")
+    fun updateLdapConfig(
+        @RequestBody request: UpdateLdapConfigRequest,
+    ): ResponseEntity<LdapConfigResponse> = ResponseEntity.ok(ldapService.updateLdapConfig(request))
 }

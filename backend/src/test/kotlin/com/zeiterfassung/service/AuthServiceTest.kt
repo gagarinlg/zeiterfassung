@@ -33,6 +33,8 @@ class AuthServiceTest {
 
     @Mock private lateinit var auditService: AuditService
 
+    @Mock private lateinit var totpService: TotpService
+
     @Mock private lateinit var httpRequest: HttpServletRequest
 
     private val passwordEncoder = BCryptPasswordEncoder()
@@ -47,6 +49,7 @@ class AuthServiceTest {
                 jwtService,
                 passwordEncoder,
                 auditService,
+                totpService,
                 604800000L,
                 900000L,
             )

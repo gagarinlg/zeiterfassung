@@ -28,6 +28,7 @@ class AuthService(
     private val jwtService: JwtService,
     private val passwordEncoder: PasswordEncoder,
     private val auditService: AuditService,
+    private val totpService: TotpService,
     @param:Value("\${app.jwt.refresh-token-expiration-ms}") private val refreshTokenExpMs: Long,
     @param:Value("\${app.jwt.access-token-expiration-ms}") private val accessTokenExpMs: Long,
 ) {
@@ -62,6 +63,16 @@ class AuthService(
         user.failedLoginAttempts = 0
         user.lockedUntil = null
         userRepository.save(user)
+
+        // TOTP verification
+        if (user.totpEnabled) {
+            if (request.totpCode.isNullOrBlank()) {
+                throw UnauthorizedException("TOTP code required")
+            }
+            if (!totpService.verifyCode(user.totpSecret!!, request.totpCode)) {
+                throw UnauthorizedException("Invalid TOTP code")
+            }
+        }
 
         val roles = user.roles.map { it.name }
         val permissions = user.roles.flatMap { it.permissions.map { p -> p.name } }.distinct()
@@ -185,6 +196,7 @@ class AuthService(
             permissions = permissions,
             dateFormat = this.dateFormat,
             timeFormat = this.timeFormat,
+            totpEnabled = this.totpEnabled,
         )
     }
 }

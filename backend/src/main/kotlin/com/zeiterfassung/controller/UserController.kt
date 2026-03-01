@@ -117,6 +117,18 @@ class UserController(
         return ResponseEntity.noContent().build()
     }
 
+    @PutMapping("/me")
+    fun updateOwnProfile(
+        @Valid @RequestBody request: UpdateUserRequest,
+        @AuthenticationPrincipal actorId: String,
+    ): ResponseEntity<UserResponse> = ResponseEntity.ok(userService.updateOwnProfile(UUID.fromString(actorId), request))
+
+    @GetMapping("/{id}/all-subordinates")
+    @PreAuthorize("hasAuthority('admin.users.manage') or hasAuthority('time.view.team')")
+    fun getAllSubordinates(
+        @PathVariable id: UUID,
+    ): ResponseEntity<List<UserResponse>> = ResponseEntity.ok(userService.getAllSubordinates(id))
+
     @GetMapping("/{id}/team")
     @PreAuthorize("hasAuthority('admin.users.manage') or hasAuthority('time.view.team')")
     fun getTeamMembers(

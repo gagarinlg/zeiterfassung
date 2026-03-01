@@ -34,6 +34,8 @@ class SecurityConfig(
                 auth
                     .requestMatchers("/auth/login", "/auth/refresh")
                     .permitAll()
+                    .requestMatchers("/auth/password/reset-request", "/auth/password/reset-confirm")
+                    .permitAll()
                     .requestMatchers("/terminal/**")
                     .permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")

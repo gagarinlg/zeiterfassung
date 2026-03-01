@@ -102,6 +102,7 @@ class UserService(
         request.isActive?.let { user.isActive = it }
         request.dateFormat?.let { user.dateFormat = it }
         request.timeFormat?.let { user.timeFormat = it }
+        request.employeeNumber?.let { user.employeeNumber = it }
         request.managerId?.let { managerIdStr ->
             val manager =
                 userRepository
@@ -178,6 +179,9 @@ class UserService(
             userRepository
                 .findById(id)
                 .orElseThrow { ResourceNotFoundException("User not found: $id") }
+        if (request.newPassword != request.confirmPassword) {
+            throw UnauthorizedException("Passwords do not match")
+        }
         if (!passwordEncoder.matches(request.currentPassword, user.passwordHash)) {
             throw UnauthorizedException("Current password is incorrect")
         }
@@ -195,12 +199,63 @@ class UserService(
             userRepository
                 .findById(id)
                 .orElseThrow { ResourceNotFoundException("User not found: $id") }
+        if (request.newPassword != request.confirmPassword) {
+            throw UnauthorizedException("Passwords do not match")
+        }
         user.passwordHash = passwordEncoder.encode(request.newPassword)
         userRepository.save(user)
         auditService.logDataChange(actorId, "PASSWORD_RESET", "User", id, null, null)
     }
 
     fun getTeamMembers(id: UUID): List<UserResponse> = userRepository.findByManagerId(id).map { it.toUserResponse() }
+
+    @Transactional
+    fun updateOwnProfile(
+        userId: UUID,
+        request: UpdateUserRequest,
+    ): UserResponse {
+        val user =
+            userRepository
+                .findById(userId)
+                .orElseThrow { ResourceNotFoundException("User not found: $userId") }
+        if (user.isDeleted) throw ResourceNotFoundException("User not found: $userId")
+
+        val oldResponse = user.toUserResponse()
+
+        request.dateFormat?.let { user.dateFormat = it }
+        request.timeFormat?.let { user.timeFormat = it }
+        request.phone?.let { user.phone = it }
+        request.firstName?.let { user.firstName = it }
+        request.lastName?.let { user.lastName = it }
+
+        val saved = userRepository.save(user)
+        auditService.logDataChange(userId, "USER_SELF_UPDATE", "User", saved.id, oldResponse, saved.toUserResponse())
+        return saved.toUserResponse()
+    }
+
+    /**
+     * Returns all subordinates recursively for a manager.
+     * This implements hierarchical manager rights - a manager of a manager
+     * has rights over all subordinates of that manager too.
+     */
+    fun getAllSubordinates(managerId: UUID): List<UserResponse> {
+        val result = mutableListOf<UserResponse>()
+        collectSubordinates(managerId, result, mutableSetOf())
+        return result
+    }
+
+    private fun collectSubordinates(
+        managerId: UUID,
+        result: MutableList<UserResponse>,
+        visited: MutableSet<UUID>,
+    ) {
+        if (!visited.add(managerId)) return
+        val directReports = userRepository.findByManagerId(managerId)
+        for (sub in directReports) {
+            result.add(sub.toUserResponse())
+            collectSubordinates(sub.id, result, visited)
+        }
+    }
 
     private fun UserEntity.toUserResponse(): UserResponse {
         val roles = this.roles.map { it.name }
@@ -219,6 +274,7 @@ class UserService(
             permissions = permissions,
             dateFormat = this.dateFormat,
             timeFormat = this.timeFormat,
+            totpEnabled = this.totpEnabled,
         )
     }
 }

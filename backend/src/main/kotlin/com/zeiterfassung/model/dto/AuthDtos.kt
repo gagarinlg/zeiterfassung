@@ -9,6 +9,7 @@ data class LoginRequest(
     val email: String,
     @field:NotBlank
     val password: String,
+    val totpCode: String? = null,
 )
 
 data class RefreshRequest(
@@ -37,4 +38,5 @@ data class UserResponse(
     val permissions: List<String>,
     val dateFormat: String?,
     val timeFormat: String?,
+    val totpEnabled: Boolean = false,
 )
