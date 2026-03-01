@@ -153,13 +153,13 @@ test.describe('Time Tracking Page', () => {
     test('should show error alert when API fails', async ({ page }) => {
       await mockAuthenticatedUser(page)
 
-      await page.route('**/api/time-tracking/status', (route) =>
+      await page.route('**/api/time/status', (route) =>
         route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
       )
-      await page.route('**/api/time-tracking/entries**', (route) =>
+      await page.route('**/api/time/entries**', (route) =>
         route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
       )
-      await page.route('**/api/time-tracking/monthly-summary**', (route) =>
+      await page.route('**/api/time/summary/monthly**', (route) =>
         route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
       )
 

@@ -54,7 +54,7 @@ test.describe('Dashboard Page', () => {
   test.describe('Clocked-in Status', () => {
     test('should show clocked-in banner when user is clocked in', async ({ page }) => {
       // Override the tracking status mock to show clocked in
-      await page.route('**/api/time-tracking/status', (route) =>
+      await page.route('**/api/time/status', (route) =>
         route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -82,7 +82,7 @@ test.describe('Dashboard Page', () => {
   test.describe('Error Handling', () => {
     test('should show error alert when API calls fail', async ({ page }) => {
       // Override tracking status to fail
-      await page.route('**/api/time-tracking/status', (route) =>
+      await page.route('**/api/time/status', (route) =>
         route.fulfill({ status: 500, contentType: 'application/json', body: '{"message":"Server error"}' }),
       )
 

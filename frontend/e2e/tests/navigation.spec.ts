@@ -33,7 +33,7 @@ test.describe('Navigation', () => {
       await mockDashboardApis(page)
 
       // Mock time-tracking APIs
-      await page.route('**/api/time-tracking/status', (route) =>
+      await page.route('**/api/time/status', (route) =>
         route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -48,10 +48,10 @@ test.describe('Navigation', () => {
           }),
         }),
       )
-      await page.route('**/api/time-tracking/entries**', (route) =>
+      await page.route('**/api/time/entries**', (route) =>
         route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
       )
-      await page.route('**/api/time-tracking/monthly-summary**', (route) =>
+      await page.route('**/api/time/summary/monthly**', (route) =>
         route.fulfill({
           status: 200,
           contentType: 'application/json',

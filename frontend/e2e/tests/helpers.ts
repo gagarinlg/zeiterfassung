@@ -141,14 +141,14 @@ export async function mockAuthenticatedUser(page: Page) {
 
 /** Mock the common dashboard API calls so the page loads without errors. */
 export async function mockDashboardApis(page: Page) {
-  await page.route('**/api/time-tracking/status', (route) =>
+  await page.route('**/api/time/status', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify(MOCK_TRACKING_STATUS_CLOCKED_OUT),
     }),
   )
-  await page.route('**/api/time-tracking/weekly-summary**', (route) =>
+  await page.route('**/api/time/summary/weekly**', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -162,7 +162,7 @@ export async function mockDashboardApis(page: Page) {
       body: JSON.stringify(MOCK_VACATION_BALANCE),
     }),
   )
-  await page.route('**/api/time-tracking/team-status', (route) =>
+  await page.route('**/api/time/manage/team/status', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) }),
   )
   await page.route('**/api/vacation/requests?**', (route) =>
@@ -175,23 +175,30 @@ export async function mockDashboardApis(page: Page) {
   await page.route(`**/api/users/${MOCK_USER.id}/team`, (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
   )
+  await page.route('**/api/vacation/pending**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ content: [], totalElements: 0, totalPages: 0, pageNumber: 0, pageSize: 1 }),
+    }),
+  )
 }
 
 /** Mock time-tracking page specific APIs. */
 export async function mockTimeTrackingApis(page: Page, statusOverride?: object) {
   const trackingStatus = statusOverride ?? MOCK_TRACKING_STATUS_CLOCKED_OUT
 
-  await page.route('**/api/time-tracking/status', (route) =>
+  await page.route('**/api/time/status', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify(trackingStatus),
     }),
   )
-  await page.route('**/api/time-tracking/entries**', (route) =>
+  await page.route('**/api/time/entries**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
   )
-  await page.route('**/api/time-tracking/monthly-summary**', (route) =>
+  await page.route('**/api/time/summary/monthly**', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
