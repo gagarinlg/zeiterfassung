@@ -3,6 +3,17 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Android Server URL Configuration
+
+### Added
+- **ServerConfigPreferences**: DataStore-based preferences for storing server URL with MDM managed app configuration support (`RestrictionsManager`)
+- **ServerSettingsScreen**: Compose UI screen for viewing/editing server URL; disables editing when URL is managed by MDM
+- **ServerSettingsViewModel**: ViewModel with managed config detection, save with success feedback
+- **app_restrictions.xml**: Android managed app configuration schema for MDM provisioning of `server_url`
+- **AndroidManifest.xml**: `APP_RESTRICTIONS` meta-data reference
+- **NetworkModule**: `provideRetrofit` now reads effective server URL from `ServerConfigPreferences` (managed > user setting > default)
+- **ZeiterfassungNavGraph**: `ServerSettings` route added to navigation
+
 ## [Unreleased] — Phase 13: Database Backup & Restore (IN PROGRESS)
 
 ### Added

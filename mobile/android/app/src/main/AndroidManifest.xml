@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Zeiterfassung"
         android:usesCleartextTraffic="false">
+        <meta-data
+            android:name="android.content.APP_RESTRICTIONS"
+            android:resource="@xml/app_restrictions" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

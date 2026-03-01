@@ -5,6 +5,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.zeiterfassung.app.BuildConfig
 import com.zeiterfassung.app.data.api.ZeiterfassungApi
 import com.zeiterfassung.app.data.repository.AuthPreferences
+import com.zeiterfassung.app.data.repository.ServerConfigPreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -69,13 +70,16 @@ object NetworkModule {
     fun provideRetrofit(
         okHttpClient: OkHttpClient,
         moshi: Moshi,
-    ): Retrofit =
-        Retrofit
+        serverConfigPreferences: ServerConfigPreferences,
+    ): Retrofit {
+        val baseUrl = runBlocking { serverConfigPreferences.getEffectiveServerUrl(BASE_URL_DEFAULT) }
+        return Retrofit
             .Builder()
-            .baseUrl(BASE_URL_DEFAULT)
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
+    }
 
     @Provides
     @Singleton

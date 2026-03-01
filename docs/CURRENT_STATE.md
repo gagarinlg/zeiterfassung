@@ -1,6 +1,6 @@
 # Current Project State
 
-> Last updated: 2026-03-01
+> Last updated: 2026-03-02
 
 ## Quick Summary
 
@@ -70,7 +70,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Playwright screenshot generation (12 screenshots)
 
 ### Mobile (Fully Implemented)
-- ✅ **Android**: real API integration with Retrofit + Moshi + Hilt; LoginScreen, DashboardScreen, TimeTrackingScreen (state-aware buttons), VacationScreen (balance + requests); 24 ViewModel unit tests
+- ✅ **Android**: real API integration with Retrofit + Moshi + Hilt; LoginScreen, DashboardScreen, TimeTrackingScreen (state-aware buttons), VacationScreen (balance + requests); ServerSettingsScreen with configurable server URL (DataStore + MDM managed config support); 24 ViewModel unit tests
 - ✅ **iOS**: real API integration using URLSession; Keychain token storage (replaces UserDefaults); DashboardView, TimeTrackingView (action buttons, elapsed timer), VacationView (balance breakdown + request list); AuthViewModel, DashboardViewModel, TimeTrackingViewModel, VacationViewModel
 
 ### Terminal (Fully Functional — Phase 6 Complete)
