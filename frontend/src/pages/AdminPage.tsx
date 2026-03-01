@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, ClipboardList, Settings, Plus, Edit, Trash2, Key, Wifi } from 'lucide-react'
+import { Users, ClipboardList, Settings, Plus, Edit, Trash2, Key, Wifi, Mail } from 'lucide-react'
 import adminService from '../services/adminService'
 import type { AuditLogEntry, SystemSetting, CreateUserPayload, UpdateUserPayload } from '../services/adminService'
 import type { User } from '../types'
@@ -59,6 +59,7 @@ interface UserModalProps {
 
 function UserModal({ user, onClose, onSave }: UserModalProps) {
   const { t } = useTranslation()
+  const [allUsers, setAllUsers] = useState<User[]>([])
   const [form, setForm] = useState({
     email: user?.email ?? '',
     password: '',
@@ -68,10 +69,15 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
     phone: user?.phone ?? '',
     roles: user?.roles ?? ['EMPLOYEE'],
     isActive: user?.isActive ?? true,
+    managerId: user?.managerId ?? '',
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const isNew = user === null
+
+  useEffect(() => {
+    adminService.getUsers(0, 100).then((data) => setAllUsers(data.content)).catch(() => {})
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -95,6 +101,8 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
           lastName: form.lastName,
           phone: form.phone || undefined,
           isActive: form.isActive,
+          managerId: form.managerId || undefined,
+          employeeNumber: form.employeeNumber || undefined,
         }
         await adminService.updateUser(user.id, payload)
         if (JSON.stringify([...form.roles].sort()) !== JSON.stringify([...user.roles].sort())) {
@@ -185,17 +193,29 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
                 onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
               />
             </div>
-            {isNew && (
-              <div>
-                <label htmlFor="modal-employeeNumber" className="block text-sm font-medium text-gray-700 mb-1">{t('users.employee_number')}</label>
-                <input
-                  id="modal-employeeNumber"
-                  className="w-full border rounded-lg px-3 py-2 text-sm"
-                  value={form.employeeNumber}
-                  onChange={(e) => setForm((p) => ({ ...p, employeeNumber: e.target.value }))}
-                />
-              </div>
-            )}
+            <div>
+              <label htmlFor="modal-employeeNumber" className="block text-sm font-medium text-gray-700 mb-1">{t('users.employee_number')}</label>
+              <input
+                id="modal-employeeNumber"
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                value={form.employeeNumber}
+                onChange={(e) => setForm((p) => ({ ...p, employeeNumber: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label htmlFor="modal-manager" className="block text-sm font-medium text-gray-700 mb-1">{t('users.manager')}</label>
+              <select
+                id="modal-manager"
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                value={form.managerId}
+                onChange={(e) => setForm((p) => ({ ...p, managerId: e.target.value }))}
+              >
+                <option value="">—</option>
+                {allUsers.filter((u) => u.id !== user?.id && (u.roles.includes('MANAGER') || u.roles.includes('ADMIN') || u.roles.includes('SUPER_ADMIN'))).map((u) => (
+                  <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
+                ))}
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.roles')}</label>
               <div className="flex flex-wrap gap-2">
@@ -304,16 +324,21 @@ function RfidModal({ user, onClose, onSave }: { user: User; onClose: () => void;
 function ResetPasswordModal({ user, onClose }: { user: User; onClose: () => void }) {
   const { t } = useTranslation()
   const [newPassword, setNewPassword] = useState('')
+  const [confirmPwd, setConfirmPwd] = useState('')
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (newPassword !== confirmPwd) {
+      setError(t('settings.passwords_no_match'))
+      return
+    }
     setSaving(true)
     setError(null)
     try {
-      await adminService.resetPassword(user.id, newPassword)
+      await adminService.resetPassword(user.id, newPassword, confirmPwd)
       setSuccess(true)
     } catch {
       setError(t('admin.errors.save_failed'))
@@ -351,6 +376,17 @@ function ResetPasswordModal({ user, onClose }: { user: User; onClose: () => void
                   className="w-full border rounded-lg px-3 py-2 text-sm"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  minLength={8}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.confirm_password')}</label>
+                <input
+                  type="password"
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  value={confirmPwd}
+                  onChange={(e) => setConfirmPwd(e.target.value)}
                   required
                   minLength={8}
                 />
@@ -652,6 +688,9 @@ function SettingsTab() {
   const [error, setError] = useState<string | null>(null)
   const [editing, setEditing] = useState<{ key: string; value: string } | null>(null)
   const [saving, setSaving] = useState(false)
+  const [testMailEmail, setTestMailEmail] = useState('')
+  const [testMailSending, setTestMailSending] = useState(false)
+  const [testMailResult, setTestMailResult] = useState<{ status: 'ok' | 'error'; message: string } | null>(null)
 
   const loadSettings = useCallback(async () => {
     setLoading(true)
@@ -684,8 +723,23 @@ function SettingsTab() {
     }
   }
 
+  const handleSendTestMail = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setTestMailSending(true)
+    setTestMailResult(null)
+    try {
+      const result = await adminService.sendTestMail(testMailEmail)
+      setTestMailResult({ status: 'ok', message: result.message })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : t('admin.errors.save_failed')
+      setTestMailResult({ status: 'error', message: msg })
+    } finally {
+      setTestMailSending(false)
+    }
+  }
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {error && <ErrorBanner message={error} />}
       {loading ? (
         <LoadingSpinner />
@@ -739,6 +793,48 @@ function SettingsTab() {
           </table>
         </div>
       )}
+
+      {/* Test Mail */}
+      <div className="bg-white rounded-xl border p-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <Mail size={16} />
+          {t('admin.settings.test_mail')}
+        </h3>
+        <p className="text-xs text-gray-500 mb-4">{t('admin.settings.test_mail_description')}</p>
+        <form onSubmit={handleSendTestMail} className="flex items-end gap-3">
+          <div className="flex-1">
+            <label htmlFor="test-mail-email" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('common.email')}
+            </label>
+            <input
+              id="test-mail-email"
+              type="email"
+              value={testMailEmail}
+              onChange={(e) => setTestMailEmail(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 text-sm"
+              placeholder="admin@example.com"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={testMailSending}
+            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 disabled:opacity-50 whitespace-nowrap"
+          >
+            <Mail size={14} />
+            {testMailSending ? t('common.loading') : t('admin.settings.send_test')}
+          </button>
+        </form>
+        {testMailResult && (
+          <div className={`mt-3 p-3 rounded-lg text-sm ${
+            testMailResult.status === 'ok'
+              ? 'bg-green-50 border border-green-200 text-green-700'
+              : 'bg-red-50 border border-red-200 text-red-700'
+          }`}>
+            {testMailResult.message}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

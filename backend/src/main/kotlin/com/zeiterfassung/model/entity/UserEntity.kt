@@ -37,6 +37,14 @@ class UserEntity(
     var phone: String? = null,
     @Column(name = "photo_url")
     var photoUrl: String? = null,
+    @Column(name = "date_format")
+    var dateFormat: String? = null,
+    @Column(name = "time_format")
+    var timeFormat: String? = null,
+    @Column(name = "totp_secret")
+    var totpSecret: String? = null,
+    @Column(name = "totp_enabled", nullable = false)
+    var totpEnabled: Boolean = false,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id")
     var manager: UserEntity? = null,

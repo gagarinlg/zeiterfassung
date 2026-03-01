@@ -27,6 +27,7 @@ describe('ProtectedRoute', () => {
       login: vi.fn(),
       logout: vi.fn(),
       updateUser: vi.fn(),
+      refreshUser: vi.fn(),
     })
     render(
       <MemoryRouter>
@@ -49,6 +50,7 @@ describe('ProtectedRoute', () => {
       login: vi.fn(),
       logout: vi.fn(),
       updateUser: vi.fn(),
+      refreshUser: vi.fn(),
     })
     render(
       <MemoryRouter initialEntries={['/dashboard']}>
@@ -79,6 +81,7 @@ describe('ProtectedRoute', () => {
       login: vi.fn(),
       logout: vi.fn(),
       updateUser: vi.fn(),
+      refreshUser: vi.fn(),
     })
     render(
       <MemoryRouter>
@@ -110,6 +113,7 @@ describe('ProtectedRoute', () => {
       login: vi.fn(),
       logout: vi.fn(),
       updateUser: vi.fn(),
+      refreshUser: vi.fn(),
     })
     render(
       <MemoryRouter>

@@ -86,6 +86,50 @@ jobs:
           name: frontend-test-results
           path: frontend/coverage/
 
+  frontend-e2e:
+    name: Frontend - E2E Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npx playwright test --config=e2e/playwright.config.ts
+        env:
+          CI: true
+
+      - name: Upload E2E test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: e2e-test-results
+          path: |
+            frontend/e2e/test-results/
+            frontend/e2e/playwright-report/
+
+      - name: Upload E2E screenshots
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: e2e-screenshots
+          path: frontend/e2e/screenshots/
+
   terminal-lint-test:
     name: Terminal - Lint & Test
     runs-on: ubuntu-latest
@@ -185,7 +229,7 @@ jobs:
   build:
     name: Build All Components
     runs-on: ubuntu-latest
-    needs: [backend-lint-test, frontend-lint-test, terminal-lint-test, android-lint-test, ios-lint-test]
+    needs: [backend-lint-test, frontend-lint-test, frontend-e2e, terminal-lint-test, android-lint-test, ios-lint-test]
 
     steps:
       - uses: actions/checkout@v6

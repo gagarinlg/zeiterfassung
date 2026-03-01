@@ -3,10 +3,65 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased]
+## [Unreleased] — Phase 10: Security Features & LDAP Integration
+
+### Added
+- **V8 Flyway migration**: TOTP columns on users table (`totp_secret`, `totp_enabled`), `password_reset_tokens` table, LDAP configuration settings in `system_settings`
+- **TOTP 2FA**: `TotpService` with RFC 6238 TOTP generation/verification (base32, HmacSHA1, ±1 time step window); endpoints `POST /auth/totp/setup`, `/totp/enable`, `/totp/disable`
+- **Password reset flow**: `PasswordResetTokenEntity` + `PasswordResetTokenRepository`; `PasswordResetService` with email-based token flow; endpoints `POST /auth/password/reset-request`, `/auth/password/reset-confirm` (public, unauthenticated)
+- **LDAP/Active Directory configuration**: `LdapService` for reading/updating LDAP settings from system_settings; endpoints `GET /admin/ldap`, `PUT /admin/ldap`
+- **Self-service profile update**: `PUT /users/me` endpoint for users to update own preferences (name, phone, date/time format)
+- **Recursive subordinate listing**: `GET /users/{id}/all-subordinates` — returns full hierarchy of subordinates for a manager
+- **Password confirmation validation**: `confirmPassword` field added to `ChangePasswordRequest`, `ResetPasswordRequest`, and new `PasswordResetConfirmRequest`
+- **TOTP in login flow**: `totpCode` field added to `LoginRequest`; `AuthService.login()` verifies TOTP code when enabled
+- **New DTOs**: `TotpSetupResponse`, `TotpVerifyRequest`, `PasswordResetLinkRequest`, `PasswordResetConfirmRequest`, `LdapConfigResponse`, `UpdateLdapConfigRequest`
+- **UserResponse extended**: `totpEnabled` field added to `UserResponse`
+- **UpdateUserRequest extended**: `employeeNumber` field added for admin updates
+- **SecurityConfig**: password reset endpoints added to public paths
+- **Frontend: UserSettingsPage** (`/settings`): display preferences and password change with confirmation
+- **Frontend: PasswordResetRequestPage** (`/forgot-password`): request password reset email
+- **Frontend: PasswordResetConfirmPage** (`/reset-password`): confirm password reset with token
+- **Frontend: LoginPage TOTP**: TOTP code input shown on 401 TOTP-required; forgot password link
+- **Frontend: AdminPage**: manager dropdown, always-visible employee number, confirm password in reset modal
+- **Frontend: AuthContext**: `refreshUser` method; Settings nav link in sidebar
+- **Frontend: Services**: LDAP config, updateOwnProfile, changeOwnPassword, TOTP, password reset APIs
+- **Frontend: i18n**: auth reset, TOTP, settings, nav keys for DE and EN
+
+## [Unreleased] — Phase 9: Testing & Security Hardening (COMPLETE)
+
+### Fixed
+- **CORS**: Changed `allowedOrigins` to `allowedOriginPatterns` in SecurityConfig, fixing "Invalid CORS request" on localhost
+- **Date localization**: Dates now display in locale-correct format (DD.MM.YYYY for German) instead of US format; calendar uses Monday as first day of week for German locale
+- **JwtAuthenticationFilter**: Added `/terminal/` to publicPaths for consistency with SecurityConfig permitAll rules
+- **V7 migration**: Fixed column names from `setting_key`/`setting_value` to `key`/`value` matching V5 schema; fixed `ON CONFLICT` clause to target `(key)` column
+- **NavLink active state**: Added `end` prop to `/vacation` NavLink so it no longer highlights when on `/vacation/approvals`
+- **ktlint CI**: Auto-formatted `AuthControllerIntegrationTest.kt` to pass ktlint checks
+- **E2E mock API paths**: Corrected all E2E test mocks from wrong `/api/time-tracking/` to correct `/api/time/` matching actual frontend service endpoints
+
+### Added
+- **V7 migration**: `date_format` and `time_format` columns on users table; system settings for `display.date_format`, `display.time_format`, `display.first_day_of_week`
+- **Per-user date/time preferences**: UserEntity, UserResponse, UpdateUserRequest extended with dateFormat/timeFormat; falls back to global system settings
+- **`dateUtils.ts`**: locale-aware date formatting utility using date-fns (formatDate, formatTime, formatDateTime, formatMonthYear, getFirstDayOfWeek, getWeekdayHeaders)
+- **`DateFormatContext`**: React context providing user's date/time format preferences to all components
+- **AuthControllerIntegrationTest**: 10 integration tests (CORS preflight, credentials, auth login/logout, security headers)
+- Frontend unit tests for `dateUtils.ts` (18 tests)
+- **Playwright E2E test suite** (7 spec files, 62+ tests):
+  - `login.spec.ts`: 12 tests — form rendering, language toggle, validation, login flows
+  - `navigation.spec.ts`: 6 tests — sidebar, route navigation, protected routes, logout
+  - `dashboard.spec.ts`: 8 tests — widgets, status banners, weekly summary, error handling
+  - `time-tracking.spec.ts`: 14 tests — clock states, buttons, timesheet, CSV export, errors
+  - `vacation.spec.ts`: 8 tests — balance card, requests tab, new request form, calendar, errors
+  - `vacation-approval.spec.ts`: 6 tests — pending requests, approve/reject, reject modal, empty state, errors
+  - `admin.spec.ts`: 8 tests — user list, create user, audit log, settings, errors
+- E2E testing job in CI workflow (`.github/workflows/ci.yml`)
+- Comprehensive installation guide (`docs/installation/README.md`)
+
+### Changed
+- Date/calendar localization across the frontend (Dashboard, TimeTracking, Vacation pages)
+- Per-user date/time format preferences in backend (V7 migration, UserEntity, DTOs)
+- `playwright.config.ts`: screenshot mode set to `on` (always capture for docs)
 
 ### Planned
-- Phase 9: Testing & Security Hardening
 - Phase 10: Documentation & Polish
 
 ## [Phase 7+8 - Mobile Apps + Admin Panel] - 2026-03-01

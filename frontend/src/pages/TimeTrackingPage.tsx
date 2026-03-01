@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { timeService } from '../services/timeService'
 import type { TrackingStatusResponse, TimeEntry, TimeSheetResponse } from '../types'
+import { formatTime, formatDate } from '../utils/dateUtils'
+import { useDateFormat } from '../context/DateFormatContext'
 
 function formatMinutes(minutes: number): string {
   const h = Math.floor(minutes / 60)
@@ -42,6 +44,7 @@ function getTomorrowInstant(): string {
 
 export default function TimeTrackingPage() {
   const { t } = useTranslation()
+  const { dateFormat, timeFormat } = useDateFormat()
 
   const [status, setStatus] = useState<TrackingStatusResponse | null>(null)
   const [entries, setEntries] = useState<TimeEntry[]>([])
@@ -282,7 +285,7 @@ export default function TimeTrackingPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-gray-700">
-                    {new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {formatTime(entry.timestamp, timeFormat)}
                   </p>
                   <p className="text-xs text-gray-400">{entry.source}</p>
                 </div>
@@ -330,7 +333,7 @@ export default function TimeTrackingPage() {
               <tbody className="divide-y divide-gray-100">
                 {monthSheet.dailySummaries.map((day) => (
                   <tr key={day.date} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-900">{day.date}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{formatDate(day.date, dateFormat)}</td>
                     <td className="px-4 py-3 text-sm text-gray-900">{formatMinutes(day.totalWorkMinutes)}</td>
                     <td className="px-4 py-3 text-sm text-gray-900">{formatMinutes(day.totalBreakMinutes)}</td>
                     <td className={`px-4 py-3 text-sm font-medium ${overtimeColorClass(day.overtimeMinutes)}`}>

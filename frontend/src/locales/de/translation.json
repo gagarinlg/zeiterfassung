@@ -10,7 +10,8 @@
     "vacation_approvals": "Urlaubsgenehmigungen",
     "admin": "Administration",
     "profile": "Profil",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "settings": "Einstellungen"
   },
   "auth": {
     "login": "Anmelden",
@@ -23,6 +24,18 @@
     "session_expired": "Sitzung abgelaufen. Bitte melden Sie sich erneut an.",
     "switch_language": "Sprache wechseln",
     "rate_limit_exceeded": "Zu viele Anmeldeversuche. Bitte versuchen Sie es später erneut.",
+    "reset_password": "Passwort zurücksetzen",
+    "reset_instructions": "Geben Sie Ihre E-Mail-Adresse ein. Sie erhalten einen Link zum Zurücksetzen Ihres Passworts.",
+    "reset_email_sent": "Falls ein Konto mit dieser E-Mail existiert, wurde eine E-Mail mit einem Zurücksetzungslink gesendet.",
+    "send_reset_link": "Zurücksetzungslink senden",
+    "back_to_login": "Zurück zur Anmeldung",
+    "forgot_password": "Passwort vergessen?",
+    "set_new_password": "Neues Passwort festlegen",
+    "password_reset_success": "Ihr Passwort wurde erfolgreich geändert. Sie können sich jetzt anmelden.",
+    "reset_failed": "Passwort-Zurücksetzung fehlgeschlagen. Der Link ist möglicherweise abgelaufen.",
+    "invalid_reset_token": "Ungültiger oder fehlender Zurücksetzungslink.",
+    "totp_code": "Zwei-Faktor-Code",
+    "totp_required": "Bitte geben Sie den Code aus Ihrer Authenticator-App ein.",
     "validation": {
       "email_required": "E-Mail-Adresse ist erforderlich",
       "email_invalid": "Ungültige E-Mail-Adresse",
@@ -189,7 +202,10 @@
     "settings": {
       "key": "Einstellungsschlüssel",
       "value": "Wert",
-      "description": "Beschreibung"
+      "description": "Beschreibung",
+      "test_mail": "E-Mail-Test",
+      "test_mail_description": "Senden Sie eine Test-E-Mail, um zu überprüfen, ob die E-Mail-Konfiguration korrekt funktioniert.",
+      "send_test": "Test-E-Mail senden"
     },
     "reports": "Berichte",
     "audit": {
@@ -264,6 +280,27 @@
     "change_password": "Passwort ändern",
     "reset_password": "Passwort zurücksetzen",
     "current_password": "Aktuelles Passwort",
-    "new_password": "Neues Passwort"
+    "new_password": "Neues Passwort",
+    "confirm_password": "Passwort bestätigen"
+  },
+  "settings": {
+    "date_format": "Datumsformat",
+    "time_format": "Zeitformat",
+    "date_format_options": {
+      "DD.MM.YYYY": "DD.MM.YYYY (deutsch)",
+      "YYYY-MM-DD": "YYYY-MM-DD (ISO)",
+      "MM/DD/YYYY": "MM/DD/YYYY (US)"
+    },
+    "time_format_options": {
+      "24h": "24-Stunden",
+      "12h": "12-Stunden"
+    },
+    "preferences": "Einstellungen",
+    "preferences_saved": "Einstellungen gespeichert",
+    "display_preferences": "Anzeigeeinstellungen",
+    "confirm_password": "Passwort bestätigen",
+    "passwords_no_match": "Die Passwörter stimmen nicht überein",
+    "password_changed": "Passwort erfolgreich geändert",
+    "password_change_failed": "Passwort konnte nicht geändert werden"
   }
 }

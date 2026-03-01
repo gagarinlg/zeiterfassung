@@ -38,6 +38,9 @@ export interface UpdateUserPayload {
   phone?: string
   managerId?: string
   isActive?: boolean
+  dateFormat?: string
+  timeFormat?: string
+  employeeNumber?: string
 }
 
 const adminService = {
@@ -83,8 +86,27 @@ const adminService = {
   updateRfid: (id: string, rfidTagId: string | null) =>
     apiClient.put<User>(`/users/${id}/rfid`, { rfidTagId }).then((r) => r.data),
 
-  resetPassword: (id: string, newPassword: string) =>
-    apiClient.put(`/users/${id}/password/reset`, { newPassword }).then((r) => r.data),
+  resetPassword: (id: string, newPassword: string, confirmPassword: string) =>
+    apiClient.put(`/users/${id}/password/reset`, { newPassword, confirmPassword }).then((r) => r.data),
+
+  // LDAP config
+  getLdapConfig: () =>
+    apiClient.get('/admin/ldap').then((r) => r.data),
+
+  updateLdapConfig: (config: Record<string, unknown>) =>
+    apiClient.put('/admin/ldap', config).then((r) => r.data),
+
+  // Self-service profile update
+  updateOwnProfile: (payload: UpdateUserPayload) =>
+    apiClient.put<User>('/users/me', payload).then((r) => r.data),
+
+  // Self-service password change
+  changeOwnPassword: (userId: string, currentPassword: string, newPassword: string, confirmPassword: string) =>
+    apiClient.put(`/users/${userId}/password`, { currentPassword, newPassword, confirmPassword }).then((r) => r.data),
+
+  // Test mail
+  sendTestMail: (recipientEmail: string) =>
+    apiClient.post<{ status: string; message: string }>('/admin/mail/test', { recipientEmail }).then((r) => r.data),
 }
 
 export default adminService

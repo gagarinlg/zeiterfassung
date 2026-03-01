@@ -1,10 +1,10 @@
 # Current Project State
 
-> Last updated: 2026-03-01
+> Last updated: 2026-03-02
 
 ## Quick Summary
 
-Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–8 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, and admin endpoints (audit log + system settings). The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages. Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests.
+Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–9 are complete, Phase 10 is in progress.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, admin endpoints, TOTP 2FA, password reset flow, and LDAP configuration. The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright across all 7 frontend pages (62+ tests).
 
 ## What Works Right Now
 
@@ -27,17 +27,35 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Terminal heartbeat: `GET /api/terminal/heartbeat`
 - ✅ Admin audit log: `GET /api/admin/audit-log` (paginated, filterable by userId)
 - ✅ Admin system settings: `GET /api/admin/settings`, `PUT /api/admin/settings/{key}`
+- ✅ Per-user date/time format preferences with system-wide defaults
+- ✅ CORS: `allowedOriginPatterns` for proper localhost + credential handling
+- ✅ TOTP 2FA: setup, enable, disable, verification during login
+- ✅ Password reset: token-based flow with email notifications
+- ✅ LDAP/AD configuration: read/update via admin endpoints
+- ✅ Self-service profile update: `PUT /api/users/me`
+- ✅ Recursive subordinate listing: `GET /api/users/{id}/all-subordinates`
 
 ### Frontend (Fully Implemented)
 - ✅ Login page with validation and error handling
 - ✅ Auth context with auto-refresh and permission helpers
 - ✅ Protected routes with 403 handling
-- ✅ Navigation with role-based menu items
+- ✅ Navigation with role-based menu items and correct active state highlighting
 - ✅ Vacation page: balance card, request list, new-request form, monthly calendar
 - ✅ Vacation approval page: manager queue with approve/reject-with-reason modal
 - ✅ Dashboard: real data widgets (today hours, weekly hours, vacation balance, team status, compliance warnings)
 - ✅ Time Tracking page: full implementation (status, clock in/out/break, live timer, today's entries list, monthly timesheet, CSV export)
 - ✅ Admin page: 3-tab UI (User Management, Audit Log, System Settings) with full CRUD, search, modals
+- ✅ Date/calendar localization: `dateUtils.ts` utility with `formatDate`, `formatTime`, `formatDateTime`, `formatMonthYear` using date-fns locales; `DateFormatContext` for per-user date/time format preferences; all pages (Dashboard, TimeTracking, Vacation) use localized date formatting
+- ✅ User Settings page: display preferences (date/time format) and password change with confirmation
+- ✅ Password reset flow: request page and confirm page with token
+- ✅ TOTP 2FA support on login page (shown after TOTP-required error)
+- ✅ Admin UserModal: manager assignment dropdown, always-visible employee number
+- ✅ Admin ResetPasswordModal: confirm password field
+- ✅ Forgot password link on login page
+- ✅ Settings nav link in sidebar
+- ✅ Unit tests: 59 tests total (LoginPage, AuthContext, ProtectedRoute, AdminPage, dateUtils)
+- ✅ E2E tests: 62+ Playwright tests covering all 7 pages (login, navigation, dashboard, time-tracking, vacation, vacation-approval, admin)
+- ✅ CI: E2E testing with Playwright (Chromium) integrated into GitHub Actions workflow
 
 ### Mobile (Fully Implemented)
 - ✅ **Android**: real API integration with Retrofit + Moshi + Hilt; LoginScreen, DashboardScreen, TimeTrackingScreen (state-aware buttons), VacationScreen (balance + requests); 24 ViewModel unit tests
@@ -52,12 +70,12 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 
 ## Tech Debt / Known Issues
 - Backend test coverage targets (≥90%) not yet fully verified for all services
-- E2E Playwright tests need expansion (Phase 9)
 - Android: push notifications, biometric auth, offline caching — not yet implemented
 - iOS: push notifications, Face ID / Touch ID — not yet implemented
 
 ## Next Steps
-1. **Phase 9: Testing & Security Hardening** — E2E Playwright tests, penetration testing, OWASP ZAP scans, coverage enforcement
-2. **Phase 10: Documentation & Polish** — Playwright screenshots, full user docs, API reference
-3. Continue dependency updates (review and merge Dependabot PRs)
+1. **Phase 10 (continued)**: Frontend UI for TOTP setup, password reset page, LDAP admin page
+2. **Phase 10 (continued)**: Unit tests for TotpService, PasswordResetService, LdapService
+3. **Phase 11: Documentation & Polish** — Playwright screenshots, full user docs, API reference
+4. Continue dependency updates (review and merge Dependabot PRs)
 

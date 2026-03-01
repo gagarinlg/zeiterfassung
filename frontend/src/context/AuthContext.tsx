@@ -10,6 +10,7 @@ export interface AuthContextValue {
   login: (tokens: AuthTokens, user: User) => void
   logout: () => Promise<void>
   updateUser: (user: User) => void
+  refreshUser: () => Promise<void>
   hasPermission: (permission: string) => boolean
   hasRole: (role: string) => boolean
 }
@@ -121,6 +122,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('auth_user', JSON.stringify(updatedUser))
   }, [])
 
+  const refreshUser = useCallback(async () => {
+    try {
+      const freshUser = await authService.getCurrentUser()
+      setUser(freshUser)
+      localStorage.setItem('auth_user', JSON.stringify(freshUser))
+    } catch {
+      // Ignore refresh errors
+    }
+  }, [])
+
   const hasPermission = useCallback(
     (permission: string) => user?.permissions.includes(permission) ?? false,
     [user]
@@ -141,6 +152,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         logout,
         updateUser,
+        refreshUser,
         hasPermission,
         hasRole,
       }}

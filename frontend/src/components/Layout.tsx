@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
-import { Clock, Calendar, LayoutDashboard, Settings, LogOut, User, CheckCircle } from 'lucide-react'
+import { Clock, Calendar, LayoutDashboard, Settings, LogOut, User, CheckCircle, UserCog } from 'lucide-react'
 
 export default function Layout() {
   const { t } = useTranslation()
@@ -45,6 +45,7 @@ export default function Layout() {
           </NavLink>
           <NavLink
             to="/vacation"
+            end
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
@@ -88,6 +89,17 @@ export default function Layout() {
               {user?.firstName} {user?.lastName}
             </span>
           </div>
+          <NavLink
+            to="/settings"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+              }`
+            }
+          >
+            <UserCog size={18} />
+            {t('nav.settings')}
+          </NavLink>
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"

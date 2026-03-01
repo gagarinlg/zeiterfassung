@@ -39,6 +39,11 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config as typeof error.config & { _retry?: boolean }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // Don't intercept 401 for auth endpoints — expected for wrong credentials
+      const url = originalRequest.url as string | undefined
+      if (url && /\/auth\//.test(url)) {
+        return Promise.reject(error)
+      }
       if (isRefreshing) {
         return new Promise<string>((resolve, reject) => {
           failedQueue.push({ resolve, reject })

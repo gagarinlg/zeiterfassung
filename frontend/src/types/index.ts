@@ -10,6 +10,9 @@ export interface User {
   isActive: boolean
   roles: string[]
   permissions: string[]
+  dateFormat?: string
+  timeFormat?: string
+  totpEnabled?: boolean
 }
 
 export interface TimeEntry {
@@ -90,6 +93,7 @@ export interface AuthTokens {
 export interface LoginRequest {
   email: string
   password: string
+  totpCode?: string
 }
 
 export interface ApiError {

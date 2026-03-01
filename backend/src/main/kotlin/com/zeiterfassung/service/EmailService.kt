@@ -41,4 +41,21 @@ class EmailService(
             logger.error("Failed to send email to {}: {}", to, e.message)
         }
     }
+
+    /**
+     * Sends a test email synchronously and returns a result message.
+     * Unlike sendAsync, this throws on failure so the caller can report the error.
+     */
+    fun sendTestMail(to: String) {
+        val message = SimpleMailMessage()
+        message.from = fromAddress
+        message.setTo(to)
+        message.subject = "Zeiterfassung – E-Mail-Test"
+        message.text =
+            "Diese E-Mail bestätigt, dass die E-Mail-Konfiguration korrekt funktioniert.\n\n" +
+            "This email confirms that the email configuration is working correctly.\n\n" +
+            "— Zeiterfassung System"
+        mailSender.send(message)
+        logger.info("Test email sent successfully to {}", to)
+    }
 }

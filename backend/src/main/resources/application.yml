@@ -48,6 +48,9 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+  health:
+    mail:
+      enabled: false
 
 springdoc:
   api-docs:
@@ -66,7 +69,8 @@ app:
     admin-password: ${SEED_ADMIN_PASSWORD:Admin@123!}
   mail:
     from: ${MAIL_FROM:noreply@zeiterfassung.local}
-    enabled: ${MAIL_ENABLED:true}
+    enabled: ${MAIL_ENABLED:false}
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
 
 ---
 spring:

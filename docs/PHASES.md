@@ -1,7 +1,8 @@
 # Zeiterfassung — Project Phases & Roadmap
 
-> **Last updated:** 2026-03-01
-> **Current phase:** Phase 9 (Testing & Security Hardening) — NEXT UP
+> Last updated: 2026-03-01
+>
+> **Current phase:** Phase 10 (Security Features & LDAP Integration) — IN PROGRESS
 
 ---
 
@@ -373,23 +374,117 @@
 
 ---
 
-## Phase 9: Testing & Security Hardening 🔲
-- **Status**: PLANNED
+## Phase 9: Testing & Security Hardening ✅
+- **Status**: COMPLETE
 - **Priority**: HIGH
 
-### What needs to be built
-- **Backend unit tests**: ≥90% coverage for all services and controllers
-- **Frontend unit tests**: ≥85% coverage with Vitest
-- **E2E tests**: comprehensive Playwright test suite with screenshots for docs
+### What has been delivered
+
+#### Playwright E2E Test Suite (7 spec files, 62+ tests)
+- **`e2e/tests/helpers.ts`**: shared mock data (user, tokens, tracking status, summaries, vacation balance) and reusable mock setup functions (`mockAuthenticatedUser`, `mockDashboardApis`, `mockTimeTrackingApis`); mock API paths corrected to match actual frontend service paths (`/api/time/` not `/api/time-tracking/`)
+- **`e2e/tests/login.spec.ts`**: 12 tests — form rendering, language toggle, redirect from all protected routes, Zod client-side validation (empty fields, invalid email, empty password), successful login with mocked API, failed login (401/423/429 error messages)
+- **`e2e/tests/navigation.spec.ts`**: 6 tests — sidebar links for admin user, route navigation to time tracking and vacation, protected route redirect, logout flow
+- **`e2e/tests/dashboard.spec.ts`**: 8 tests — page rendering with title and user name, today's hours / weekly hours / vacation balance / team present widgets, clocked-in status banner, weekly summary values, error handling
+- **`e2e/tests/time-tracking.spec.ts`**: 14 tests — clocked-out/clocked-in/on-break states with correct buttons, status badges, today summary, no-entries message, monthly timesheet table (heading, column headers, daily entries, total row, compliance badges, CSV export button), error handling
+- **`e2e/tests/vacation.spec.ts`**: 8 tests — page rendering with title, balance card, tab navigation, requests table with status badges, new request form, calendar navigation, error handling
+- **`e2e/tests/vacation-approval.spec.ts`**: 6 tests — page title, pending requests table with employee names, approve/reject buttons, reject modal with reason textarea, empty state message, error handling
+- **`e2e/tests/admin.spec.ts`**: 8 tests — page title, tab navigation, user list display, create user button/modal, audit log entries, system settings display with edit buttons, error handling
+- **`e2e/tsconfig.json`**: TypeScript config for E2E tests
+- **`playwright.config.ts`**: updated to always capture screenshots (`screenshot: 'on'`)
+
+#### Backend Integration Tests
+- **`AuthControllerIntegrationTest`**: 10 `@SpringBootTest` integration tests — CORS preflight allowed/blocked, credentials header, login success/failure/validation, protected endpoint auth, security headers (HSTS, X-Frame-Options, X-Content-Type-Options)
+
+#### Frontend Unit Tests
+- **`dateUtils.test.ts`**: 18 tests covering `formatDate` (DD.MM.YYYY, YYYY-MM-DD, MM/DD/YYYY, empty, invalid, ISO timestamp, locale default), `formatTime` (24h, 12h, empty), `formatDateTime` (combined, empty), `formatMonthYear` (German, English), `getFirstDayOfWeek` (German=1, English=0)
+
+#### CI/CD
+- **`frontend-e2e` job** added to `.github/workflows/ci.yml` — installs Playwright + Chromium, runs E2E tests, uploads test results and screenshots as artifacts
+- **`build` job** now depends on `frontend-e2e` in addition to all other lint/test jobs
+
+#### Bug Fixes
+- **CORS**: Changed `allowedOrigins` → `allowedOriginPatterns` in `SecurityConfig.kt` to fix localhost login
+- **V7 migration**: Fixed column names from `setting_key`/`setting_value` to `key`/`value` matching V5 schema
+- **NavLink active state**: Added `end` prop to `/vacation` NavLink to prevent highlighting when on `/vacation/approvals`
+- **ktlint**: Auto-formatted `AuthControllerIntegrationTest.kt` to pass CI
+
+#### Documentation
+- **`docs/installation/README.md`**: comprehensive installation guide covering Docker deployment, development setup, production deployment, Raspberry Pi terminal setup, mobile apps, configuration reference, and troubleshooting
+
+### What could be expanded in future
+- **Backend unit tests**: expand to ≥90% coverage for all services and controllers
+- **Frontend unit tests**: expand to ≥85% coverage with Vitest
 - **Penetration testing**: OWASP ZAP automated scans, manual testing checklist
-- **Security headers**: verify CSP, HSTS, X-Frame-Options, X-Content-Type-Options
-- **Input validation**: comprehensive server-side validation on all endpoints
 - **Rate limiting**: implement on all sensitive endpoints
 - **Dependency audit**: verify all dependencies are up-to-date and secure
 
 ---
 
-## Phase 10: Documentation & Polish 🔲
+## Phase 10: Security Features & LDAP Integration 🚧
+- **Status**: IN PROGRESS
+- **Priority**: HIGH
+
+### What has been delivered
+- **V8 Flyway migration**: TOTP columns, password_reset_tokens table, LDAP system settings
+- **TotpService**: RFC 6238 TOTP generation and verification with base32 encoding
+- **PasswordResetService**: email-based password reset with token hashing and expiration
+- **LdapService**: LDAP/AD configuration management via system_settings
+- **Self-service profile update**: users can update their own preferences
+- **Recursive subordinate listing**: hierarchical manager rights
+- **Auth enhancements**: TOTP verification during login, password confirmation validation
+- **New DTOs**: TOTP, password reset, LDAP configuration
+- **SecurityConfig**: public password reset endpoints
+
+### Key files
+- `backend/src/main/resources/db/migration/V8__add_totp_and_password_reset.sql`
+- `backend/src/main/kotlin/com/zeiterfassung/model/entity/PasswordResetTokenEntity.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/repository/PasswordResetTokenRepository.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/TotpService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/PasswordResetService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/LdapService.kt`
+
+### Key API endpoints
+- POST /api/auth/totp/setup, /totp/enable, /totp/disable
+- POST /api/auth/password/reset-request, /password/reset-confirm
+- PUT /api/users/me
+- GET /api/users/{id}/all-subordinates
+- GET /api/admin/ldap, PUT /api/admin/ldap
+
+### What still needs to be built
+- Frontend UI for TOTP setup/disable (toggle in UserSettingsPage)
+- Frontend LDAP configuration page in admin panel
+- Unit tests for TotpService, PasswordResetService, LdapService
+
+### Frontend delivered (Phase 10)
+- UserSettingsPage: display preferences (date/time format) and password change with confirmation
+- Password reset flow: PasswordResetRequestPage + PasswordResetConfirmPage
+- Login TOTP code support: shown on 401 with TOTP-required error
+- Admin UserModal: manager dropdown (filtered to MANAGER/ADMIN roles), always-visible employee number
+- Admin ResetPasswordModal: confirm password field with mismatch validation
+- AuthContext: refreshUser method for re-fetching user after profile update
+- Layout: Settings nav link with UserCog icon
+- Routes: /settings, /forgot-password, /reset-password
+- i18n: all new keys for auth, nav, settings, users (DE + EN)
+
+### Key frontend files
+- `frontend/src/pages/UserSettingsPage.tsx` — user preferences and password change
+- `frontend/src/pages/PasswordResetRequestPage.tsx` — request password reset email
+- `frontend/src/pages/PasswordResetConfirmPage.tsx` — confirm password reset with token
+- `frontend/src/pages/LoginPage.tsx` — TOTP code field, forgot password link
+- `frontend/src/pages/AdminPage.tsx` — manager dropdown, employee number, confirm password
+- `frontend/src/services/adminService.ts` — LDAP config, updateOwnProfile, changeOwnPassword
+- `frontend/src/services/authService.ts` — TOTP and password reset methods
+- `frontend/src/context/AuthContext.tsx` — refreshUser method
+- `frontend/src/components/Layout.tsx` — Settings nav link
+- `frontend/src/App.tsx` — new routes
+
+### Depends on
+- Phase 2 (auth/users) ✅
+- Phase 8 (admin panel) ✅
+
+---
+
+## Phase 11: Documentation & Polish 🔲
 - **Status**: PLANNED
 - **Priority**: MEDIUM
 
@@ -397,7 +492,7 @@
 - **User documentation**: with Playwright screenshots
 - **Admin documentation**: configuration guide
 - **API documentation**: complete OpenAPI/Swagger annotations
-- **Installation guide**: complete with all scenarios
+- **Installation guide**: complete with Docker, development, production, terminal, and mobile setup
 - **Architecture decision records**: document key technical decisions
 - **Performance optimization**: database indexing, query optimization, caching
 - **Accessibility**: WCAG 2.1 AA compliance
