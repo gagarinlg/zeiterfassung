@@ -8,9 +8,9 @@ class TimeTrackingViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var actionError: String?
 
-    private let timeService: TimeService
+    private let timeService: TimeServiceProtocol
 
-    init(timeService: TimeService = TimeService()) {
+    init(timeService: TimeServiceProtocol = TimeService()) {
         self.timeService = timeService
     }
 

@@ -1,6 +1,6 @@
 import Foundation
 
-class TimeService {
+class TimeService: TimeServiceProtocol {
     private let client: APIClient
 
     init(client: APIClient = .shared) {

@@ -7,9 +7,9 @@ class VacationViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
-    private let vacationService: VacationService
+    private let vacationService: VacationServiceProtocol
 
-    init(vacationService: VacationService = VacationService()) {
+    init(vacationService: VacationServiceProtocol = VacationService()) {
         self.vacationService = vacationService
     }
 
@@ -26,7 +26,7 @@ class VacationViewModel: ObservableObject {
         }
 
         do {
-            let page = try await vacationService.getRequests(userId: userId)
+            let page = try await vacationService.getRequests(userId: userId, page: 0, size: 20)
             requests = page.content
         } catch {
             // Non-fatal: leave requests empty

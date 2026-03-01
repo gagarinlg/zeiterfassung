@@ -8,9 +8,9 @@ class AuthViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var currentUserId: String?
 
-    private let authService: AuthService
+    private let authService: AuthServiceProtocol
 
-    init(authService: AuthService = AuthService()) {
+    init(authService: AuthServiceProtocol = AuthService()) {
         self.authService = authService
         checkStoredSession()
     }

@@ -8,10 +8,10 @@ class DashboardViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
-    private let timeService: TimeService
-    private let vacationService: VacationService
+    private let timeService: TimeServiceProtocol
+    private let vacationService: VacationServiceProtocol
 
-    init(timeService: TimeService = TimeService(), vacationService: VacationService = VacationService()) {
+    init(timeService: TimeServiceProtocol = TimeService(), vacationService: VacationServiceProtocol = VacationService()) {
         self.timeService = timeService
         self.vacationService = vacationService
     }

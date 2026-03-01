@@ -1,6 +1,6 @@
 import Foundation
 
-class AuthService {
+class AuthService: AuthServiceProtocol {
     private let client: APIClient
 
     init(client: APIClient = .shared) {

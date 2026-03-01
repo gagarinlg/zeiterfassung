@@ -1,6 +1,6 @@
 import Foundation
 
-class VacationService {
+class VacationService: VacationServiceProtocol {
     private let client: APIClient
 
     init(client: APIClient = .shared) {
