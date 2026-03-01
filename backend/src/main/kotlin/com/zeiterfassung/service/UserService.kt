@@ -110,6 +110,17 @@ class UserService(
                     .orElseThrow { ResourceNotFoundException("Manager not found: $managerIdStr") }
             user.manager = manager
         }
+        request.substituteId?.let { substituteIdStr ->
+            if (substituteIdStr.isBlank()) {
+                user.substitute = null
+            } else {
+                val substitute =
+                    userRepository
+                        .findById(UUID.fromString(substituteIdStr))
+                        .orElseThrow { ResourceNotFoundException("Substitute not found: $substituteIdStr") }
+                user.substitute = substitute
+            }
+        }
 
         val saved = userRepository.save(user)
         auditService.logDataChange(actorId, "USER_UPDATED", "User", saved.id, oldResponse, saved.toUserResponse())
@@ -209,6 +220,37 @@ class UserService(
 
     fun getTeamMembers(id: UUID): List<UserResponse> = userRepository.findByManagerId(id).map { it.toUserResponse() }
 
+    /**
+     * Returns the effective subordinate IDs for a user, including subordinates
+     * of any managers who designated this user as their substitute.
+     */
+    fun getEffectiveSubordinateIds(user: UserEntity): Set<UUID> {
+        val ids = mutableSetOf<UUID>()
+        // Direct subordinates
+        user.subordinates.forEach { ids.add(it.id) }
+        // Subordinates of managers who designated this user as substitute
+        val managersWithSubstitute = userRepository.findBySubstituteId(user.id)
+        for (manager in managersWithSubstitute) {
+            manager.subordinates.forEach { ids.add(it.id) }
+        }
+        return ids
+    }
+
+    /**
+     * Checks if the given user has access to the target user as a subordinate,
+     * either directly or via substitute delegation.
+     */
+    fun isSubordinateOrSubstitute(
+        actor: UserEntity,
+        targetUserId: UUID,
+    ): Boolean {
+        if (actor.subordinates.any { it.id == targetUserId }) return true
+        val managersWithSubstitute = userRepository.findBySubstituteId(actor.id)
+        return managersWithSubstitute.any { manager ->
+            manager.subordinates.any { it.id == targetUserId }
+        }
+    }
+
     @Transactional
     fun updateOwnProfile(
         userId: UUID,
@@ -269,6 +311,7 @@ class UserService(
             phone = this.phone,
             photoUrl = this.photoUrl,
             managerId = this.manager?.id?.toString(),
+            substituteId = this.substitute?.id?.toString(),
             isActive = this.isActive,
             roles = roles,
             permissions = permissions,

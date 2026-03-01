@@ -220,7 +220,30 @@
       "save_failed": "Änderungen konnten nicht gespeichert werden",
       "delete_failed": "Löschen fehlgeschlagen"
     },
-    "users_tab": "Benutzerverwaltung"
+    "users_tab": "Benutzerverwaltung",
+    "ldap_tab": "LDAP",
+    "ldap": {
+      "title": "LDAP / Active Directory Konfiguration",
+      "enabled": "LDAP aktiviert",
+      "url": "LDAP-URL",
+      "base_dn": "Basis-DN",
+      "user_search_base": "Benutzer-Suchbasis",
+      "user_search_filter": "Benutzer-Suchfilter",
+      "group_search_base": "Gruppen-Suchbasis",
+      "group_search_filter": "Gruppen-Suchfilter",
+      "manager_dn": "Manager-DN",
+      "manager_password": "Manager-Passwort",
+      "ad_mode": "Active Directory Modus",
+      "ad_domain": "Active Directory Domäne",
+      "role_mapping": "Rollenzuordnung (JSON)",
+      "email_attribute": "E-Mail-Attribut",
+      "first_name_attribute": "Vorname-Attribut",
+      "last_name_attribute": "Nachname-Attribut",
+      "employee_number_attribute": "Personalnummer-Attribut",
+      "save_success": "LDAP-Konfiguration gespeichert",
+      "save_error": "LDAP-Konfiguration konnte nicht gespeichert werden",
+      "load_error": "LDAP-Konfiguration konnte nicht geladen werden"
+    }
   },
   "common": {
     "save": "Speichern",
@@ -274,6 +297,7 @@
     "roles": "Rollen",
     "rfid_tag": "RFID-Tag",
     "manager": "Vorgesetzter",
+    "substitute": "Stellvertreter",
     "team": "Team",
     "active": "Aktiv",
     "inactive": "Inaktiv",
@@ -301,6 +325,17 @@
     "confirm_password": "Passwort bestätigen",
     "passwords_no_match": "Die Passwörter stimmen nicht überein",
     "password_changed": "Passwort erfolgreich geändert",
-    "password_change_failed": "Passwort konnte nicht geändert werden"
+    "password_change_failed": "Passwort konnte nicht geändert werden",
+    "totp_title": "Zwei-Faktor-Authentifizierung",
+    "totp_enabled": "Zwei-Faktor-Authentifizierung ist aktiviert.",
+    "totp_disabled": "Zwei-Faktor-Authentifizierung ist nicht aktiviert.",
+    "totp_setup": "2FA einrichten",
+    "totp_disable": "2FA deaktivieren",
+    "totp_setup_instructions": "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App und geben Sie den Bestätigungscode unten ein.",
+    "totp_verify_code": "Bestätigungscode",
+    "totp_secret_label": "Manueller Eingabeschlüssel",
+    "totp_enabled_success": "Zwei-Faktor-Authentifizierung erfolgreich aktiviert",
+    "totp_disabled_success": "Zwei-Faktor-Authentifizierung deaktiviert",
+    "totp_error": "Zwei-Faktor-Authentifizierung konnte nicht aktualisiert werden"
   }
 }

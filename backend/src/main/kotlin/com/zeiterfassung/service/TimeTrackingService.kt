@@ -323,7 +323,14 @@ class TimeTrackingService(
                 .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
         val isAdmin = manager.roles.flatMap { it.permissions }.any { it.name == "admin.users.manage" }
         if (!isAdmin && manager.subordinates.none { it.id == userId }) {
-            throw com.zeiterfassung.exception.ForbiddenException("Access denied: user $userId is not your subordinate")
+            // Check if user is a substitute for a manager who has this subordinate
+            val isSubstitute =
+                userRepository.findBySubstituteId(managerId).any { m ->
+                    m.subordinates.any { it.id == userId }
+                }
+            if (!isSubstitute) {
+                throw com.zeiterfassung.exception.ForbiddenException("Access denied: user $userId is not your subordinate")
+            }
         }
         return getEntriesForUser(userId, start, end)
     }
@@ -417,7 +424,13 @@ class TimeTrackingService(
             userRepository
                 .findById(managerId)
                 .orElseThrow { ResourceNotFoundException("Manager not found: $managerId") }
-        return manager.subordinates.associate { it.id to getCurrentStatus(it.id) }
+        val allSubordinateIds = mutableSetOf<UUID>()
+        manager.subordinates.forEach { allSubordinateIds.add(it.id) }
+        // Include subordinates from managers who designated this user as substitute
+        userRepository.findBySubstituteId(managerId).forEach { m ->
+            m.subordinates.forEach { allSubordinateIds.add(it.id) }
+        }
+        return allSubordinateIds.associateWith { getCurrentStatus(it) }
     }
 
     /**
@@ -479,15 +492,30 @@ class TimeTrackingService(
         var shortBreakMinutes = 0L
         var clockInTime: Instant? = null
         var breakStartTime: Instant? = null
+        var lastClockOutTime: Instant? = null
 
         for (entry in entries) {
             when (entry.entryType) {
-                TimeEntryType.CLOCK_IN -> clockInTime = entry.timestamp
+                TimeEntryType.CLOCK_IN -> {
+                    // When clocking in again after a previous clock-out on the same day,
+                    // the gap is treated as a break if it is >= 15 minutes.
+                    if (lastClockOutTime != null) {
+                        val gapMinutes = ChronoUnit.MINUTES.between(lastClockOutTime, entry.timestamp)
+                        if (gapMinutes >= minQualifyingBreak) {
+                            qualifyingBreakMinutes += gapMinutes
+                        } else if (gapMinutes > 0) {
+                            shortBreakMinutes += gapMinutes
+                        }
+                        lastClockOutTime = null
+                    }
+                    clockInTime = entry.timestamp
+                }
                 TimeEntryType.CLOCK_OUT -> {
                     if (clockInTime != null) {
                         rawWorkMinutes += ChronoUnit.MINUTES.between(clockInTime, entry.timestamp)
                         clockInTime = null
                     }
+                    lastClockOutTime = entry.timestamp
                 }
                 TimeEntryType.BREAK_START -> breakStartTime = entry.timestamp
                 TimeEntryType.BREAK_END -> {

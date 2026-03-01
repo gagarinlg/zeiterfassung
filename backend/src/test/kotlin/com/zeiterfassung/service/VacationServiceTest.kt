@@ -388,6 +388,100 @@ class VacationServiceTest {
         assertThat(resultHE).hasSize(1) // federal only
     }
 
+    // ---- setBalance ----
+
+    @Test
+    fun `setBalance should update total days`() {
+        val actorId = UUID.randomUUID()
+        val balance = balanceWith(totalDays = 30, usedDays = 5, carriedOverDays = 0)
+
+        `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2026)).thenReturn(balance)
+        `when`(vacationBalanceRepository.save(any())).thenAnswer { it.arguments[0] as VacationBalanceEntity }
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: userId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
+
+        val result = service.setBalance(userId, 2026, BigDecimal("25"), null, null, actorId)
+
+        assertThat(result.totalDays).isEqualByComparingTo(BigDecimal("25"))
+        assertThat(result.usedDays).isEqualByComparingTo(BigDecimal("5"))
+    }
+
+    @Test
+    fun `setBalance should update carried over days`() {
+        val actorId = UUID.randomUUID()
+        val balance = balanceWith(totalDays = 30, usedDays = 0, carriedOverDays = 0)
+
+        `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2026)).thenReturn(balance)
+        `when`(vacationBalanceRepository.save(any())).thenAnswer { it.arguments[0] as VacationBalanceEntity }
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: userId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
+
+        val result = service.setBalance(userId, 2026, null, null, BigDecimal("5"), actorId)
+
+        assertThat(result.carriedOverDays).isEqualByComparingTo(BigDecimal("5"))
+    }
+
+    // ---- triggerCarryOver ----
+
+    @Test
+    fun `triggerCarryOver should carry over remaining days from previous year`() {
+        val actorId = UUID.randomUUID()
+        val prevBalance = balanceWith(totalDays = 30, usedDays = 20, carriedOverDays = 0)
+        val curBalance = balanceWith(totalDays = 30, usedDays = 0, carriedOverDays = 0)
+
+        `when`(employeeConfigRepository.findByUserId(userId)).thenReturn(configWith(vacationDaysPerYear = 30))
+        `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2025)).thenReturn(prevBalance)
+        `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2026)).thenReturn(curBalance)
+        `when`(vacationBalanceRepository.save(any())).thenAnswer { it.arguments[0] as VacationBalanceEntity }
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: userId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
+
+        val result = service.triggerCarryOver(userId, 2026, actorId)
+
+        // Previous year: 30 - 20 = 10 remaining, max carry-over = 10 → should carry over 10
+        assertThat(result.carriedOverDays).isEqualByComparingTo(BigDecimal("10"))
+    }
+
+    @Test
+    fun `triggerCarryOver should cap at max carry over`() {
+        val actorId = UUID.randomUUID()
+        val prevBalance = balanceWith(totalDays = 30, usedDays = 0, carriedOverDays = 5)
+        val curBalance = balanceWith(totalDays = 30, usedDays = 0, carriedOverDays = 0)
+        val config = configWith(vacationDaysPerYear = 30, vacationCarryOverMax = 10)
+
+        `when`(employeeConfigRepository.findByUserId(userId)).thenReturn(config)
+        `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2025)).thenReturn(prevBalance)
+        `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2026)).thenReturn(curBalance)
+        `when`(vacationBalanceRepository.save(any())).thenAnswer { it.arguments[0] as VacationBalanceEntity }
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: userId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
+
+        val result = service.triggerCarryOver(userId, 2026, actorId)
+
+        // Previous year: 30 + 5 - 0 = 35 remaining but cap is 10
+        assertThat(result.carriedOverDays).isEqualByComparingTo(BigDecimal("10"))
+    }
+
     // ---- helpers ----
 
     private fun balanceWith(

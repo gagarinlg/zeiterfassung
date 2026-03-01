@@ -20,6 +20,8 @@ interface UserRepository : JpaRepository<UserEntity, UUID> {
 
     fun findByManagerId(managerId: UUID): List<UserEntity>
 
+    fun findBySubstituteId(substituteId: UUID): List<UserEntity>
+
     fun existsByEmail(email: String): Boolean
 
     fun existsByEmailAndIdNot(

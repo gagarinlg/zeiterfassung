@@ -26,6 +26,7 @@ data class UpdateUserRequest(
     val lastName: String? = null,
     val phone: String? = null,
     val managerId: String? = null,
+    val substituteId: String? = null,
     val isActive: Boolean? = null,
     val dateFormat: String? = null,
     val timeFormat: String? = null,

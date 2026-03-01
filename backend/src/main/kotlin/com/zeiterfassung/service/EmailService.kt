@@ -45,8 +45,14 @@ class EmailService(
     /**
      * Sends a test email synchronously and returns a result message.
      * Unlike sendAsync, this throws on failure so the caller can report the error.
+     * Checks mailEnabled first to avoid connection attempts when mail is disabled.
      */
     fun sendTestMail(to: String) {
+        if (!mailEnabled) {
+            throw IllegalStateException(
+                "Mail sending is disabled. Set MAIL_ENABLED=true and configure SMTP settings to enable email.",
+            )
+        }
         val message = SimpleMailMessage()
         message.from = fromAddress
         message.setTo(to)

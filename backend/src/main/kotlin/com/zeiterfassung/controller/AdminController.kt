@@ -79,6 +79,8 @@ class AdminController(
         try {
             emailService.sendTestMail(request.recipientEmail)
             ResponseEntity.ok(mapOf("status" to "ok", "message" to "Test email sent successfully"))
+        } catch (e: IllegalStateException) {
+            ResponseEntity.badRequest().body(mapOf("status" to "error", "message" to (e.message ?: "Mail is not configured")))
         } catch (e: Exception) {
             ResponseEntity.status(500).body(mapOf("status" to "error", "message" to (e.message ?: "Unknown error")))
         }

@@ -37,6 +37,7 @@ export interface UpdateUserPayload {
   lastName?: string
   phone?: string
   managerId?: string
+  substituteId?: string
   isActive?: boolean
   dateFormat?: string
   timeFormat?: string

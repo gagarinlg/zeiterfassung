@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, ClipboardList, Settings, Plus, Edit, Trash2, Key, Wifi, Mail } from 'lucide-react'
+import { Users, ClipboardList, Settings, Plus, Edit, Trash2, Key, Wifi, Mail, FolderTree } from 'lucide-react'
 import adminService from '../services/adminService'
 import type { AuditLogEntry, SystemSetting, CreateUserPayload, UpdateUserPayload } from '../services/adminService'
 import type { User } from '../types'
 
-type Tab = 'users' | 'audit' | 'settings'
+type Tab = 'users' | 'audit' | 'settings' | 'ldap'
 
 const AVAILABLE_ROLES = ['EMPLOYEE', 'MANAGER', 'ADMIN', 'SUPER_ADMIN']
 
@@ -70,6 +70,7 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
     roles: user?.roles ?? ['EMPLOYEE'],
     isActive: user?.isActive ?? true,
     managerId: user?.managerId ?? '',
+    substituteId: user?.substituteId ?? '',
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -102,6 +103,7 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
           phone: form.phone || undefined,
           isActive: form.isActive,
           managerId: form.managerId || undefined,
+          substituteId: form.substituteId || undefined,
           employeeNumber: form.employeeNumber || undefined,
         }
         await adminService.updateUser(user.id, payload)
@@ -217,7 +219,20 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">{t('users.roles')}</label>
+              <label htmlFor="modal-substitute" className="block text-sm font-medium text-gray-700 mb-1">{t('users.substitute')}</label>
+              <select
+                id="modal-substitute"
+                className="w-full border rounded-lg px-3 py-2 text-sm"
+                value={form.substituteId}
+                onChange={(e) => setForm((p) => ({ ...p, substituteId: e.target.value }))}
+              >
+                <option value="">—</option>
+                {allUsers.filter((u) => u.id !== user?.id && (u.roles.includes('MANAGER') || u.roles.includes('ADMIN') || u.roles.includes('SUPER_ADMIN'))).map((u) => (
+                  <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
+                ))}
+              </select>
+            </div>
+            <div>
               <div className="flex flex-wrap gap-2">
                 {AVAILABLE_ROLES.map((role) => (
                   <label key={role} className="flex items-center gap-1.5 text-sm cursor-pointer">
@@ -731,7 +746,15 @@ function SettingsTab() {
       const result = await adminService.sendTestMail(testMailEmail)
       setTestMailResult({ status: 'ok', message: result.message })
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t('admin.errors.save_failed')
+      let msg = t('admin.errors.save_failed')
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response?: { data?: { message?: string } } }
+        if (axiosErr.response?.data?.message) {
+          msg = axiosErr.response.data.message
+        }
+      } else if (err instanceof Error) {
+        msg = err.message
+      }
       setTestMailResult({ status: 'error', message: msg })
     } finally {
       setTestMailSending(false)
@@ -839,6 +862,168 @@ function SettingsTab() {
   )
 }
 
+interface LdapConfig {
+  enabled: boolean
+  url: string
+  baseDn: string
+  userSearchBase: string
+  userSearchFilter: string
+  groupSearchBase: string
+  groupSearchFilter: string
+  managerDn: string
+  managerPassword: string
+  activeDirectoryMode: boolean
+  activeDirectoryDomain: string
+  roleMapping: string
+  emailAttribute: string
+  firstNameAttribute: string
+  lastNameAttribute: string
+  employeeNumberAttribute: string
+}
+
+const EMPTY_LDAP_CONFIG: LdapConfig = {
+  enabled: false,
+  url: '',
+  baseDn: '',
+  userSearchBase: '',
+  userSearchFilter: '',
+  groupSearchBase: '',
+  groupSearchFilter: '',
+  managerDn: '',
+  managerPassword: '',
+  activeDirectoryMode: false,
+  activeDirectoryDomain: '',
+  roleMapping: '',
+  emailAttribute: '',
+  firstNameAttribute: '',
+  lastNameAttribute: '',
+  employeeNumberAttribute: '',
+}
+
+function LdapTab() {
+  const { t } = useTranslation()
+  const [config, setConfig] = useState<LdapConfig>(EMPTY_LDAP_CONFIG)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await adminService.getLdapConfig()
+        setConfig({ ...EMPTY_LDAP_CONFIG, ...data })
+      } catch {
+        setError(t('admin.ldap.load_error'))
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [t])
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaving(true)
+    setError(null)
+    setSuccess(null)
+    try {
+      await adminService.updateLdapConfig(config as unknown as Record<string, unknown>)
+      setSuccess(t('admin.ldap.save_success'))
+    } catch {
+      setError(t('admin.ldap.save_error'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const updateField = (field: keyof LdapConfig, value: string | boolean) => {
+    setConfig((prev) => ({ ...prev, [field]: value }))
+  }
+
+  if (loading) return <LoadingSpinner />
+
+  const textFields: { key: keyof LdapConfig; label: string; type?: string }[] = [
+    { key: 'url', label: t('admin.ldap.url') },
+    { key: 'baseDn', label: t('admin.ldap.base_dn') },
+    { key: 'userSearchBase', label: t('admin.ldap.user_search_base') },
+    { key: 'userSearchFilter', label: t('admin.ldap.user_search_filter') },
+    { key: 'groupSearchBase', label: t('admin.ldap.group_search_base') },
+    { key: 'groupSearchFilter', label: t('admin.ldap.group_search_filter') },
+    { key: 'managerDn', label: t('admin.ldap.manager_dn') },
+    { key: 'managerPassword', label: t('admin.ldap.manager_password'), type: 'password' },
+    { key: 'activeDirectoryDomain', label: t('admin.ldap.ad_domain') },
+    { key: 'roleMapping', label: t('admin.ldap.role_mapping') },
+    { key: 'emailAttribute', label: t('admin.ldap.email_attribute') },
+    { key: 'firstNameAttribute', label: t('admin.ldap.first_name_attribute') },
+    { key: 'lastNameAttribute', label: t('admin.ldap.last_name_attribute') },
+    { key: 'employeeNumberAttribute', label: t('admin.ldap.employee_number_attribute') },
+  ]
+
+  return (
+    <div className="bg-white rounded-xl border p-6">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('admin.ldap.title')}</h2>
+      <form onSubmit={handleSave} className="space-y-4">
+        <div className="flex items-center gap-2">
+          <input
+            id="ldapEnabled"
+            type="checkbox"
+            checked={config.enabled}
+            onChange={(e) => updateField('enabled', e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <label htmlFor="ldapEnabled" className="text-sm font-medium text-gray-700">
+            {t('admin.ldap.enabled')}
+          </label>
+        </div>
+
+        {textFields.map(({ key, label, type }) => (
+          <div key={key}>
+            <label htmlFor={`ldap-${key}`} className="block text-sm font-medium text-gray-700 mb-1">
+              {label}
+            </label>
+            <input
+              id={`ldap-${key}`}
+              type={type || 'text'}
+              value={config[key] as string}
+              onChange={(e) => updateField(key, e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 text-sm"
+            />
+          </div>
+        ))}
+
+        <div className="flex items-center gap-2">
+          <input
+            id="ldapAdMode"
+            type="checkbox"
+            checked={config.activeDirectoryMode}
+            onChange={(e) => updateField('activeDirectoryMode', e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          <label htmlFor="ldapAdMode" className="text-sm font-medium text-gray-700">
+            {t('admin.ldap.ad_mode')}
+          </label>
+        </div>
+
+        {error && <ErrorBanner message={error} />}
+        {success && (
+          <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+            {success}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+        >
+          {saving ? t('common.loading') : t('common.save')}
+        </button>
+      </form>
+    </div>
+  )
+}
+
 export default function AdminPage() {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<Tab>('users')
@@ -854,11 +1039,13 @@ export default function AdminPage() {
         <TabButton active={activeTab === 'users'} onClick={() => setActiveTab('users')} icon={Users} label={t('admin.users_tab')} />
         <TabButton active={activeTab === 'audit'} onClick={() => setActiveTab('audit')} icon={ClipboardList} label={t('admin.audit_log')} />
         <TabButton active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} icon={Settings} label={t('admin.settings_tab')} />
+        <TabButton active={activeTab === 'ldap'} onClick={() => setActiveTab('ldap')} icon={FolderTree} label={t('admin.ldap_tab')} />
       </div>
 
       {activeTab === 'users' && <UsersTab />}
       {activeTab === 'audit' && <AuditLogTab />}
       {activeTab === 'settings' && <SettingsTab />}
+      {activeTab === 'ldap' && <LdapTab />}
     </div>
   )
 }

@@ -33,6 +33,7 @@ data class UserResponse(
     val phone: String?,
     val photoUrl: String?,
     val managerId: String?,
+    val substituteId: String?,
     val isActive: Boolean,
     val roles: List<String>,
     val permissions: List<String>,

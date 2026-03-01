@@ -191,6 +191,7 @@ class AuthService(
             phone = this.phone,
             photoUrl = this.photoUrl,
             managerId = this.manager?.id?.toString(),
+            substituteId = this.substitute?.id?.toString(),
             isActive = this.isActive,
             roles = roles,
             permissions = permissions,
