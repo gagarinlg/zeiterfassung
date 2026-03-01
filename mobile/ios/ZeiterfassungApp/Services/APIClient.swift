@@ -30,8 +30,7 @@ class APIClient {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if let token = UserDefaults.standard.string(forKey: "access_token") {
-            // TODO: Replace UserDefaults with iOS Keychain for secure token storage
+        if let token = KeychainHelper.read(forKey: "access_token") {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         if let body = body {
@@ -51,3 +50,4 @@ class APIClient {
         return try JSONDecoder().decode(T.self, from: data)
     }
 }
+

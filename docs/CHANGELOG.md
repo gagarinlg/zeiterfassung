@@ -6,8 +6,58 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Planned
-- Phase 7: Mobile Apps Full Implementation
-- Phase 8: Admin Panel & Settings UI
+- Phase 9: Testing & Security Hardening
+- Phase 10: Documentation & Polish
+
+## [Phase 7+8 - Mobile Apps + Admin Panel] - 2026-03-01
+
+### Added (Phase 8 — Admin Panel)
+
+**Backend**
+- `SystemSettingEntity` + `SystemSettingRepository`: JPA key-value store for system settings
+- `AdminService`: paginated audit log retrieval (filter by userId), system settings CRUD
+- `AdminController` (`/api/admin`): `GET /audit-log`, `GET /settings`, `PUT /settings/{key}` — all `@PreAuthorize("hasRole('ADMIN')")`
+- `AdminDtos.kt`: `AuditLogResponse`, `SystemSettingResponse`, `UpdateSystemSettingRequest`
+- `AdminServiceTest`: 9 unit tests
+
+**Frontend**
+- `adminService.ts`: typed API client for user management, audit log, and settings endpoints
+- `AdminPage.tsx`: full 3-tab admin panel (User Management, Audit Log, System Settings)
+  - User Management: paginated table with client-side search, create/edit/deactivate/delete modals, role assignment, RFID management, password reset
+  - Audit Log: paginated table with action, user, entity, IP address, timestamp
+  - System Settings: inline-editable key-value table
+- All form inputs have `htmlFor`/`id` pairs for accessibility
+- i18n keys `admin.users_tab`, `admin.audit.*`, `admin.settings.*`, `admin.errors.*` in EN + DE
+- `AdminPage.test.tsx`: 25 frontend tests
+
+### Added (Phase 7 — Android)
+- `Models.kt`: User, LoginResponse, TrackingStatusResponse, VacationBalance, VacationRequest, PageResponse
+- Retrofit `ZeiterfassungApi` with all required endpoints
+- `AuthPreferences` (DataStore), `AuthRepository`, `TimeTrackingRepository`, `VacationRepository`
+- `NetworkModule`: OkHttp auth interceptor, Moshi, Retrofit DI module
+- `AuthViewModel` with empty-field validation and session restore
+- `DashboardViewModel`, `TimeTrackingViewModel`, `VacationViewModel`
+- `LoginScreen`, `DashboardScreen`, `TimeTrackingScreen`, `VacationScreen` — all replace placeholder composables
+- `NavGraph` updated to use real screens
+- `AuthViewModelTest` (8), `TimeTrackingViewModelTest` (9), `VacationViewModelTest` (7)
+- Test deps: `mockk`, `turbine`, `kotlinx-coroutines-test`, `core-testing`
+
+### Added (Phase 7 — iOS)
+- `KeychainHelper`: Security-framework wrapper for secure token storage
+- `DashboardViewModel`, `TimeTrackingViewModel`, `VacationViewModel`
+- `VacationService`: getBalance, paginated getRequests
+- `TimeService` extended: getTrackingStatus, startBreak, endBreak
+- `DashboardView`, `TimeTrackingView`, `VacationView` — real data replacing placeholder `Text`
+- `VacationRequest` updated to flat backend-compatible fields with `PageResponse<T>`
+- `TrackingStatusResponse`, `VacationBalance` models added
+- i18n: `vacation_request`, `time_tracking_today_work/break`, `vacation_total/used`, `common_days`, improved `common_error` in EN + DE
+
+### Fixed
+- **CI**: removed unused `within` import in `AdminPage.test.tsx` that caused ESLint error and failed the "Frontend - Lint & Test" CI job
+- **iOS security**: replaced all `UserDefaults` token storage with Keychain in `AuthViewModel` and `APIClient`
+- **iOS model**: `LoginResponse` corrected from `tokens: AuthTokens` to flat `accessToken`/`refreshToken` to match backend
+- **iOS model**: `VacationRequest` updated to match backend fields (`startDate`/`endDate` as String, `isHalfDayStart/End`, `totalDays`, `rejectionReason`, `createdAt`)
+- **Android forms**: user creation/edit modal labels have `htmlFor`/`id` pairs for accessibility and screen reader support
 
 ## [Phase 6 - multi-terminal support] - 2026-03-01
 

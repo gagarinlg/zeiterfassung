@@ -21,4 +21,11 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="settings">Settings</string>
+    <string name="status_clocked_in">Clocked In</string>
+    <string name="status_on_break">On Break</string>
+    <string name="status_clocked_out">Clocked Out</string>
+    <string name="today_work">Work Today</string>
+    <string name="today_break">Break Today</string>
+    <string name="vacation_requests">Vacation Requests</string>
+    <string name="days">days</string>
 </resources>

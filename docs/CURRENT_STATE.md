@@ -4,7 +4,7 @@
 
 ## Quick Summary
 
-Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–6 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, and terminal RFID scan endpoint. The terminal Raspberry Pi app is fully implemented with multi-terminal support. The frontend has fully implemented login, navigation, dashboard, time tracking, and vacation pages. Mobile apps are scaffolded.
+Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–8 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, and admin endpoints (audit log + system settings). The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages. Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests.
 
 ## What Works Right Now
 
@@ -23,10 +23,12 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Email notifications: vacation lifecycle events (created/approved/rejected/cancelled)
 - ✅ Monthly email reports: personal hours + vacation balance to employees; team summary to managers
 - ✅ DSGVO enforcement: employees cannot access other employees' time or vacation data
-- ✅ Terminal RFID scan: `POST /api/terminal/scan` — looks up user by RFID, toggles clock state, returns summary; transactional to prevent race conditions with multiple terminals
-- ✅ Terminal heartbeat: `GET /api/terminal/heartbeat` — connectivity check for terminal devices
+- ✅ Terminal RFID scan: `POST /api/terminal/scan` — looks up user by RFID, toggles clock state; transactional with 409 on race condition
+- ✅ Terminal heartbeat: `GET /api/terminal/heartbeat`
+- ✅ Admin audit log: `GET /api/admin/audit-log` (paginated, filterable by userId)
+- ✅ Admin system settings: `GET /api/admin/settings`, `PUT /api/admin/settings/{key}`
 
-### Frontend (Partially Implemented)
+### Frontend (Fully Implemented)
 - ✅ Login page with validation and error handling
 - ✅ Auth context with auto-refresh and permission helpers
 - ✅ Protected routes with 403 handling
@@ -35,29 +37,27 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Vacation approval page: manager queue with approve/reject-with-reason modal
 - ✅ Dashboard: real data widgets (today hours, weekly hours, vacation balance, team status, compliance warnings)
 - ✅ Time Tracking page: full implementation (status, clock in/out/break, live timer, today's entries list, monthly timesheet, CSV export)
-- ⚠️ Admin page: placeholder
+- ✅ Admin page: 3-tab UI (User Management, Audit Log, System Settings) with full CRUD, search, modals
 
-### Mobile (Scaffolded Only)
-- ⚠️ Android: navigation + placeholder screens
-- ⚠️ iOS: tab view + placeholder views
+### Mobile (Fully Implemented)
+- ✅ **Android**: real API integration with Retrofit + Moshi + Hilt; LoginScreen, DashboardScreen, TimeTrackingScreen (state-aware buttons), VacationScreen (balance + requests); 24 ViewModel unit tests
+- ✅ **iOS**: real API integration using URLSession; Keychain token storage (replaces UserDefaults); DashboardView, TimeTrackingView (action buttons, elapsed timer), VacationView (balance breakdown + request list); AuthViewModel, DashboardViewModel, TimeTrackingViewModel, VacationViewModel
 
 ### Terminal (Fully Functional — Phase 6 Complete)
 - ✅ Full iced 0.12.1 Application with complete state machine (Idle/Loading/ClockIn/ClockOut/OfflineConfirm/Error)
-- ✅ All 6 screens implemented with colour-coded views (green clock-in / red clock-out / amber offline & error)
-- ✅ RFID subscription (async iced subscription via `subscription::channel`, 50 ms polling)
-- ✅ Offline SQLite buffering with auto-sync; stale/conflicted events discarded cleanly
-- ✅ Audio feedback (rodio 0.22)
-- ✅ Multi-terminal support: each terminal has a unique `terminal_id` in `terminal.toml`; `@Transactional` scan prevents race conditions; HTTP 409 shown as "Bitte erneut scannen"
+- ✅ All 6 screens implemented with colour-coded views
+- ✅ RFID subscription, offline SQLite buffering, audio feedback
+- ✅ Multi-terminal support with HTTP 409 race condition protection
 - ✅ 15 unit tests (api, buffer, config)
 
 ## Tech Debt / Known Issues
-- Admin page is a placeholder (Phase 8)
-- Backend test coverage targets (≥90%) not yet fully verified
-- Frontend test coverage targets (≥85%) not yet fully verified
-- E2E Playwright tests need expansion
-- Mobile apps are scaffold-only (Phase 7)
+- Backend test coverage targets (≥90%) not yet fully verified for all services
+- E2E Playwright tests need expansion (Phase 9)
+- Android: push notifications, biometric auth, offline caching — not yet implemented
+- iOS: push notifications, Face ID / Touch ID — not yet implemented
 
 ## Next Steps
-1. **Phase 7: Mobile Apps** — implement Android and iOS placeholder screens
-2. **Phase 8: Admin Panel** — replace admin placeholder with full user/role/settings management UI
+1. **Phase 9: Testing & Security Hardening** — E2E Playwright tests, penetration testing, OWASP ZAP scans, coverage enforcement
+2. **Phase 10: Documentation & Polish** — Playwright screenshots, full user docs, API reference
 3. Continue dependency updates (review and merge Dependabot PRs)
+

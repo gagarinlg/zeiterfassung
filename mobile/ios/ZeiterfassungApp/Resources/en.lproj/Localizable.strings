@@ -27,14 +27,21 @@
 "time_tracking_clock_out" = "Clock Out";
 "time_tracking_break_start" = "Start Break";
 "time_tracking_break_end" = "End Break";
+"time_tracking_today_work" = "Work Today";
+"time_tracking_today_break" = "Break Today";
 
 /* Vacation */
 "vacation_title" = "Vacation";
-"vacation_request" = "Request Vacation";
+"vacation_request" = "Vacation Requests";
 "vacation_remaining" = "Remaining Days";
+"vacation_total" = "Total";
+"vacation_used" = "Used";
+"vacation_remaining_label" = "Remaining";
 
 /* Common */
 "common_loading" = "Loading...";
-"common_error" = "Error";
+"common_error" = "An error occurred. Please try again.";
 "common_save" = "Save";
 "common_cancel" = "Cancel";
+"common_days" = "days";
+

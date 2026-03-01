@@ -12,6 +12,9 @@ class AuthService {
         let password: String
     }
 
+    struct EmptyBody: Encodable {}
+    struct EmptyResponse: Decodable {}
+
     func login(email: String, password: String) async throws -> LoginResponse {
         return try await client.post("/auth/login", body: LoginRequest(email: email, password: password))
     }
@@ -19,7 +22,5 @@ class AuthService {
     func logout() async throws {
         let _: EmptyResponse = try await client.post("/auth/logout", body: EmptyBody())
     }
-
-    struct EmptyBody: Encodable {}
-    struct EmptyResponse: Decodable {}
 }
+

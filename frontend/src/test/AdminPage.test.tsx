@@ -302,7 +302,7 @@ describe('AdminPage', () => {
 
   it('should show error banner when users fail to load', async () => {
     const { default: adminService } = await import('../services/adminService')
-    adminService.getUsers.mockRejectedValue(new Error('Server error'))
+    vi.mocked(adminService.getUsers).mockRejectedValue(new Error('Server error'))
     renderAdminPage()
     await waitFor(() => {
       expect(screen.getByRole('alert')).toBeInTheDocument()
@@ -342,7 +342,7 @@ describe('AdminPage', () => {
 
   it('should show error banner when audit log fails to load', async () => {
     const { default: adminService } = await import('../services/adminService')
-    adminService.getAuditLog.mockRejectedValue(new Error('Server error'))
+    vi.mocked(adminService.getAuditLog).mockRejectedValue(new Error('Server error'))
     renderAdminPage()
     fireEvent.click(screen.getByText('admin.audit_log'))
     await waitFor(() => {
@@ -388,7 +388,7 @@ describe('AdminPage', () => {
 
   it('should show error banner when settings fail to load', async () => {
     const { default: adminService } = await import('../services/adminService')
-    adminService.getSettings.mockRejectedValue(new Error('Server error'))
+    vi.mocked(adminService.getSettings).mockRejectedValue(new Error('Server error'))
     renderAdminPage()
     fireEvent.click(screen.getByText('admin.settings_tab'))
     await waitFor(() => {
