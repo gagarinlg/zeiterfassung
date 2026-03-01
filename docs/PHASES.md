@@ -2,7 +2,7 @@
 
 > Last updated: 2026-03-01
 >
-> **Current phase:** Phase 9 (Testing & Security Hardening) — IN PROGRESS
+> **Current phase:** Phase 10 (Security Features & LDAP Integration) — IN PROGRESS
 
 ---
 
@@ -420,7 +420,49 @@
 
 ---
 
-## Phase 10: Documentation & Polish 🔲
+## Phase 10: Security Features & LDAP Integration 🚧
+- **Status**: IN PROGRESS
+- **Priority**: HIGH
+
+### What has been delivered
+- **V8 Flyway migration**: TOTP columns, password_reset_tokens table, LDAP system settings
+- **TotpService**: RFC 6238 TOTP generation and verification with base32 encoding
+- **PasswordResetService**: email-based password reset with token hashing and expiration
+- **LdapService**: LDAP/AD configuration management via system_settings
+- **Self-service profile update**: users can update their own preferences
+- **Recursive subordinate listing**: hierarchical manager rights
+- **Auth enhancements**: TOTP verification during login, password confirmation validation
+- **New DTOs**: TOTP, password reset, LDAP configuration
+- **SecurityConfig**: public password reset endpoints
+
+### Key files
+- `backend/src/main/resources/db/migration/V8__add_totp_and_password_reset.sql`
+- `backend/src/main/kotlin/com/zeiterfassung/model/entity/PasswordResetTokenEntity.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/repository/PasswordResetTokenRepository.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/TotpService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/PasswordResetService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/LdapService.kt`
+
+### Key API endpoints
+- POST /api/auth/totp/setup, /totp/enable, /totp/disable
+- POST /api/auth/password/reset-request, /password/reset-confirm
+- PUT /api/users/me
+- GET /api/users/{id}/all-subordinates
+- GET /api/admin/ldap, PUT /api/admin/ldap
+
+### What still needs to be built
+- Frontend UI for TOTP setup/disable
+- Frontend password reset page
+- Frontend LDAP configuration page in admin panel
+- Unit tests for TotpService, PasswordResetService, LdapService
+
+### Depends on
+- Phase 2 (auth/users) ✅
+- Phase 8 (admin panel) ✅
+
+---
+
+## Phase 11: Documentation & Polish 🔲
 - **Status**: PLANNED
 - **Priority**: MEDIUM
 

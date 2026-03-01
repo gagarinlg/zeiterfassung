@@ -4,7 +4,7 @@
 
 ## Quick Summary
 
-Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–9 are complete.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, and admin endpoints (audit log + system settings). The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright across all 7 frontend pages (62+ tests).
+Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–9 are complete, Phase 10 is in progress.** The backend has working auth, user management, time tracking, vacation management, email notifications, CSV export, terminal RFID scan endpoint, admin endpoints, TOTP 2FA, password reset flow, and LDAP configuration. The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, and admin pages with proper date/calendar localization and 59 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration and ViewModel unit tests. CI includes E2E testing with Playwright across all 7 frontend pages (62+ tests).
 
 ## What Works Right Now
 
@@ -29,6 +29,11 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Admin system settings: `GET /api/admin/settings`, `PUT /api/admin/settings/{key}`
 - ✅ Per-user date/time format preferences with system-wide defaults
 - ✅ CORS: `allowedOriginPatterns` for proper localhost + credential handling
+- ✅ TOTP 2FA: setup, enable, disable, verification during login
+- ✅ Password reset: token-based flow with email notifications
+- ✅ LDAP/AD configuration: read/update via admin endpoints
+- ✅ Self-service profile update: `PUT /api/users/me`
+- ✅ Recursive subordinate listing: `GET /api/users/{id}/all-subordinates`
 
 ### Frontend (Fully Implemented)
 - ✅ Login page with validation and error handling
@@ -62,6 +67,8 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - iOS: push notifications, Face ID / Touch ID — not yet implemented
 
 ## Next Steps
-1. **Phase 10: Documentation & Polish** — Playwright screenshots, full user docs, API reference
-2. Continue dependency updates (review and merge Dependabot PRs)
+1. **Phase 10 (continued)**: Frontend UI for TOTP setup, password reset page, LDAP admin page
+2. **Phase 10 (continued)**: Unit tests for TotpService, PasswordResetService, LdapService
+3. **Phase 11: Documentation & Polish** — Playwright screenshots, full user docs, API reference
+4. Continue dependency updates (review and merge Dependabot PRs)
 

@@ -3,6 +3,22 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Phase 10: Security Features & LDAP Integration
+
+### Added
+- **V8 Flyway migration**: TOTP columns on users table (`totp_secret`, `totp_enabled`), `password_reset_tokens` table, LDAP configuration settings in `system_settings`
+- **TOTP 2FA**: `TotpService` with RFC 6238 TOTP generation/verification (base32, HmacSHA1, ±1 time step window); endpoints `POST /auth/totp/setup`, `/totp/enable`, `/totp/disable`
+- **Password reset flow**: `PasswordResetTokenEntity` + `PasswordResetTokenRepository`; `PasswordResetService` with email-based token flow; endpoints `POST /auth/password/reset-request`, `/auth/password/reset-confirm` (public, unauthenticated)
+- **LDAP/Active Directory configuration**: `LdapService` for reading/updating LDAP settings from system_settings; endpoints `GET /admin/ldap`, `PUT /admin/ldap`
+- **Self-service profile update**: `PUT /users/me` endpoint for users to update own preferences (name, phone, date/time format)
+- **Recursive subordinate listing**: `GET /users/{id}/all-subordinates` — returns full hierarchy of subordinates for a manager
+- **Password confirmation validation**: `confirmPassword` field added to `ChangePasswordRequest`, `ResetPasswordRequest`, and new `PasswordResetConfirmRequest`
+- **TOTP in login flow**: `totpCode` field added to `LoginRequest`; `AuthService.login()` verifies TOTP code when enabled
+- **New DTOs**: `TotpSetupResponse`, `TotpVerifyRequest`, `PasswordResetLinkRequest`, `PasswordResetConfirmRequest`, `LdapConfigResponse`, `UpdateLdapConfigRequest`
+- **UserResponse extended**: `totpEnabled` field added to `UserResponse`
+- **UpdateUserRequest extended**: `employeeNumber` field added for admin updates
+- **SecurityConfig**: password reset endpoints added to public paths
+
 ## [Unreleased] — Phase 9: Testing & Security Hardening (COMPLETE)
 
 ### Fixed
