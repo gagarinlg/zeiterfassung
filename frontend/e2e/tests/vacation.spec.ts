@@ -115,9 +115,9 @@ test.describe('Vacation Page', () => {
     test('should show vacation balance card', async ({ page }) => {
       await page.goto('/vacation')
 
-      // Balance values from MOCK_VACATION_BALANCE
-      await expect(page.getByText(String(MOCK_VACATION_BALANCE.totalDays))).toBeVisible()
-      await expect(page.getByText(String(MOCK_VACATION_BALANCE.remainingDays))).toBeVisible()
+      // Balance values from MOCK_VACATION_BALANCE (page shows totalDays + carriedOverDays)
+      await expect(page.getByText(String(MOCK_VACATION_BALANCE.totalDays + MOCK_VACATION_BALANCE.carriedOverDays))).toBeVisible()
+      await expect(page.getByText(String(MOCK_VACATION_BALANCE.remainingDays), { exact: true })).toBeVisible()
     })
 
     test('should show tab navigation', async ({ page }) => {
@@ -167,8 +167,8 @@ test.describe('Vacation Page', () => {
       await page.getByRole('button', { name: /Kalender/i }).click()
 
       // Calendar navigation buttons should be visible
-      await expect(page.getByRole('button', { name: '‹' })).toBeVisible()
-      await expect(page.getByRole('button', { name: '›' })).toBeVisible()
+      await expect(page.getByRole('button', { name: '←' })).toBeVisible()
+      await expect(page.getByRole('button', { name: '→' })).toBeVisible()
     })
   })
 

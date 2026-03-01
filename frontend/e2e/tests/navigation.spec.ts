@@ -15,14 +15,14 @@ test.describe('Navigation', () => {
       // Core navigation links (German labels by default)
       await expect(page.getByRole('link', { name: /Dashboard/i })).toBeVisible()
       await expect(page.getByRole('link', { name: /Zeiterfassung/i })).toBeVisible()
-      await expect(page.getByRole('link', { name: /Urlaub/i })).toBeVisible()
+      await expect(page.getByRole('link', { name: /^Urlaub$/i })).toBeVisible()
 
       // Permission-gated links should be visible for admin
       await expect(page.getByRole('link', { name: /Urlaubsgenehmigungen/i })).toBeVisible()
       await expect(page.getByRole('link', { name: /Administration/i })).toBeVisible()
 
       // User info and logout
-      await expect(page.getByText('Admin User')).toBeVisible()
+      await expect(page.locator('aside').getByText('Admin User')).toBeVisible()
       await expect(page.getByRole('button', { name: /Abmelden/i })).toBeVisible()
     })
   })
@@ -72,7 +72,7 @@ test.describe('Navigation', () => {
       await page.getByRole('link', { name: /Zeiterfassung/i }).click()
 
       await expect(page).toHaveURL(/\/time-tracking/)
-      await expect(page.getByRole('heading', { name: /Zeiterfassung/i })).toBeVisible()
+      await expect(page.locator('main').getByRole('heading', { name: /Zeiterfassung/i })).toBeVisible()
     })
 
     test('should navigate to Vacation page', async ({ page }) => {

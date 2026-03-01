@@ -17,7 +17,7 @@ test.describe('Time Tracking Page', () => {
     test('should render the time tracking page with title', async ({ page }) => {
       await page.goto('/time-tracking')
 
-      await expect(page.getByRole('heading', { name: /Zeiterfassung/i })).toBeVisible()
+      await expect(page.locator('main').getByRole('heading', { name: /Zeiterfassung/i })).toBeVisible()
     })
 
     test('should show current status label', async ({ page }) => {
@@ -68,8 +68,8 @@ test.describe('Time Tracking Page', () => {
     test('should show today summary with work and break time', async ({ page }) => {
       await page.goto('/time-tracking')
 
-      await expect(page.getByText(/Arbeitszeit/i)).toBeVisible()
-      await expect(page.getByText(/Pausenzeit/i)).toBeVisible()
+      await expect(page.getByText(/Arbeitszeit/i).first()).toBeVisible()
+      await expect(page.getByText(/Pausenzeit/i).first()).toBeVisible()
     })
   })
 
@@ -121,9 +121,11 @@ test.describe('Time Tracking Page', () => {
     test('should show daily entries in the timesheet', async ({ page }) => {
       await page.goto('/time-tracking')
 
-      // Check that dates from mock data appear
+      // Check that dates from mock data appear (formatted as DD.MM.YYYY)
       for (const day of MOCK_MONTHLY_SUMMARY.dailySummaries) {
-        await expect(page.getByText(day.date)).toBeVisible()
+        const [year, month, dayOfMonth] = day.date.split('-')
+        const formatted = `${dayOfMonth}.${month}.${year}`
+        await expect(page.getByText(formatted)).toBeVisible()
       }
     })
 

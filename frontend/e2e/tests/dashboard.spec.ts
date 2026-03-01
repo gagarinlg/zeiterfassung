@@ -19,7 +19,7 @@ test.describe('Dashboard Page', () => {
       await page.goto('/dashboard')
 
       await expect(page.getByRole('heading', { name: /Dashboard/i })).toBeVisible()
-      await expect(page.getByText(`${MOCK_USER.firstName} ${MOCK_USER.lastName}`)).toBeVisible()
+      await expect(page.locator('main').getByText(`${MOCK_USER.firstName} ${MOCK_USER.lastName}`)).toBeVisible()
     })
 
     test('should show today\'s work hours widget', async ({ page }) => {

@@ -29,7 +29,9 @@ test.describe('Login Page', () => {
 
       // Switch to English
       await langButton.click()
-      await expect(langButton).toHaveText('DE')
+      // After switching to English, the button's aria-label changes to English
+      const langButtonEn = page.getByRole('button', { name: /Switch Language/i })
+      await expect(langButtonEn).toHaveText('DE')
 
       // Labels should now be in English
       await expect(page.getByLabel(/Email Address/i)).toBeVisible()
