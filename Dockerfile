@@ -19,12 +19,16 @@ RUN npm run build
 FROM eclipse-temurin:21-jre-jammy AS runtime
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client curl \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN addgroup --system zeiterfassung && adduser --system --ingroup zeiterfassung zeiterfassung
 
 COPY --from=backend-build /app/backend/build/libs/*.jar app.jar
 COPY --from=frontend-build /app/frontend/dist ./static
 
-RUN chown -R zeiterfassung:zeiterfassung /app
+RUN mkdir -p /var/lib/zeiterfassung/backups \
+    && chown -R zeiterfassung:zeiterfassung /app /var/lib/zeiterfassung
 USER zeiterfassung
 
 EXPOSE 8080
