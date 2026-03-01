@@ -16,6 +16,7 @@ import com.zeiterfassung.model.dto.VacationBalanceResponse
 import com.zeiterfassung.model.dto.VacationCalendarResponse
 import com.zeiterfassung.model.dto.VacationRequestResponse
 import com.zeiterfassung.model.entity.PublicHolidayEntity
+import com.zeiterfassung.model.entity.UserEntity
 import com.zeiterfassung.model.entity.VacationBalanceEntity
 import com.zeiterfassung.model.entity.VacationRequestEntity
 import com.zeiterfassung.model.enums.VacationStatus
@@ -96,7 +97,7 @@ class VacationService(
         val saved = vacationRequestRepository.save(entity)
         auditService.logDataChange(userId, "VACATION_REQUEST_CREATED", "VacationRequest", saved.id, null, saved.toResponse())
         // Notify manager(s) and their substitutes
-        val notifyUsers = mutableListOf<com.zeiterfassung.model.entity.UserEntity>()
+        val notifyUsers = mutableListOf<UserEntity>()
         user.manager?.let { manager ->
             notifyUsers.add(manager)
             manager.substitute?.let { notifyUsers.add(it) }

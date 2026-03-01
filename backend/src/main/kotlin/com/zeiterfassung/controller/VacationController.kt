@@ -5,6 +5,7 @@ import com.zeiterfassung.model.dto.CreateVacationRequest
 import com.zeiterfassung.model.dto.PageResponse
 import com.zeiterfassung.model.dto.PublicHolidayResponse
 import com.zeiterfassung.model.dto.RejectVacationRequest
+import com.zeiterfassung.model.dto.SetVacationBalanceRequest
 import com.zeiterfassung.model.dto.UpdateVacationRequest
 import com.zeiterfassung.model.dto.VacationBalanceResponse
 import com.zeiterfassung.model.dto.VacationCalendarResponse
@@ -184,7 +185,7 @@ class VacationController(
     fun setBalance(
         @PathVariable userId: UUID,
         @RequestParam(required = false) year: Int?,
-        @Valid @RequestBody dto: com.zeiterfassung.model.dto.SetVacationBalanceRequest,
+        @Valid @RequestBody dto: SetVacationBalanceRequest,
         @AuthenticationPrincipal actorId: String,
     ): ResponseEntity<VacationBalanceResponse> {
         val targetYear = year ?: LocalDate.now().year

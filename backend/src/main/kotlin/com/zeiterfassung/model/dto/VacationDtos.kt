@@ -86,7 +86,6 @@ data class TeamVacationOverviewResponse(
 )
 
 data class SetVacationBalanceRequest(
-    @field:NotNull
     val totalDays: BigDecimal? = null,
     val usedDays: BigDecimal? = null,
     val carriedOverDays: BigDecimal? = null,
