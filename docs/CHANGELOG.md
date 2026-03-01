@@ -3,6 +3,16 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — iOS Server URL Configuration
+
+### Added
+- **ServerConfigManager**: Singleton managing server URL with priority chain (MDM managed config > UserDefaults > default)
+- **ServerSettingsView**: SwiftUI Form view for viewing/editing server URL; disables editing when URL is managed via MDM
+- **ServerSettingsViewModel**: `@MainActor` ViewModel with managed config detection, save with success feedback
+- **APIClient**: Updated initializer to use `ServerConfigManager.shared.effectiveServerUrl` instead of `ProcessInfo` environment variable
+- **MainTabView**: Added gear menu with server settings and logout options
+- **Localizable.strings**: Added 11 new i18n keys for server settings UI (EN + DE)
+
 ## [Unreleased] — Android Server URL Configuration
 
 ### Added

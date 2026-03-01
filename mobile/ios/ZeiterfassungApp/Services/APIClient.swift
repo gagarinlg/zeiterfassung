@@ -6,8 +6,8 @@ class APIClient {
     private let baseURL: String
     private let session: URLSession
 
-    init(baseURL: String = ProcessInfo.processInfo.environment["API_BASE_URL"] ?? "https://zeiterfassung.example.com/api") {
-        self.baseURL = baseURL
+    init(baseURL: String? = nil) {
+        self.baseURL = baseURL ?? ServerConfigManager.shared.effectiveServerUrl
         let config = URLSessionConfiguration.default
         config.timeoutIntervalForRequest = 30
         self.session = URLSession(configuration: config)

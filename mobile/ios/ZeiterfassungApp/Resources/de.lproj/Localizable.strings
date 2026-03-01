@@ -38,10 +38,22 @@
 "vacation_used" = "Verbraucht";
 "vacation_remaining_label" = "Verbleibend";
 
+/* Server Settings */
+"server_settings_title" = "Servereinstellungen";
+"server_settings_managed_info" = "Die Server-URL wird von Ihrer Organisation verwaltet und kann nicht geändert werden.";
+"server_settings_url_placeholder" = "https://zeiterfassung.example.com/api";
+"server_settings_save" = "Speichern";
+"server_settings_restart_hint" = "Server-URL gespeichert. Bitte starten Sie die App neu, damit die Änderungen wirksam werden.";
+"server_settings_info_header" = "Information";
+"server_settings_info_body" = "Die Server-URL bestimmt, mit welchem Zeiterfassungsserver sich diese App verbindet. Wenden Sie sich an Ihren Administrator, wenn Sie sich über die richtige URL unsicher sind.";
+"nav_server_settings" = "Servereinstellungen";
+"auth_logout_button" = "Abmelden";
+
 /* Common */
 "common_loading" = "Laden...";
 "common_error" = "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.";
 "common_save" = "Speichern";
 "common_cancel" = "Abbrechen";
+"common_close" = "Schließen";
 "common_days" = "Tage";
 
