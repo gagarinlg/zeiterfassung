@@ -3,22 +3,13 @@
 // All strings are candidates for extraction — do not add new hardcoded strings.
 
 use chrono::{DateTime, Utc};
+use iced::widget::container::Appearance;
 use iced::widget::{column, container, row, text, Column, Space};
 use iced::{Alignment, Color, Element, Length};
-use iced::widget::container::Appearance;
 
 use super::Message;
 
 // ─── Data types ─────────────────────────────────────────────────────────────
-
-/// Represents the different screens displayed on the terminal
-#[derive(Debug, Clone, PartialEq)]
-pub enum Screen {
-    Idle,
-    ClockIn(ClockInData),
-    ClockOut(ClockOutData),
-    Error(ErrorData),
-}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ClockInData {
@@ -49,7 +40,6 @@ pub struct ErrorData {
 pub enum ErrorType {
     BadgeNotRecognized,
     ServerUnavailable,
-    NetworkError,
     Other,
 }
 
@@ -181,7 +171,10 @@ pub fn clock_out_view(data: &ClockOutData, seconds_left: u64) -> Element<'static
         row![
             summary_item(
                 "\u{00DC}berstunden",
-                &format!("{}{}h {:02}min", overtime_sign, overtime_hours, overtime_mins),
+                &format!(
+                    "{}{}h {:02}min",
+                    overtime_sign, overtime_hours, overtime_mins
+                ),
             ),
             Space::with_width(40),
             summary_item(
@@ -252,11 +245,10 @@ pub fn error_view(data: &ErrorData, seconds_left: u64) -> Element<'static, Messa
             "\u{26A0}  Server nicht erreichbar",
             "Bitte versuchen Sie es sp\u{00E4}ter erneut.",
         ),
-        ErrorType::NetworkError => (
-            "\u{26A0}  Netzwerkfehler",
-            "Bitte versuchen Sie es sp\u{00E4}ter erneut.",
+        ErrorType::Other => (
+            "\u{26A0}  Fehler",
+            "Ein unbekannter Fehler ist aufgetreten.",
         ),
-        ErrorType::Other => ("\u{26A0}  Fehler", "Ein unbekannter Fehler ist aufgetreten."),
     };
 
     let col = column![

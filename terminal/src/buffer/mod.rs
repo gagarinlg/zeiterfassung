@@ -174,7 +174,10 @@ mod tests {
         let pending = buf.get_pending().unwrap();
         // Oldest event dropped, newer ones retained
         let tags: Vec<&str> = pending.iter().map(|e| e.rfid_tag_id.as_str()).collect();
-        assert!(!tags.contains(&"TAG001"), "oldest event should have been dropped");
+        assert!(
+            !tags.contains(&"TAG001"),
+            "oldest event should have been dropped"
+        );
         assert!(tags.contains(&"TAG004"));
     }
 

@@ -18,11 +18,9 @@ class TerminalController(
     @PostMapping("/scan")
     fun scan(
         @RequestBody request: TerminalScanRequest,
-    ): ResponseEntity<TerminalScanResponse> =
-        ResponseEntity.ok(terminalService.scan(request.rfidTagId, request.terminalId))
+    ): ResponseEntity<TerminalScanResponse> = ResponseEntity.ok(terminalService.scan(request.rfidTagId, request.terminalId))
 
     /** Simple heartbeat endpoint — terminals poll this to detect backend connectivity. */
     @GetMapping("/heartbeat")
-    fun heartbeat(): ResponseEntity<Map<String, String>> =
-        ResponseEntity.ok(mapOf("status" to "ok"))
+    fun heartbeat(): ResponseEntity<Map<String, String>> = ResponseEntity.ok(mapOf("status" to "ok"))
 }

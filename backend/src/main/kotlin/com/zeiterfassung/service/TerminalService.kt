@@ -22,6 +22,7 @@ class TerminalService(
     private val vacationService: VacationService,
 ) {
     private val log = LoggerFactory.getLogger(TerminalService::class.java)
+
     /**
      * Processes an RFID scan from a terminal device.
      *

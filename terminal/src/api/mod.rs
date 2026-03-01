@@ -8,6 +8,7 @@ use crate::config::ApiConfig;
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[allow(dead_code)] // `id` and `photo_url` are deserialized from the server response for future use
 pub struct EmployeeInfo {
     pub id: String,
     pub first_name: String,
@@ -139,6 +140,8 @@ impl ApiClient {
         Err(last_error)
     }
 
+    /// Checks whether the backend is reachable.  Used by the heartbeat subscription.
+    #[allow(dead_code)]
     pub async fn health_check(&self) -> bool {
         let url = format!("{}/actuator/health", self.base_url);
         match self.client.get(&url).send().await {
@@ -177,11 +180,17 @@ mod tests {
 
     #[test]
     fn test_api_error_display() {
-        assert!(ApiError::NotFound("x".to_string()).to_string().contains("Not found"));
+        assert!(ApiError::NotFound("x".to_string())
+            .to_string()
+            .contains("Not found"));
         assert!(ApiError::Unauthorized.to_string().contains("Unauthorized"));
         assert!(ApiError::Conflict.to_string().contains("scan again"));
-        assert!(ApiError::ServerError("500".to_string()).to_string().contains("Server error"));
-        assert!(ApiError::NetworkError("conn".to_string()).to_string().contains("Network error"));
+        assert!(ApiError::ServerError("500".to_string())
+            .to_string()
+            .contains("Server error"));
+        assert!(ApiError::NetworkError("conn".to_string())
+            .to_string()
+            .contains("Network error"));
         assert!(ApiError::Timeout.to_string().contains("timed out"));
     }
 

@@ -1,10 +1,8 @@
 pub mod screens;
 
 use chrono::{DateTime, Utc};
-use iced::{
-    executor, Application, Command, Element, Settings, Size, Subscription, Theme,
-};
 use iced::futures::SinkExt;
+use iced::{executor, Application, Command, Element, Settings, Size, Subscription, Theme};
 use log::{info, warn};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
@@ -35,13 +33,29 @@ pub enum Message {
 // ─── Application state ───────────────────────────────────────────────────────
 
 enum AppState {
-    Idle { now: DateTime<Utc> },
-    Loading { rfid: String },
-    ClockIn { data: ClockInData, seconds_left: u64 },
-    ClockOut { data: ClockOutData, seconds_left: u64 },
+    Idle {
+        now: DateTime<Utc>,
+    },
+    Loading {
+        rfid: String,
+    },
+    ClockIn {
+        data: ClockInData,
+        seconds_left: u64,
+    },
+    ClockOut {
+        data: ClockOutData,
+        seconds_left: u64,
+    },
     /// Event was stored offline; shown with amber colour scheme.
-    OfflineConfirm { data: ClockInData, seconds_left: u64 },
-    Error { data: ErrorData, seconds_left: u64 },
+    OfflineConfirm {
+        data: ClockInData,
+        seconds_left: u64,
+    },
+    Error {
+        data: ErrorData,
+        seconds_left: u64,
+    },
 }
 
 struct TerminalApp {
@@ -75,7 +89,10 @@ impl Application for TerminalApp {
         let event_buffer = Arc::new(Mutex::new(
             EventBuffer::new(&config.offline.buffer_path, config.offline.max_buffer_size)
                 .unwrap_or_else(|e| {
-                    warn!("Cannot open event buffer at '{}': {}. Falling back to in-memory.", config.offline.buffer_path, e);
+                    warn!(
+                        "Cannot open event buffer at '{}': {}. Falling back to in-memory.",
+                        config.offline.buffer_path, e
+                    );
                     EventBuffer::new(":memory:", config.offline.max_buffer_size)
                         .expect("in-memory buffer must always succeed")
                 }),
@@ -143,9 +160,7 @@ impl Application for TerminalApp {
                 !self.is_online,
             ),
             AppState::Loading { .. } => screens::loading_view(),
-            AppState::ClockIn { data, seconds_left } => {
-                screens::clock_in_view(data, *seconds_left)
-            }
+            AppState::ClockIn { data, seconds_left } => screens::clock_in_view(data, *seconds_left),
             AppState::ClockOut { data, seconds_left } => {
                 screens::clock_out_view(data, *seconds_left)
             }
@@ -159,10 +174,8 @@ impl Application for TerminalApp {
     fn subscription(&self) -> Subscription<Message> {
         let tick = iced::time::every(Duration::from_secs(1)).map(|_| Message::Tick);
 
-        let sync_interval =
-            Duration::from_secs(self.config.offline.sync_interval_seconds.max(5));
-        let sync_tick =
-            iced::time::every(sync_interval).map(|_| Message::SyncTick);
+        let sync_interval = Duration::from_secs(self.config.offline.sync_interval_seconds.max(5));
+        let sync_tick = iced::time::every(sync_interval).map(|_| Message::SyncTick);
 
         let rfid = rfid_subscription(Arc::clone(&self.rfid_reader));
 
@@ -232,7 +245,9 @@ impl TerminalApp {
         self.last_scan_time = Some((tag_id.clone(), now));
 
         info!("RFID scanned: {}", tag_id);
-        self.state = AppState::Loading { rfid: tag_id.clone() };
+        self.state = AppState::Loading {
+            rfid: tag_id.clone(),
+        };
 
         let api = self.api_client.clone();
         let rfid = tag_id.clone();
@@ -380,10 +395,7 @@ fn rfid_subscription(reader: Arc<Mutex<RfidReader>>) -> Subscription<Message> {
         loop {
             tokio::time::sleep(Duration::from_millis(50)).await;
 
-            let tag = reader
-                .lock()
-                .ok()
-                .and_then(|mut r| r.poll());
+            let tag = reader.lock().ok().and_then(|mut r| r.poll());
 
             if let Some(tag_id) = tag {
                 let _ = sender.send(Message::RfidScanned(tag_id)).await;
@@ -405,10 +417,7 @@ fn rfid_subscription(reader: Arc<Mutex<RfidReader>>) -> Subscription<Message> {
 ///   terminal was offline.  The event is stale; discard it so it is never retried.
 /// * **404 Not found** — the RFID tag was deregistered while offline; discard.
 /// * **Other server error** — discard to avoid blocking the queue indefinitely.
-async fn sync_buffered_events(
-    api: ApiClient,
-    buffer: Arc<Mutex<EventBuffer>>,
-) -> u32 {
+async fn sync_buffered_events(api: ApiClient, buffer: Arc<Mutex<EventBuffer>>) -> u32 {
     let events = match buffer.lock() {
         Ok(buf) => buf.get_pending().unwrap_or_default(),
         Err(_) => return 0,
@@ -417,7 +426,10 @@ async fn sync_buffered_events(
     let mut synced = 0u32;
     for event in &events {
         if let Some(id) = event.id {
-            match api.clock_in_out(&event.rfid_tag_id, &event.terminal_id).await {
+            match api
+                .clock_in_out(&event.rfid_tag_id, &event.terminal_id)
+                .await
+            {
                 Ok(_) => {
                     if let Ok(buf) = buffer.lock() {
                         let _ = buf.mark_synced(id);
