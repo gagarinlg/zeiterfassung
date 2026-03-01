@@ -8,6 +8,10 @@
     "time_tracking": "Zeiterfassung",
     "vacation": "Urlaub",
     "vacation_approvals": "Urlaubsgenehmigungen",
+    "sick_leave": "Krankmeldung",
+    "business_trips": "Dienstreisen",
+    "business_trip_approvals": "Reisegenehmigungen",
+    "projects": "Projekte",
     "admin": "Administration",
     "profile": "Profil",
     "logout": "Abmelden",
@@ -340,6 +344,154 @@
     "totp_enabled_success": "Zwei-Faktor-Authentifizierung erfolgreich aktiviert",
     "totp_disabled_success": "Zwei-Faktor-Authentifizierung deaktiviert",
     "totp_error": "Zwei-Faktor-Authentifizierung konnte nicht aktualisiert werden"
+  },
+  "sick_leave": {
+    "title": "Krankmeldung",
+    "tabs": {
+      "list": "Meine Krankmeldungen",
+      "report": "Krankmeldung erstellen"
+    },
+    "start_date": "Startdatum",
+    "end_date": "Enddatum",
+    "notes": "Anmerkungen",
+    "report_button": "Krankmeldung einreichen",
+    "submit_certificate": "Attest einreichen",
+    "certificate_yes": "Eingereicht",
+    "certificate_no": "Nicht eingereicht",
+    "no_entries": "Keine Krankmeldungen gefunden",
+    "status": {
+      "reported": "Gemeldet",
+      "certificate_pending": "Attest ausstehend",
+      "certificate_received": "Attest eingegangen",
+      "cancelled": "Storniert"
+    },
+    "columns": {
+      "start_date": "Startdatum",
+      "end_date": "Enddatum",
+      "status": "Status",
+      "certificate": "Attest",
+      "notes": "Anmerkungen",
+      "actions": "Aktionen"
+    },
+    "errors": {
+      "load_failed": "Krankmeldungsdaten konnten nicht geladen werden",
+      "report_failed": "Krankmeldung konnte nicht erstellt werden",
+      "cancel_failed": "Krankmeldung konnte nicht storniert werden",
+      "certificate_failed": "Attest konnte nicht eingereicht werden"
+    },
+    "success": {
+      "reported": "Krankmeldung erfolgreich eingereicht",
+      "cancelled": "Krankmeldung storniert",
+      "certificate_submitted": "Attest erfolgreich eingereicht"
+    }
+  },
+  "business_trip": {
+    "title": "Dienstreisen",
+    "tabs": {
+      "list": "Meine Reisen",
+      "new_request": "Neuer Antrag"
+    },
+    "destination": "Reiseziel",
+    "purpose": "Zweck",
+    "start_date": "Startdatum",
+    "end_date": "Enddatum",
+    "notes": "Anmerkungen",
+    "estimated_cost": "Geschätzte Kosten",
+    "actual_cost": "Tatsächliche Kosten",
+    "cost_center": "Kostenstelle",
+    "submit_button": "Antrag einreichen",
+    "complete": "Abschließen",
+    "complete_title": "Dienstreise abschließen",
+    "no_entries": "Keine Dienstreisen gefunden",
+    "status": {
+      "requested": "Beantragt",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "cancelled": "Storniert",
+      "completed": "Abgeschlossen"
+    },
+    "columns": {
+      "destination": "Reiseziel",
+      "start_date": "Startdatum",
+      "end_date": "Enddatum",
+      "purpose": "Zweck",
+      "status": "Status",
+      "estimated_cost": "Gesch. Kosten",
+      "actions": "Aktionen"
+    },
+    "approval": {
+      "title": "Dienstreisegenehmigungen",
+      "approve": "Genehmigen",
+      "reject": "Ablehnen",
+      "reject_title": "Dienstreise ablehnen",
+      "rejection_reason": "Ablehnungsgrund (Pflichtfeld)",
+      "no_pending": "Keine ausstehenden Dienstreiseanträge",
+      "employee": "Mitarbeiter",
+      "destination": "Reiseziel",
+      "start_date": "Startdatum",
+      "end_date": "Enddatum",
+      "purpose": "Zweck",
+      "estimated_cost": "Gesch. Kosten",
+      "status": "Status",
+      "actions": "Aktionen"
+    },
+    "errors": {
+      "load_failed": "Dienstreisedaten konnten nicht geladen werden",
+      "create_failed": "Dienstreiseantrag konnte nicht erstellt werden",
+      "cancel_failed": "Dienstreise konnte nicht storniert werden",
+      "complete_failed": "Dienstreise konnte nicht abgeschlossen werden",
+      "approve_failed": "Dienstreise konnte nicht genehmigt werden",
+      "reject_failed": "Dienstreise konnte nicht abgelehnt werden"
+    },
+    "success": {
+      "created": "Dienstreiseantrag erfolgreich eingereicht",
+      "cancelled": "Dienstreise storniert",
+      "completed": "Dienstreise abgeschlossen"
+    }
+  },
+  "projects": {
+    "title": "Projekte & Zeitverteilung",
+    "tabs": {
+      "allocations": "Meine Zuweisungen",
+      "new_allocation": "Neue Zuweisung",
+      "manage_projects": "Projekte verwalten"
+    },
+    "project": "Projekt",
+    "select_project": "Projekt auswählen...",
+    "minutes": "Minuten",
+    "notes": "Anmerkungen",
+    "add_allocation": "Zuweisung hinzufügen",
+    "create_project": "Projekt erstellen",
+    "project_name": "Projektname",
+    "project_code": "Projektcode",
+    "description": "Beschreibung",
+    "cost_center": "Kostenstelle",
+    "no_allocations": "Keine Zeitzuweisungen gefunden",
+    "columns": {
+      "date": "Datum",
+      "project": "Projekt",
+      "code": "Code",
+      "duration": "Dauer",
+      "notes": "Anmerkungen",
+      "actions": "Aktionen"
+    },
+    "project_columns": {
+      "name": "Name",
+      "code": "Code",
+      "cost_center": "Kostenstelle",
+      "status": "Status"
+    },
+    "errors": {
+      "load_failed": "Projektdaten konnten nicht geladen werden",
+      "allocation_create_failed": "Zeitzuweisung konnte nicht erstellt werden",
+      "allocation_delete_failed": "Zeitzuweisung konnte nicht gelöscht werden",
+      "project_create_failed": "Projekt konnte nicht erstellt werden"
+    },
+    "success": {
+      "allocation_created": "Zeitzuweisung erfolgreich erstellt",
+      "allocation_deleted": "Zeitzuweisung gelöscht",
+      "project_created": "Projekt erfolgreich erstellt"
+    }
   },
   "backup": {
     "title": "Datenbank-Sicherungen",
