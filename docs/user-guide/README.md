@@ -89,6 +89,15 @@ The balance card at the top shows:
 
 Your manager will be notified by email. You can track the status of your requests in the **Requests** tab.
 
+### Creating Requests on Behalf of Employees (Managers)
+
+![Vacation - Manager On-Behalf-Of](../screenshots/vacation-new-request-manager.png)
+
+If you are a manager, the New Request form shows an **On Behalf Of** dropdown at the top. You can:
+- Select **For Myself** to create a request for yourself (default)
+- Select a subordinate from the dropdown to create a vacation request on their behalf
+- When creating on behalf of an employee, **past dates are allowed** (useful for retroactive entries)
+
 ### Request Status
 
 - 🟡 **Pending**: Awaiting manager approval
@@ -126,6 +135,10 @@ The **Sick Leave** page lets you report and track sick leave.
 
 Your manager will be notified by email.
 
+### Reporting on Behalf of Employees (Managers)
+
+If you are a manager, the Report form shows an **On Behalf Of** dropdown. You can select a subordinate to report sick leave on their behalf.
+
 ### Certificate Submission
 
 German labor law requires a medical certificate (Arbeitsunfähigkeitsbescheinigung) after a certain period of sick leave. You can mark a certificate as submitted by clicking **Submit Certificate** in the actions column.
@@ -155,6 +168,10 @@ The **Business Trips** page lets you request and manage business trips.
 
 Your manager will be notified and can approve or reject the request.
 
+### Creating Trips on Behalf of Employees (Managers)
+
+If you are a manager, the New Request form shows an **On Behalf Of** dropdown. You can select a subordinate to create a business trip request on their behalf.
+
 ### Completing a Trip
 
 After an approved trip is finished, click **Complete** to mark it as completed. You can optionally enter the actual cost at this point.
@@ -179,6 +196,50 @@ Here you can:
 - View pending business trip requests from your team
 - **Approve** requests with one click
 - **Reject** requests with a mandatory reason
+
+---
+
+## Work Hour Changes
+
+The **Work Hours** page lets you request changes to your weekly and daily work hours (e.g., switching from full-time to part-time).
+
+![Work Hour Changes](../screenshots/work-hour-changes.png)
+
+### Viewing Your Requests
+
+The **My Requests** tab shows all your work hour change requests with current hours, requested hours, effective date, status, and reason.
+
+### Creating a Request
+
+1. Click the **New Request** tab
+2. Enter the **Requested Weekly Hours** (e.g., 32 for part-time)
+3. Optionally enter **Requested Daily Hours**
+4. Select the **Effective Date** (when the change should take effect)
+5. Add a **Reason** explaining the change
+6. Click **Submit Request**
+
+Your manager will review and approve or reject the request. Only one pending request is allowed at a time.
+
+### Request Status
+
+- 🟡 **Pending**: Awaiting manager approval
+- 🟢 **Approved**: Request approved — your work hours have been updated
+- 🔴 **Rejected**: Request rejected (reason shown)
+- ⚪ **Cancelled**: Request cancelled by you
+
+---
+
+## Work Hour Change Approvals (Managers)
+
+If you are a manager, you will see the **Hours Approvals** page.
+
+![Work Hour Change Approvals](../screenshots/work-hour-change-approvals.png)
+
+Here you can:
+- View pending work hour change requests from your team
+- See the employee's current and requested hours, effective date, and reason
+- **Approve**: Automatically updates the employee's configured work hours
+- **Reject**: With a mandatory reason
 
 ---
 
