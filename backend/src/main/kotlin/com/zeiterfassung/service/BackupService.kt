@@ -64,7 +64,7 @@ class BackupService(
             ProcessBuilder(
                 "bash",
                 "-c",
-                "set -o pipefail; pg_dump -h $host -p $port -U $safeUsername -d $dbName | gzip > ${backupFile.absolutePath}",
+                "set -o pipefail; pg_dump -h $host -p $port -U $safeUsername -d $dbName --clean --if-exists | gzip > ${backupFile.absolutePath}",
             ).apply {
                 environment()["PGPASSWORD"] = datasourcePassword
                 redirectErrorStream(false)
