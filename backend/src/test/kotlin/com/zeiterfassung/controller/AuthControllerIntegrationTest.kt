@@ -60,6 +60,8 @@ class AuthControllerIntegrationTest {
     fun setUp() {
         auditLogRepository.deleteAll()
         refreshTokenRepository.deleteAll()
+        // Delete audit logs again in case @Async audit entries arrived after first deleteAll
+        auditLogRepository.deleteAll()
         userRepository.deleteAll()
         roleRepository.deleteAll()
 
