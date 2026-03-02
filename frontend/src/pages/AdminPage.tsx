@@ -456,24 +456,40 @@ function EmployeeConfigModal({ user, onClose }: { user: User; onClose: () => voi
   const [vacationDaysPerYear, setVacationDaysPerYear] = useState('30')
   const [vacationCarryOverMax, setVacationCarryOverMax] = useState('10')
 
+  const [balanceTotalDays, setBalanceTotalDays] = useState('0')
+  const [balanceUsedDays, setBalanceUsedDays] = useState('0')
+  const [balanceCarriedOver, setBalanceCarriedOver] = useState('0')
+  const [balanceRemaining, setBalanceRemaining] = useState('0')
+  const [balancePending, setBalancePending] = useState('0')
+
   useEffect(() => {
-    const loadConfig = async () => {
+    const loadData = async () => {
       setLoading(true)
       setError(null)
       try {
-        const data = await adminService.getEmployeeConfig(user.id)
-        setWeeklyWorkHours(String(data.weeklyWorkHours))
-        setDailyWorkHours(String(data.dailyWorkHours))
-        setWorkDays(data.workDays)
-        setVacationDaysPerYear(String(data.vacationDaysPerYear))
-        setVacationCarryOverMax(String(data.vacationCarryOverMax))
+        const [configData, balanceData] = await Promise.all([
+          adminService.getEmployeeConfig(user.id),
+          adminService.getVacationBalance(user.id).catch(() => null),
+        ])
+        setWeeklyWorkHours(String(configData.weeklyWorkHours))
+        setDailyWorkHours(String(configData.dailyWorkHours))
+        setWorkDays(configData.workDays)
+        setVacationDaysPerYear(String(configData.vacationDaysPerYear))
+        setVacationCarryOverMax(String(configData.vacationCarryOverMax))
+        if (balanceData) {
+          setBalanceTotalDays(String(balanceData.totalDays))
+          setBalanceUsedDays(String(balanceData.usedDays))
+          setBalanceCarriedOver(String(balanceData.carriedOverDays))
+          setBalanceRemaining(String(balanceData.remainingDays))
+          setBalancePending(String(balanceData.pendingDays))
+        }
       } catch {
         setError(t('admin.errors.load_failed'))
       } finally {
         setLoading(false)
       }
     }
-    loadConfig()
+    loadData()
   }, [user.id, t])
 
   const toggleWorkDay = (day: number) => {
@@ -500,6 +516,11 @@ function EmployeeConfigModal({ user, onClose }: { user: User; onClose: () => voi
         vacationCarryOverMax: parseInt(vacationCarryOverMax, 10),
       }
       await adminService.updateEmployeeConfig(user.id, payload)
+      await adminService.setVacationBalance(user.id, {
+        totalDays: parseFloat(balanceTotalDays),
+        usedDays: parseFloat(balanceUsedDays),
+        carriedOverDays: parseFloat(balanceCarriedOver),
+      })
       setSuccess(true)
     } catch {
       setError(t('admin.errors.save_failed'))
@@ -614,6 +635,66 @@ function EmployeeConfigModal({ user, onClose }: { user: User; onClose: () => voi
                     onChange={(e) => setVacationCarryOverMax(e.target.value)}
                     required
                   />
+                </div>
+              </div>
+              <div className="border-t pt-4 mt-2">
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                  {t('admin.employee_config.vacation_balance')} ({new Date().getFullYear()})
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="ec-balanceTotal" className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('vacation.balance.total')}
+                    </label>
+                    <input
+                      id="ec-balanceTotal"
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      value={balanceTotalDays}
+                      onChange={(e) => setBalanceTotalDays(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="ec-balanceUsed" className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('vacation.balance.used')}
+                    </label>
+                    <input
+                      id="ec-balanceUsed"
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      value={balanceUsedDays}
+                      onChange={(e) => setBalanceUsedDays(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="ec-balanceCarried" className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('vacation.balance.carried_over')}
+                    </label>
+                    <input
+                      id="ec-balanceCarried"
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      value={balanceCarriedOver}
+                      onChange={(e) => setBalanceCarriedOver(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('vacation.balance.remaining')}
+                    </label>
+                    <p className="w-full border rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-700 font-medium">
+                      {balanceRemaining} <span className="text-xs text-gray-500">({t('vacation.balance.pending')}: {balancePending})</span>
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
