@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, ClipboardList, Settings, Plus, Edit, Trash2, Key, Wifi, Mail, FolderTree, Database, Download, Upload, RefreshCw, ImageIcon } from 'lucide-react'
+import { Users, ClipboardList, Settings, Plus, Edit, Trash2, Key, Wifi, Mail, FolderTree, Database, Download, Upload, RefreshCw, ImageIcon, Sliders } from 'lucide-react'
 import adminService from '../services/adminService'
-import type { AuditLogEntry, SystemSetting, CreateUserPayload, UpdateUserPayload, BackupInfo } from '../services/adminService'
+import type { AuditLogEntry, SystemSetting, CreateUserPayload, UpdateUserPayload, BackupInfo, EmployeeConfigPayload } from '../services/adminService'
 import type { User } from '../types'
 import { invalidateBrandingCache } from '../hooks/useBranding'
 
@@ -441,6 +441,282 @@ function ResetPasswordModal({ user, onClose }: { user: User; onClose: () => void
   )
 }
 
+const ALL_WEEK_DAYS = [1, 2, 3, 4, 5, 6, 7]
+
+function EmployeeConfigModal({ user, onClose }: { user: User; onClose: () => void }) {
+  const { t } = useTranslation()
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
+
+  const [weeklyWorkHours, setWeeklyWorkHours] = useState('40')
+  const [dailyWorkHours, setDailyWorkHours] = useState('8')
+  const [workDays, setWorkDays] = useState<number[]>([1, 2, 3, 4, 5])
+  const [vacationDaysPerYear, setVacationDaysPerYear] = useState('30')
+  const [vacationCarryOverMax, setVacationCarryOverMax] = useState('10')
+
+  const [balanceTotalDays, setBalanceTotalDays] = useState('0')
+  const [balanceUsedDays, setBalanceUsedDays] = useState('0')
+  const [balanceCarriedOver, setBalanceCarriedOver] = useState('0')
+  const [balanceRemaining, setBalanceRemaining] = useState('0')
+  const [balancePending, setBalancePending] = useState('0')
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const [configData, balanceData] = await Promise.all([
+          adminService.getEmployeeConfig(user.id),
+          adminService.getVacationBalance(user.id).catch(() => null),
+        ])
+        setWeeklyWorkHours(String(configData.weeklyWorkHours))
+        setDailyWorkHours(String(configData.dailyWorkHours))
+        setWorkDays(configData.workDays)
+        setVacationDaysPerYear(String(configData.vacationDaysPerYear))
+        setVacationCarryOverMax(String(configData.vacationCarryOverMax))
+        if (balanceData) {
+          setBalanceTotalDays(String(balanceData.totalDays))
+          setBalanceUsedDays(String(balanceData.usedDays))
+          setBalanceCarriedOver(String(balanceData.carriedOverDays))
+          setBalanceRemaining(String(balanceData.remainingDays))
+          setBalancePending(String(balanceData.pendingDays))
+        }
+      } catch {
+        setError(t('admin.errors.load_failed'))
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
+  }, [user.id, t])
+
+  const toggleWorkDay = (day: number) => {
+    setWorkDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day].sort(),
+    )
+  }
+
+  const dayLabel = (day: number): string => {
+    return t(`admin.employee_config.day_${day}`)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaving(true)
+    setError(null)
+    setSuccess(false)
+    try {
+      const payload: EmployeeConfigPayload = {
+        weeklyWorkHours: parseFloat(weeklyWorkHours),
+        dailyWorkHours: parseFloat(dailyWorkHours),
+        workDays,
+        vacationDaysPerYear: parseInt(vacationDaysPerYear, 10),
+        vacationCarryOverMax: parseInt(vacationCarryOverMax, 10),
+      }
+      await adminService.updateEmployeeConfig(user.id, payload)
+      await adminService.setVacationBalance(user.id, {
+        totalDays: parseFloat(balanceTotalDays),
+        usedDays: parseFloat(balanceUsedDays),
+        carriedOverDays: parseFloat(balanceCarriedOver),
+      })
+      setSuccess(true)
+    } catch {
+      setError(t('admin.errors.save_failed'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+        <div className="p-6 border-b">
+          <h2 className="text-lg font-semibold text-gray-900">{t('admin.employee_config.title')}</h2>
+          <p className="text-sm text-gray-500 mt-1">{user.firstName} {user.lastName}</p>
+        </div>
+        {loading ? (
+          <div className="p-6"><LoadingSpinner /></div>
+        ) : success ? (
+          <div className="p-6">
+            <p className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg p-3">
+              {t('admin.employee_config.save_success')}
+            </p>
+            <div className="mt-4 flex justify-end">
+              <button onClick={onClose} className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                {t('common.confirm')}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <div className="p-6 space-y-4">
+              {error && <ErrorBanner message={error} />}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="ec-weeklyHours" className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('admin.employee_config.weekly_work_hours')}
+                  </label>
+                  <input
+                    id="ec-weeklyHours"
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    max="60"
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    value={weeklyWorkHours}
+                    onChange={(e) => setWeeklyWorkHours(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="ec-dailyHours" className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('admin.employee_config.daily_work_hours')}
+                  </label>
+                  <input
+                    id="ec-dailyHours"
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    max="12"
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    value={dailyWorkHours}
+                    onChange={(e) => setDailyWorkHours(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('admin.employee_config.work_days')}
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {ALL_WEEK_DAYS.map((day) => (
+                    <label key={day} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={workDays.includes(day)}
+                        onChange={() => toggleWorkDay(day)}
+                        className="rounded border-gray-300"
+                      />
+                      {dayLabel(day)}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="ec-vacationDays" className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('admin.employee_config.vacation_days_per_year')}
+                  </label>
+                  <input
+                    id="ec-vacationDays"
+                    type="number"
+                    min="0"
+                    max="365"
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    value={vacationDaysPerYear}
+                    onChange={(e) => setVacationDaysPerYear(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="ec-carryOver" className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('admin.employee_config.vacation_carry_over_max')}
+                  </label>
+                  <input
+                    id="ec-carryOver"
+                    type="number"
+                    min="0"
+                    max="365"
+                    className="w-full border rounded-lg px-3 py-2 text-sm"
+                    value={vacationCarryOverMax}
+                    onChange={(e) => setVacationCarryOverMax(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="border-t pt-4 mt-2">
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                  {t('admin.employee_config.vacation_balance')} ({new Date().getFullYear()})
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="ec-balanceTotal" className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('vacation.balance.total')}
+                    </label>
+                    <input
+                      id="ec-balanceTotal"
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      value={balanceTotalDays}
+                      onChange={(e) => setBalanceTotalDays(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="ec-balanceUsed" className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('vacation.balance.used')}
+                    </label>
+                    <input
+                      id="ec-balanceUsed"
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      value={balanceUsedDays}
+                      onChange={(e) => setBalanceUsedDays(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="ec-balanceCarried" className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('vacation.balance.carried_over')}
+                    </label>
+                    <input
+                      id="ec-balanceCarried"
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      value={balanceCarriedOver}
+                      onChange={(e) => setBalanceCarriedOver(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('vacation.balance.remaining')}
+                    </label>
+                    <p className="w-full border rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-700 font-medium">
+                      {balanceRemaining} <span className="text-xs text-gray-500">({t('vacation.balance.pending')}: {balancePending})</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t flex justify-end gap-3">
+              <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-700 border rounded-lg hover:bg-gray-50">
+                {t('common.cancel')}
+              </button>
+              <button
+                type="submit"
+                disabled={saving}
+                className="px-4 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+              >
+                {saving ? t('common.loading') : t('common.save')}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function UsersTab() {
   const { t } = useTranslation()
   const [users, setUsers] = useState<User[]>([])
@@ -449,7 +725,7 @@ function UsersTab() {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(1)
-  const [modal, setModal] = useState<'create' | 'edit' | 'rfid' | 'password' | null>(null)
+  const [modal, setModal] = useState<'create' | 'edit' | 'rfid' | 'password' | 'config' | null>(null)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
 
@@ -552,6 +828,9 @@ function UsersTab() {
                       <button aria-label={t('common.edit')} onClick={() => { setSelectedUser(user); setModal('edit') }} className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-gray-100 rounded">
                         <Edit size={14} />
                       </button>
+                      <button aria-label={t('admin.employee_config.title')} onClick={() => { setSelectedUser(user); setModal('config') }} className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-gray-100 rounded">
+                        <Sliders size={14} />
+                      </button>
                       <button aria-label={t('users.rfid_tag')} onClick={() => { setSelectedUser(user); setModal('rfid') }} className="p-1.5 text-gray-500 hover:text-primary-600 hover:bg-gray-100 rounded">
                         <Wifi size={14} />
                       </button>
@@ -607,6 +886,9 @@ function UsersTab() {
       )}
       {modal === 'password' && selectedUser && (
         <ResetPasswordModal user={selectedUser} onClose={() => setModal(null)} />
+      )}
+      {modal === 'config' && selectedUser && (
+        <EmployeeConfigModal user={selectedUser} onClose={() => setModal(null)} />
       )}
     </div>
   )

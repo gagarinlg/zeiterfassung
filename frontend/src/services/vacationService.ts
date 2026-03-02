@@ -54,6 +54,11 @@ export const vacationService = {
     return response.data
   },
 
+  async createRequestForUser(userId: string, data: CreateVacationRequestData): Promise<VacationRequest> {
+    const response = await apiClient.post<VacationRequest>(`/vacation/requests/user/${userId}`, data)
+    return response.data
+  },
+
   async updateRequest(id: string, data: UpdateVacationRequestData): Promise<VacationRequest> {
     const response = await apiClient.put<VacationRequest>(`/vacation/requests/${id}`, data)
     return response.data

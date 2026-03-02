@@ -81,7 +81,6 @@ export default function TrackingStatusBar({
             </>
           )}
           {status.status === 'ON_BREAK' && (
-            <>
               <button
                 onClick={onEndBreak}
                 disabled={actionLoading}
@@ -89,14 +88,6 @@ export default function TrackingStatusBar({
               >
                 {t('time_tracking.break_end')}
               </button>
-              <button
-                onClick={onClockOut}
-                disabled={actionLoading}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
-              >
-                {t('time_tracking.clock_out')}
-              </button>
-            </>
           )}
         </div>
       </div>

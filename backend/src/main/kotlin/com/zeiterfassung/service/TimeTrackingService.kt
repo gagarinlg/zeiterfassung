@@ -184,6 +184,7 @@ class TimeTrackingService(
         val status =
             when (lastEntry?.entryType) {
                 TimeEntryType.CLOCK_IN -> TrackingStatus.CLOCKED_IN
+                TimeEntryType.BREAK_END -> TrackingStatus.CLOCKED_IN
                 TimeEntryType.BREAK_START -> TrackingStatus.ON_BREAK
                 else -> TrackingStatus.CLOCKED_OUT
             }

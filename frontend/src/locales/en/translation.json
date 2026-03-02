@@ -12,6 +12,8 @@
     "business_trips": "Business Trips",
     "business_trip_approvals": "Trip Approvals",
     "projects": "Projects",
+    "work_hour_changes": "Work Hours",
+    "work_hour_change_approvals": "Hours Approvals",
     "admin": "Administration",
     "profile": "Profile",
     "logout": "Logout",
@@ -105,6 +107,8 @@
       "cancel": "Cancel",
       "cancel_confirm": "Are you sure you want to cancel this request?",
       "submit": "Submit Request",
+      "on_behalf_of": "On Behalf Of",
+      "for_myself": "For Myself",
       "start_date": "Start Date",
       "end_date": "End Date",
       "half_day_start": "Half day on start date",
@@ -202,6 +206,23 @@
       "rfid_placeholder": "Scan or enter RFID tag ID",
       "rfid_hint": "Leave empty to remove the RFID tag",
       "password_reset_success": "Password has been reset successfully"
+    },
+    "employee_config": {
+      "title": "Employee Configuration",
+      "weekly_work_hours": "Weekly Hours",
+      "daily_work_hours": "Daily Hours",
+      "work_days": "Work Days",
+      "vacation_days_per_year": "Vacation Days/Year",
+      "vacation_carry_over_max": "Max Carry-Over",
+      "save_success": "Employee configuration saved successfully",
+      "vacation_balance": "Vacation Balance",
+      "day_1": "Mon",
+      "day_2": "Tue",
+      "day_3": "Wed",
+      "day_4": "Thu",
+      "day_5": "Fri",
+      "day_6": "Sat",
+      "day_7": "Sun"
     },
     "audit_log": "Audit Log",
     "settings_tab": "System Settings",
@@ -497,6 +518,52 @@
       "allocation_created": "Time allocation created successfully",
       "allocation_deleted": "Time allocation deleted",
       "project_created": "Project created successfully"
+    }
+  },
+  "work_hour_change": {
+    "title": "Work Hour Changes",
+    "approvals_title": "Work Hour Change Approvals",
+    "tabs": {
+      "list": "My Requests",
+      "new_request": "New Request"
+    },
+    "requested_weekly_hours": "Requested Weekly Hours",
+    "requested_daily_hours": "Requested Daily Hours",
+    "effective_date": "Effective Date",
+    "reason": "Reason",
+    "submit": "Submit Request",
+    "no_entries": "No work hour change requests found",
+    "no_pending": "No pending work hour change requests",
+    "see_reason": "See rejection reason",
+    "reject_title": "Reject Work Hour Change Request",
+    "reject_reason_placeholder": "Enter rejection reason...",
+    "columns": {
+      "employee": "Employee",
+      "current_hours": "Current Hours",
+      "requested_hours": "Requested Hours",
+      "effective_date": "Effective Date",
+      "reason": "Reason",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "errors": {
+      "load_failed": "Failed to load requests",
+      "create_failed": "Failed to create request",
+      "cancel_failed": "Failed to cancel request",
+      "approve_failed": "Failed to approve request",
+      "reject_failed": "Failed to reject request"
+    },
+    "success": {
+      "created": "Work hour change request submitted",
+      "cancelled": "Request cancelled",
+      "approved": "Request approved",
+      "rejected": "Request rejected"
     }
   },
   "backup": {

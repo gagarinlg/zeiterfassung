@@ -3,6 +3,7 @@ package com.zeiterfassung.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeiterfassung.audit.AuditService
 import com.zeiterfassung.exception.ConflictException
+import com.zeiterfassung.model.dto.TrackingStatus
 import com.zeiterfassung.model.entity.DailySummaryEntity
 import com.zeiterfassung.model.entity.TimeEntryEntity
 import com.zeiterfassung.model.entity.UserEntity
@@ -173,6 +174,35 @@ class TimeTrackingServiceTest {
 
         val result = service.endBreak(userId, TimeEntrySource.WEB)
         assertThat(result.entryType).isEqualTo(TimeEntryType.BREAK_END)
+    }
+
+    @Test
+    fun `getCurrentStatus should return CLOCKED_IN after break end`() {
+        val now = Instant.now()
+        val breakEndEntry =
+            TimeEntryEntity(
+                user = user,
+                entryType = TimeEntryType.BREAK_END,
+                timestamp = now.minusSeconds(60),
+            )
+        val entries =
+            listOf(
+                TimeEntryEntity(user = user, entryType = TimeEntryType.CLOCK_IN, timestamp = now.minus(2, ChronoUnit.HOURS)),
+                TimeEntryEntity(user = user, entryType = TimeEntryType.BREAK_START, timestamp = now.minus(1, ChronoUnit.HOURS)),
+                breakEndEntry,
+            )
+        `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
+        `when`(timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)).thenReturn(breakEndEntry)
+        `when`(
+            timeEntryRepository.findByUserIdAndDateRange(
+                any(UUID::class.java) ?: userId,
+                any(Instant::class.java) ?: now,
+                any(Instant::class.java) ?: now,
+            ),
+        ).thenReturn(entries)
+
+        val result = service.getCurrentStatus(userId)
+        assertThat(result.status).isEqualTo(TrackingStatus.CLOCKED_IN)
     }
 
     @Test

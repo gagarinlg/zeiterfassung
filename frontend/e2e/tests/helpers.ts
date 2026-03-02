@@ -11,8 +11,11 @@ export const MOCK_USER = {
   roles: ['ADMIN'],
   permissions: [
     'time.track',
+    'time.edit.own',
+    'time.edit.team',
     'time.view.team',
     'vacation.request',
+    'vacation.request.own',
     'vacation.approve',
     'admin.users.manage',
   ],

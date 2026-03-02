@@ -56,6 +56,47 @@ export interface RestoreResponse {
   message: string
 }
 
+export interface EmployeeConfig {
+  id: string
+  userId: string
+  weeklyWorkHours: number
+  dailyWorkHours: number
+  workDays: number[]
+  vacationDaysPerYear: number
+  vacationCarryOverMax: number
+  contractStartDate: string | null
+  contractEndDate: string | null
+  isHomeOfficeEligible: boolean
+}
+
+export interface EmployeeConfigPayload {
+  weeklyWorkHours?: number
+  dailyWorkHours?: number
+  workDays?: number[]
+  vacationDaysPerYear?: number
+  vacationCarryOverMax?: number
+  contractStartDate?: string | null
+  contractEndDate?: string | null
+  isHomeOfficeEligible?: boolean
+}
+
+export interface VacationBalance {
+  id: string
+  userId: string
+  year: number
+  totalDays: number
+  usedDays: number
+  carriedOverDays: number
+  remainingDays: number
+  pendingDays: number
+}
+
+export interface SetVacationBalancePayload {
+  totalDays?: number
+  usedDays?: number
+  carriedOverDays?: number
+}
+
 const adminService = {
   // Audit log
   getAuditLog: (page = 0, size = 50) =>
@@ -165,6 +206,20 @@ const adminService = {
   // Test mail
   sendTestMail: (recipientEmail: string) =>
     apiClient.post<{ status: string; message: string }>('/admin/mail/test', { recipientEmail }).then((r) => r.data),
+
+  // Employee configuration
+  getEmployeeConfig: (userId: string) =>
+    apiClient.get<EmployeeConfig>(`/employee-config/${userId}`).then((r) => r.data),
+
+  updateEmployeeConfig: (userId: string, payload: EmployeeConfigPayload) =>
+    apiClient.put<EmployeeConfig>(`/employee-config/${userId}`, payload).then((r) => r.data),
+
+  // Vacation balance
+  getVacationBalance: (userId: string, year?: number) =>
+    apiClient.get<VacationBalance>(`/vacation/balance/${userId}`, { params: year ? { year } : {} }).then((r) => r.data),
+
+  setVacationBalance: (userId: string, payload: SetVacationBalancePayload, year?: number) =>
+    apiClient.put<VacationBalance>(`/vacation/balance/${userId}`, payload, { params: year ? { year } : {} }).then((r) => r.data),
 }
 
 export default adminService

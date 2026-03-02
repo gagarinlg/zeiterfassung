@@ -1,8 +1,42 @@
 # Zeiterfassung — Project Phases & Roadmap
 
-> Last updated: 2026-03-01
+> Last updated: 2026-03-02
 >
-> **Current phase:** Phase 14 — Sick Leave, Business Trips, Projects & GDPR ✅
+> **Current phase:** Phase 15 — Work Hour Change Requests 🚧
+
+---
+
+## Phase 15: Work Hour Change Requests 🚧
+- **Status**: IN PROGRESS
+
+### What was delivered
+- **Work Hour Change Request Workflow**: Full backend with entity, repository, service, controller at `/work-hour-changes`
+  - Status workflow: PENDING → APPROVED / REJECTED / CANCELLED
+  - Employee creates request specifying desired weekly (and optionally daily) hours
+  - Current hours automatically captured from EmployeeConfig
+  - Manager approval/rejection workflow (same pattern as vacation)
+  - On approval, employee's `weeklyWorkHours` and `dailyWorkHours` in EmployeeConfig are updated
+  - Duplicate pending request prevention (one pending request per user)
+  - Audit logging for all state changes
+
+### Key files created
+- `backend/src/main/resources/db/migration/V11__create_work_hour_change_requests.sql`
+- `backend/src/main/kotlin/com/zeiterfassung/model/enums/WorkHourChangeStatus.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/dto/WorkHourChangeDtos.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/entity/WorkHourChangeRequestEntity.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/repository/WorkHourChangeRequestRepository.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/WorkHourChangeService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/controller/WorkHourChangeController.kt`
+
+### API Endpoints
+| Method | Path | Permission | Description |
+|--------|------|------------|-------------|
+| POST | `/work-hour-changes` | `time.edit.own` | Create work hour change request |
+| GET | `/work-hour-changes` | `time.edit.own` | Get own requests (paginated) |
+| GET | `/work-hour-changes/pending` | `time.edit.team` | Get pending requests for approval |
+| POST | `/work-hour-changes/{id}/approve` | `time.edit.team` | Approve request |
+| POST | `/work-hour-changes/{id}/reject` | `time.edit.team` | Reject request |
+| DELETE | `/work-hour-changes/{id}` | `time.edit.own` | Cancel own request |
 
 ---
 

@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '../hooks/useAuth'
 import { businessTripService } from '../services/businessTripService'
 import type { BusinessTripResponse } from '../services/businessTripService'
+import adminService from '../services/adminService'
+import type { User } from '../types'
 import { XCircle, CheckCircle } from 'lucide-react'
 
 type Tab = 'list' | 'new_request'
@@ -25,6 +28,7 @@ function StatusBadge({ status }: { status: BusinessTripStatus }) {
 
 export default function BusinessTripPage() {
   const { t } = useTranslation()
+  const { hasPermission } = useAuth()
   const [activeTab, setActiveTab] = useState<Tab>('list')
   const [trips, setTrips] = useState<BusinessTripResponse[]>([])
   const [loading, setLoading] = useState(true)
@@ -32,6 +36,9 @@ export default function BusinessTripPage() {
   const [success, setSuccess] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [completeModal, setCompleteModal] = useState<{ id: string; actualCost: string } | null>(null)
+  const [selectedUserId, setSelectedUserId] = useState('')
+  const [teamMembers, setTeamMembers] = useState<User[]>([])
+  const isManager = hasPermission('time.edit.team')
 
   const [formData, setFormData] = useState({
     startDate: '',
@@ -60,12 +67,18 @@ export default function BusinessTripPage() {
     loadTrips()
   }, [loadTrips])
 
+  useEffect(() => {
+    if (isManager) {
+      adminService.getUsers(0, 100).then((data) => setTeamMembers(data.content)).catch(() => {})
+    }
+  }, [isManager])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setSuccess(null)
     try {
-      await businessTripService.createTrip({
+      const tripData = {
         startDate: formData.startDate,
         endDate: formData.endDate,
         destination: formData.destination,
@@ -73,9 +86,15 @@ export default function BusinessTripPage() {
         notes: formData.notes || undefined,
         estimatedCost: formData.estimatedCost ? parseFloat(formData.estimatedCost) : undefined,
         costCenter: formData.costCenter || undefined,
-      })
+      }
+      if (selectedUserId) {
+        await businessTripService.createTripForUser(selectedUserId, tripData)
+      } else {
+        await businessTripService.createTrip(tripData)
+      }
       setSuccess(t('business_trip.success.created'))
       setFormData({ startDate: '', endDate: '', destination: '', purpose: '', notes: '', estimatedCost: '', costCenter: '' })
+      setSelectedUserId('')
       setActiveTab('list')
       await loadTrips()
     } catch {
@@ -217,6 +236,24 @@ export default function BusinessTripPage() {
 
       {activeTab === 'new_request' && (
         <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6 max-w-lg space-y-4">
+          {isManager && (
+            <div>
+              <label htmlFor="tripOnBehalf" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('vacation.request.on_behalf_of')}
+              </label>
+              <select
+                id="tripOnBehalf"
+                value={selectedUserId}
+                onChange={(e) => setSelectedUserId(e.target.value)}
+                className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              >
+                <option value="">{t('vacation.request.for_myself')}</option>
+                {teamMembers.map((u) => (
+                  <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label htmlFor="destination" className="block text-sm font-medium text-gray-700 mb-1">
               {t('business_trip.destination')} *

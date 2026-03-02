@@ -3,6 +3,57 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Work Hour Change Requests
+
+### Added
+- **Work hour change request workflow**: Employees can request changes to their weekly/daily work hours; managers approve/reject
+  - `POST /work-hour-changes` — create request (captures current hours from EmployeeConfig)
+  - `GET /work-hour-changes` — list own requests (paginated)
+  - `GET /work-hour-changes/pending` — list pending requests for manager approval
+  - `POST /work-hour-changes/{id}/approve` — approve and update EmployeeConfig
+  - `POST /work-hour-changes/{id}/reject` — reject with reason
+  - `DELETE /work-hour-changes/{id}` — cancel own pending request
+- **Database migration V11**: `work_hour_change_requests` table with user/status indexes
+- **Enum**: `WorkHourChangeStatus` (PENDING, APPROVED, REJECTED, CANCELLED)
+- **DTOs**: `CreateWorkHourChangeRequest`, `RejectWorkHourChangeRequest`, `WorkHourChangeResponse`
+- **Entity**: `WorkHourChangeRequestEntity` with `@ManyToOne` user/approver, `toResponse()` method
+- **Repository**: `WorkHourChangeRequestRepository` with user/status queries
+- **Service**: `WorkHourChangeService` with validation, audit logging, EmployeeConfig update on approval
+- **Controller**: `WorkHourChangeController` with Swagger annotations and `@PreAuthorize` permission checks
+
+## [Unreleased] — Bug Fixes & Employee Configuration UI
+
+### Fixed
+- **Break end clock-out bug**: Ending a break no longer incorrectly shows the user as clocked out. Added `BREAK_END -> CLOCKED_IN` mapping in `TimeTrackingService.getCurrentStatus()`.
+- **TrackingStatusBar**: Removed Clock Out button from ON_BREAK state. Users must end their break before clocking out, preventing accidental clock-outs.
+- **AuthControllerIntegrationTest**: Fixed pre-existing FK constraint violation caused by `@Async` audit log entries arriving between cleanup calls in `setUp()`
+
+### Added
+- **Employee Configuration modal**: New modal in admin User Management tab (Sliders icon) to configure per-user work settings:
+  - Weekly work hours
+  - Daily work hours
+  - Work days (Mon–Sun checkboxes)
+  - Vacation days per year
+  - Vacation carry-over maximum
+  - Vacation balance management (total, used, carried over days for current year)
+- **`adminService` employee config methods**: `getEmployeeConfig(userId)`, `updateEmployeeConfig(userId, payload)` calling `GET/PUT /employee-config/{userId}`
+- **`adminService` vacation balance methods**: `getVacationBalance(userId)`, `setVacationBalance(userId, payload)` calling `GET/PUT /vacation/balance/{userId}`
+- **Manager on-behalf-of**: Subordinate selector in vacation, business trip, and sick leave forms for managers
+  - Backend: `POST /vacation/requests/user/{userId}`, `POST /business-trips/user/{userId}` endpoints
+  - Frontend: service methods `createRequestForUser`, `createTripForUser`, `reportSickLeaveForUser`
+  - Past dates allowed for managers in vacation requests
+- **Work hour change request workflow**: Employees request weekly/daily hour changes, managers approve/reject
+  - Backend: V11 migration, entity, DTOs, repository, service (`WorkHourChangeService`), controller at `/work-hour-changes`
+  - Frontend: `WorkHourChangePage` (request list + new request form), `WorkHourChangeApprovalPage` (approval queue with reject-with-reason modal)
+  - Navigation links and routes for both pages
+  - On approval, employee config is automatically updated with new work hours
+- **i18n translations**: Added `admin.employee_config.*`, `vacation.request.on_behalf_of/for_myself`, `work_hour_change.*`, `nav.work_hour_changes/work_hour_change_approvals` keys for both English and German
+- **Backend unit test**: `getCurrentStatus should return CLOCKED_IN after break end` in `TimeTrackingServiceTest`
+
+### Changed
+- **TrackingStatusBar test**: Updated to verify Clock Out button is NOT shown when ON_BREAK
+- Backend test count increased from 260 to 261 tests
+
 ## [Unreleased] — UI & Workflow Fixes
 
 ### Fixed

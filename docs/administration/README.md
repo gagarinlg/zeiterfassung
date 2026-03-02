@@ -23,6 +23,32 @@ The User Management tab allows you to:
 - **Reset passwords**: Reset a user's password from the admin panel
 - **Deactivate/Delete users**: Soft-delete users (GDPR-compliant)
 
+#### Employee Configuration
+
+![Admin - Employee Configuration](../screenshots/admin-employee-config.png)
+
+Click the **Sliders** icon (⚙) next to a user in the User Management table to open the Employee Configuration modal. This allows you to configure per-user work settings:
+
+| Setting | Description |
+|---------|-------------|
+| **Weekly Work Hours** | Target weekly work hours (e.g., 40 for full-time, 20 for part-time) |
+| **Daily Work Hours** | Target daily work hours (e.g., 8) |
+| **Work Days** | Which days the employee works (Mon–Sun checkboxes) |
+| **Vacation Days/Year** | Annual vacation entitlement |
+| **Carry-over Maximum** | Maximum vacation days that carry over to the next year |
+
+The modal also shows the employee's **Vacation Balance** for the current year:
+
+| Field | Description |
+|-------|-------------|
+| **Total Days** | Total vacation days for the current year (editable for migration) |
+| **Used Days** | Days already taken (editable for migration) |
+| **Carried Over** | Days carried over from the previous year (editable for migration) |
+| **Remaining** | Calculated: Total + Carried Over − Used (read-only) |
+| **Pending** | Days in pending vacation requests (read-only) |
+
+> **Migration Tip**: When migrating to Zeiterfassung, use the vacation balance fields to set each employee's current remaining vacation days for the year.
+
 #### Manager Substitute Feature
 
 A substitute (Stellvertreter) can be configured for any manager. When assigned:
@@ -146,7 +172,10 @@ Employees can report sick leave through the **Sick Leave** page. Managers are au
 1. Employee reports sick leave (start date, end date, optional notes)
 2. Status changes to **Reported**
 3. Employee submits medical certificate → status changes to **Certificate Received**
-4. Managers can also report sick leave on behalf of an employee
+4. Managers can also report sick leave on behalf of an employee using the "On Behalf Of" dropdown
+
+### Manager On-Behalf-Of
+Managers can report sick leave for their subordinates by selecting the employee from the **On Behalf Of** dropdown in the Report form. Past dates are allowed when creating entries on behalf of employees.
 
 ### Overlap Detection
 The system prevents overlapping sick leave entries. If an employee tries to report sick leave for dates that overlap with an existing non-cancelled entry, the request is rejected.
@@ -162,10 +191,36 @@ Employees can request business trips through the **Business Trips** page.
 2. Manager approves or rejects the request
 3. After the trip, the employee marks it as **Completed** with actual costs
 
+### Manager On-Behalf-Of
+Managers can create business trip requests for their subordinates by selecting the employee from the **On Behalf Of** dropdown in the New Request form.
+
 ### Manager Approval
 Managers see pending trip requests in the **Trip Approvals** page and can:
 - **Approve** with optional notes
 - **Reject** with a mandatory reason
+
+---
+
+## Work Hour Change Management
+
+Employees can request changes to their weekly and daily work hours through the **Work Hours** page. Managers approve or reject these requests.
+
+### Workflow
+1. Employee submits a work hour change request (requested weekly hours, optional daily hours, effective date, reason)
+2. Manager reviews the request in the **Hours Approvals** page
+3. Manager approves or rejects with a reason
+4. On approval, the employee's work hours in their Employee Configuration are automatically updated
+
+### Manager Approval
+
+![Work Hour Change Approvals](../screenshots/work-hour-change-approvals.png)
+
+Managers see pending work hour change requests and can:
+- **Approve**: Updates the employee's configured weekly/daily work hours
+- **Reject**: With a mandatory reason explaining the rejection
+
+### Duplicate Prevention
+Only one pending work hour change request per employee is allowed at a time. Employees must wait for the current request to be processed before submitting a new one.
 
 ---
 

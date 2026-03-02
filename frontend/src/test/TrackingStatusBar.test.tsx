@@ -58,10 +58,10 @@ describe('TrackingStatusBar', () => {
     expect(screen.queryByRole('button', { name: 'time_tracking.clock_in' })).not.toBeInTheDocument()
   })
 
-  it('should show End Break and Clock Out buttons when ON_BREAK', () => {
+  it('should show End Break button but NOT Clock Out button when ON_BREAK', () => {
     render(<TrackingStatusBar {...baseProps} status={makeStatus({ status: 'ON_BREAK' })} />)
     expect(screen.getByRole('button', { name: 'time_tracking.break_end' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'time_tracking.clock_out' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'time_tracking.clock_out' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'time_tracking.clock_in' })).not.toBeInTheDocument()
   })
 

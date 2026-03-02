@@ -48,6 +48,11 @@ export const businessTripService = {
     return response.data
   },
 
+  async createTripForUser(userId: string, data: CreateBusinessTripRequest): Promise<BusinessTripResponse> {
+    const response = await apiClient.post<BusinessTripResponse>(`/business-trips/user/${userId}`, data)
+    return response.data
+  },
+
   async updateTrip(id: string, data: UpdateBusinessTripRequest): Promise<BusinessTripResponse> {
     const response = await apiClient.put<BusinessTripResponse>(`/business-trips/${id}`, data)
     return response.data

@@ -8,7 +8,7 @@ import {
   MOCK_VACATION_BALANCE,
 } from './helpers'
 
-const SCREENSHOT_DIR = '../docs/screenshots'
+const SCREENSHOT_DIR = '../../docs/screenshots'
 
 test.describe('Documentation Screenshots', () => {
   test('Login page (English)', async ({ page }) => {
@@ -568,5 +568,219 @@ test.describe('Documentation Screenshots', () => {
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(500)
     await page.screenshot({ path: `${SCREENSHOT_DIR}/projects.png`, fullPage: true })
+  })
+
+  test('Work Hour Changes page', async ({ page }) => {
+    await mockAuthenticatedUser(page)
+    await page.route('**/api/work-hour-changes?**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          content: [
+            {
+              id: 'whc1',
+              userId: MOCK_USER.id,
+              userName: 'Admin User',
+              currentWeeklyHours: 40,
+              requestedWeeklyHours: 32,
+              currentDailyHours: 8,
+              requestedDailyHours: 6.4,
+              effectiveDate: '2026-04-01',
+              reason: 'Transition to part-time',
+              status: 'PENDING',
+              approvedById: null,
+              approvedByName: null,
+              rejectionReason: null,
+              createdAt: '2026-02-20T10:00:00Z',
+              updatedAt: '2026-02-20T10:00:00Z',
+            },
+            {
+              id: 'whc2',
+              userId: MOCK_USER.id,
+              userName: 'Admin User',
+              currentWeeklyHours: 30,
+              requestedWeeklyHours: 40,
+              currentDailyHours: 6,
+              requestedDailyHours: 8,
+              effectiveDate: '2025-10-01',
+              reason: 'Return to full-time',
+              status: 'APPROVED',
+              approvedById: '00000000-0000-0000-0000-000000000003',
+              approvedByName: 'Maria Schmidt',
+              rejectionReason: null,
+              createdAt: '2025-09-15T10:00:00Z',
+              updatedAt: '2025-09-20T14:00:00Z',
+            },
+          ],
+          totalElements: 2,
+          totalPages: 1,
+          pageNumber: 0,
+          pageSize: 20,
+        }),
+      }),
+    )
+    await page.goto('/work-hour-changes')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(500)
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/work-hour-changes.png`, fullPage: true })
+  })
+
+  test('Work Hour Change Approvals page', async ({ page }) => {
+    await mockAuthenticatedUser(page)
+    await page.route('**/api/work-hour-changes/pending**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          content: [
+            {
+              id: 'whc3',
+              userId: '00000000-0000-0000-0000-000000000002',
+              userName: 'Max Mustermann',
+              currentWeeklyHours: 40,
+              requestedWeeklyHours: 30,
+              currentDailyHours: 8,
+              requestedDailyHours: 6,
+              effectiveDate: '2026-05-01',
+              reason: 'Family care — reduce to 30h/week',
+              status: 'PENDING',
+              approvedById: null,
+              approvedByName: null,
+              rejectionReason: null,
+              createdAt: '2026-02-25T09:00:00Z',
+              updatedAt: '2026-02-25T09:00:00Z',
+            },
+          ],
+          totalElements: 1,
+          totalPages: 1,
+          pageNumber: 0,
+          pageSize: 20,
+        }),
+      }),
+    )
+    await page.goto('/work-hour-changes/approvals')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(500)
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/work-hour-change-approvals.png`, fullPage: true })
+  })
+
+  test('Admin page - Employee Config modal', async ({ page }) => {
+    await mockAuthenticatedUser(page)
+    await page.route('**/api/users?**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          content: [
+            {
+              id: '00000000-0000-0000-0000-000000000002',
+              email: 'max.mustermann@example.com',
+              firstName: 'Max',
+              lastName: 'Mustermann',
+              employeeNumber: 'EMP002',
+              isActive: true,
+              roles: ['EMPLOYEE'],
+              permissions: ['time.track', 'vacation.request'],
+            },
+          ],
+          totalElements: 1,
+          totalPages: 1,
+          pageNumber: 0,
+          pageSize: 20,
+        }),
+      }),
+    )
+    await page.route('**/api/employee-config/**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'ec1',
+          userId: '00000000-0000-0000-0000-000000000002',
+          weeklyWorkHours: 40,
+          dailyWorkHours: 8,
+          workDays: [1, 2, 3, 4, 5],
+          vacationDaysPerYear: 30,
+          vacationCarryOverMax: 10,
+          contractStartDate: '2024-01-01',
+          contractEndDate: null,
+          isHomeOfficeEligible: true,
+        }),
+      }),
+    )
+    await page.route('**/api/vacation/balance/**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'vb2',
+          userId: '00000000-0000-0000-0000-000000000002',
+          year: new Date().getFullYear(),
+          totalDays: 30,
+          usedDays: 8,
+          carriedOverDays: 3,
+          remainingDays: 25,
+          pendingDays: 2,
+        }),
+      }),
+    )
+    await page.goto('/admin')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(500)
+    // Click the employee config (Sliders) button for the first user
+    const slidersButton = page.locator('table tbody tr').first().locator('button').nth(0)
+    if (await slidersButton.isVisible()) {
+      await slidersButton.click()
+      await page.waitForTimeout(500)
+    }
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/admin-employee-config.png`, fullPage: true })
+  })
+
+  test('Vacation page - Manager on-behalf-of form', async ({ page }) => {
+    await mockAuthenticatedUser(page)
+    await page.route('**/api/vacation/balance**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(MOCK_VACATION_BALANCE),
+      }),
+    )
+    await page.route('**/api/vacation/requests?**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ content: [], totalElements: 0, totalPages: 0, pageNumber: 0, pageSize: 20 }),
+      }),
+    )
+    await page.route('**/api/vacation/holidays**', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
+    )
+    await page.route('**/api/users?**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          content: [
+            { id: '00000000-0000-0000-0000-000000000002', email: 'max@example.com', firstName: 'Max', lastName: 'Mustermann', isActive: true, roles: ['EMPLOYEE'], permissions: [] },
+            { id: '00000000-0000-0000-0000-000000000003', email: 'maria@example.com', firstName: 'Maria', lastName: 'Schmidt', isActive: true, roles: ['EMPLOYEE'], permissions: [] },
+          ],
+          totalElements: 2,
+          totalPages: 1,
+          pageNumber: 0,
+          pageSize: 100,
+        }),
+      }),
+    )
+    await page.goto('/vacation')
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(300)
+    // Click the New Request tab
+    const newReqTab = page.getByRole('button', { name: /new request|neuer antrag/i })
+    if (await newReqTab.isVisible()) {
+      await newReqTab.click()
+      await page.waitForTimeout(500)
+    }
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/vacation-new-request-manager.png`, fullPage: true })
   })
 })

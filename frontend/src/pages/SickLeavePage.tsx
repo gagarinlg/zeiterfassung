@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '../hooks/useAuth'
 import { sickLeaveService } from '../services/sickLeaveService'
 import type { SickLeaveResponse } from '../services/sickLeaveService'
+import adminService from '../services/adminService'
+import type { User } from '../types'
 import { FileText, XCircle, Upload } from 'lucide-react'
 
 type Tab = 'list' | 'report'
@@ -24,12 +27,16 @@ function StatusBadge({ status }: { status: SickLeaveStatus }) {
 
 export default function SickLeavePage() {
   const { t } = useTranslation()
+  const { hasPermission } = useAuth()
   const [activeTab, setActiveTab] = useState<Tab>('list')
   const [sickLeaves, setSickLeaves] = useState<SickLeaveResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [selectedUserId, setSelectedUserId] = useState('')
+  const [teamMembers, setTeamMembers] = useState<User[]>([])
+  const isManager = hasPermission('time.edit.team')
 
   const [formData, setFormData] = useState({
     startDate: '',
@@ -54,18 +61,30 @@ export default function SickLeavePage() {
     loadSickLeaves()
   }, [loadSickLeaves])
 
+  useEffect(() => {
+    if (isManager) {
+      adminService.getUsers(0, 100).then((data) => setTeamMembers(data.content)).catch(() => {})
+    }
+  }, [isManager])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     setSuccess(null)
     try {
-      await sickLeaveService.reportSickLeave({
+      const sickLeaveData = {
         startDate: formData.startDate,
         endDate: formData.endDate,
         notes: formData.notes || undefined,
-      })
+      }
+      if (selectedUserId) {
+        await sickLeaveService.reportSickLeaveForUser(selectedUserId, sickLeaveData)
+      } else {
+        await sickLeaveService.reportSickLeave(sickLeaveData)
+      }
       setSuccess(t('sick_leave.success.reported'))
       setFormData({ startDate: '', endDate: '', notes: '' })
+      setSelectedUserId('')
       setActiveTab('list')
       await loadSickLeaves()
     } catch {
@@ -212,6 +231,24 @@ export default function SickLeavePage() {
 
       {activeTab === 'report' && (
         <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6 max-w-lg space-y-4">
+          {isManager && (
+            <div>
+              <label htmlFor="sickOnBehalf" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('vacation.request.on_behalf_of')}
+              </label>
+              <select
+                id="sickOnBehalf"
+                value={selectedUserId}
+                onChange={(e) => setSelectedUserId(e.target.value)}
+                className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+              >
+                <option value="">{t('vacation.request.for_myself')}</option>
+                {teamMembers.map((u) => (
+                  <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
               {t('sick_leave.start_date')}

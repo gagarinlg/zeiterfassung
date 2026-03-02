@@ -49,6 +49,7 @@ class VacationService(
     fun createRequest(
         userId: UUID,
         dto: CreateVacationRequest,
+        allowPastDates: Boolean = false,
     ): VacationRequestResponse {
         val user =
             userRepository
@@ -58,7 +59,7 @@ class VacationService(
         if (dto.startDate.isAfter(dto.endDate)) {
             throw BadRequestException("vacation.error.start_after_end")
         }
-        if (dto.startDate.isBefore(LocalDate.now())) {
+        if (!allowPastDates && dto.startDate.isBefore(LocalDate.now())) {
             throw BadRequestException("vacation.error.past_date")
         }
 
@@ -112,6 +113,7 @@ class VacationService(
         requestId: UUID,
         userId: UUID,
         dto: UpdateVacationRequest,
+        allowPastDates: Boolean = false,
     ): VacationRequestResponse {
         val entity = findRequestOrThrow(requestId)
         if (entity.user.id != userId) {
@@ -127,7 +129,7 @@ class VacationService(
         if (newStart.isAfter(newEnd)) {
             throw BadRequestException("vacation.error.start_after_end")
         }
-        if (newStart.isBefore(LocalDate.now())) {
+        if (!allowPastDates && newStart.isBefore(LocalDate.now())) {
             throw BadRequestException("vacation.error.past_date")
         }
 
