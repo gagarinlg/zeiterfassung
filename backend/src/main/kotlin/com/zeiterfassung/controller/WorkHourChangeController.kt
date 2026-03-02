@@ -109,8 +109,7 @@ class WorkHourChangeController(
     fun approveRequest(
         @PathVariable id: UUID,
         @AuthenticationPrincipal approverId: String,
-    ): ResponseEntity<WorkHourChangeResponse> =
-        ResponseEntity.ok(workHourChangeService.approveRequest(id, UUID.fromString(approverId)))
+    ): ResponseEntity<WorkHourChangeResponse> = ResponseEntity.ok(workHourChangeService.approveRequest(id, UUID.fromString(approverId)))
 
     @PostMapping("/{id}/reject")
     @PreAuthorize("hasAuthority('time.edit.team')")
@@ -124,8 +123,7 @@ class WorkHourChangeController(
         @PathVariable id: UUID,
         @Valid @RequestBody dto: RejectWorkHourChangeRequest,
         @AuthenticationPrincipal approverId: String,
-    ): ResponseEntity<WorkHourChangeResponse> =
-        ResponseEntity.ok(workHourChangeService.rejectRequest(id, UUID.fromString(approverId), dto))
+    ): ResponseEntity<WorkHourChangeResponse> = ResponseEntity.ok(workHourChangeService.rejectRequest(id, UUID.fromString(approverId), dto))
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('time.edit.own')")
@@ -139,6 +137,5 @@ class WorkHourChangeController(
     fun cancelRequest(
         @PathVariable id: UUID,
         @AuthenticationPrincipal userId: String,
-    ): ResponseEntity<WorkHourChangeResponse> =
-        ResponseEntity.ok(workHourChangeService.cancelRequest(id, UUID.fromString(userId)))
+    ): ResponseEntity<WorkHourChangeResponse> = ResponseEntity.ok(workHourChangeService.cancelRequest(id, UUID.fromString(userId)))
 }

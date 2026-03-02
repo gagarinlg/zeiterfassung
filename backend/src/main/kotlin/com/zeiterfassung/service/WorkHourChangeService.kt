@@ -41,8 +41,9 @@ class WorkHourChangeService(
             throw ConflictException("A pending work hour change request already exists")
         }
 
-        val config = employeeConfigRepository.findByUserId(userId)
-            ?: throw ResourceNotFoundException("Employee config not found for user: $userId")
+        val config =
+            employeeConfigRepository.findByUserId(userId)
+                ?: throw ResourceNotFoundException("Employee config not found for user: $userId")
 
         val entity =
             WorkHourChangeRequestEntity(
@@ -69,8 +70,7 @@ class WorkHourChangeService(
     fun getMyRequests(
         userId: UUID,
         pageable: Pageable,
-    ): Page<WorkHourChangeResponse> =
-        workHourChangeRequestRepository.findByUserId(userId, pageable).map { it.toResponse() }
+    ): Page<WorkHourChangeResponse> = workHourChangeRequestRepository.findByUserId(userId, pageable).map { it.toResponse() }
 
     fun getPendingRequests(pageable: Pageable): Page<WorkHourChangeResponse> =
         workHourChangeRequestRepository
@@ -100,8 +100,9 @@ class WorkHourChangeService(
         entity.approvedBy = approver
 
         // Update employee config with new work hours
-        val config = employeeConfigRepository.findByUserId(entity.user.id)
-            ?: throw ResourceNotFoundException("Employee config not found for user: ${entity.user.id}")
+        val config =
+            employeeConfigRepository.findByUserId(entity.user.id)
+                ?: throw ResourceNotFoundException("Employee config not found for user: ${entity.user.id}")
         config.weeklyWorkHours = entity.requestedWeeklyHours
         entity.requestedDailyHours?.let { config.dailyWorkHours = it }
         employeeConfigRepository.save(config)
