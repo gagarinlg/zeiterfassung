@@ -4,7 +4,7 @@
 
 ## Quick Summary
 
-Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–14 are complete.** The backend has working auth, user management, time tracking, vacation management, sick leave tracking, business trip management, project/cost center time allocation, email notifications, CSV export, terminal RFID scan endpoint, admin endpoints, TOTP 2FA, password reset flow, LDAP configuration, manager substitute/deputy feature, Spring caching, full OpenAPI/Swagger documentation, database backup/restore system (with frontend UI), and GDPR data export/deletion. The backend now has 261 unit tests across 26 test classes covering all major services. The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, sick leave, business trips (with manager approval), project time allocation, and admin pages (including database backup management tab and employee configuration modal) with proper date/calendar localization, WCAG 2.1 AA accessibility, and 76 unit tests (including dateUtils). Mobile apps are fully implemented (Android and iOS) with real API integration, configurable server URL (UI + MDM provisioning), and ViewModel unit tests. CI includes E2E testing with Playwright across Chromium, Firefox, and WebKit, plus release build jobs for Android and iOS. Documentation includes user guide (with 16 auto-generated screenshots), administration guide, 5 architecture decision records, comprehensive installation guides for mobile apps and terminal, MDM provisioning documentation (including AppTech360), and a full testing guide.
+Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Phases 1–15 are complete.** The backend has working auth, user management, time tracking, vacation management, sick leave tracking, business trip management, project/cost center time allocation, work hour change request workflow, email notifications, CSV export, terminal RFID scan endpoint, admin endpoints, TOTP 2FA, password reset flow, LDAP configuration, manager substitute/deputy feature, Spring caching, full OpenAPI/Swagger documentation, database backup/restore system (with frontend UI), and GDPR data export/deletion. The backend now has 261 unit tests across 27 test classes covering all major services. The terminal Raspberry Pi app is fully implemented. The frontend has fully implemented login, navigation, dashboard, time tracking, vacation, sick leave, business trips (with manager approval), project time allocation, work hour change requests (with manager approval), and admin pages (including database backup management tab, employee configuration modal with vacation balance management) with proper date/calendar localization, WCAG 2.1 AA accessibility, and 76 unit tests (including dateUtils). Managers can now create vacation, business trips, and sick leave on behalf of subordinates, with past dates allowed. Mobile apps are fully implemented (Android and iOS) with real API integration, configurable server URL (UI + MDM provisioning), and ViewModel unit tests. CI includes E2E testing with Playwright across Chromium, Firefox, and WebKit, plus release build jobs for Android and iOS. Documentation includes user guide (with 16 auto-generated screenshots), administration guide, 5 architecture decision records, comprehensive installation guides for mobile apps and terminal, MDM provisioning documentation (including AppTech360), and a full testing guide.
 
 ## What Works Right Now
 
@@ -45,6 +45,8 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ GDPR data export: `GET /gdpr/export` (own data), `GET /gdpr/export/{userId}` (admin); returns all personal info, time entries, vacation requests, sick leaves, business trips, and audit log
 - ✅ GDPR account deletion: `POST /gdpr/delete` (own account), `POST /gdpr/delete/{userId}` (admin); soft delete with data anonymization and token revocation
 - ✅ Work hour change requests: create, approve, reject, cancel workflow at `/work-hour-changes`; on approval updates EmployeeConfig work hours
+- ✅ Manager on-behalf-of: `POST /vacation/requests/user/{userId}`, `POST /business-trips/user/{userId}` with past dates allowed
+- ✅ Break end status fix: `BREAK_END` entry type correctly maps to `CLOCKED_IN` status
 
 ### Frontend (Fully Implemented)
 - ✅ Login page with validation and error handling
@@ -61,6 +63,11 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Projects page: list time allocations, create new allocation, admin project management
 - ✅ Admin page: 5-tab UI (User Management, Audit Log, System Settings, LDAP, Backups) with full CRUD, search, modals
 - ✅ Admin Employee Configuration modal: set work days, weekly/daily work hours, vacation days per year, vacation carry-over max per user
+- ✅ Admin vacation balance management: set total, used, carried over days for current year (migration support)
+- ✅ Work Hour Change page: request list, new request form
+- ✅ Work Hour Change Approval page: pending requests with approve/reject-with-reason
+- ✅ Manager on-behalf-of: subordinate selector in vacation, business trip, and sick leave forms
+- ✅ TrackingStatusBar: break end no longer causes clock-out; Clock Out button hidden during ON_BREAK
 - ✅ Date/calendar localization: `dateUtils.ts` utility with `formatDate`, `formatTime`, `formatDateTime`, `formatMonthYear` using date-fns locales; `DateFormatContext` for per-user date/time format preferences; all pages (Dashboard, TimeTracking, Vacation) use localized date formatting
 - ✅ User Settings page: display preferences (date/time format) and password change with confirmation
 - ✅ Password reset flow: request page and confirm page with token

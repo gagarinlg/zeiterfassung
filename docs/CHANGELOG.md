@@ -26,6 +26,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 ### Fixed
 - **Break end clock-out bug**: Ending a break no longer incorrectly shows the user as clocked out. Added `BREAK_END -> CLOCKED_IN` mapping in `TimeTrackingService.getCurrentStatus()`.
 - **TrackingStatusBar**: Removed Clock Out button from ON_BREAK state. Users must end their break before clocking out, preventing accidental clock-outs.
+- **AuthControllerIntegrationTest**: Fixed pre-existing FK constraint violation caused by `@Async` audit log entries arriving between cleanup calls in `setUp()`
 
 ### Added
 - **Employee Configuration modal**: New modal in admin User Management tab (Sliders icon) to configure per-user work settings:
@@ -34,8 +35,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
   - Work days (Mon–Sun checkboxes)
   - Vacation days per year
   - Vacation carry-over maximum
+  - Vacation balance management (total, used, carried over days for current year)
 - **`adminService` employee config methods**: `getEmployeeConfig(userId)`, `updateEmployeeConfig(userId, payload)` calling `GET/PUT /employee-config/{userId}`
-- **i18n translations**: Added `admin.employee_config.*` keys for both English and German
+- **`adminService` vacation balance methods**: `getVacationBalance(userId)`, `setVacationBalance(userId, payload)` calling `GET/PUT /vacation/balance/{userId}`
+- **Manager on-behalf-of**: Subordinate selector in vacation, business trip, and sick leave forms for managers
+  - Backend: `POST /vacation/requests/user/{userId}`, `POST /business-trips/user/{userId}` endpoints
+  - Frontend: service methods `createRequestForUser`, `createTripForUser`, `reportSickLeaveForUser`
+  - Past dates allowed for managers in vacation requests
+- **Work hour change request workflow**: Employees request weekly/daily hour changes, managers approve/reject
+  - Backend: V11 migration, entity, DTOs, repository, service (`WorkHourChangeService`), controller at `/work-hour-changes`
+  - Frontend: `WorkHourChangePage` (request list + new request form), `WorkHourChangeApprovalPage` (approval queue with reject-with-reason modal)
+  - Navigation links and routes for both pages
+  - On approval, employee config is automatically updated with new work hours
+- **i18n translations**: Added `admin.employee_config.*`, `vacation.request.on_behalf_of/for_myself`, `work_hour_change.*`, `nav.work_hour_changes/work_hour_change_approvals` keys for both English and German
 - **Backend unit test**: `getCurrentStatus should return CLOCKED_IN after break end` in `TimeTrackingServiceTest`
 
 ### Changed
