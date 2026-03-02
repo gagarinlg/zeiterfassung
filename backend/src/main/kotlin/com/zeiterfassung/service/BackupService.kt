@@ -196,7 +196,7 @@ class BackupService(
             ProcessBuilder(
                 "bash",
                 "-c",
-                "gunzip -c ${backupFile.absolutePath} | psql -h $host -p $port -U $safeUsername -d $dbName",
+                "gunzip -c ${backupFile.absolutePath} | psql -h $host -p $port -U $safeUsername -d $dbName --single-transaction",
             ).apply {
                 environment()["PGPASSWORD"] = datasourcePassword
                 redirectErrorStream(false)

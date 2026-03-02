@@ -99,6 +99,7 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
         await adminService.createUser(payload)
       } else {
         const payload: UpdateUserPayload = {
+          email: form.email,
           firstName: form.firstName,
           lastName: form.lastName,
           phone: form.phone || undefined,
@@ -186,6 +187,19 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
                   />
                 </div>
               </>
+            )}
+            {!isNew && (
+              <div>
+                <label htmlFor="modal-email" className="block text-sm font-medium text-gray-700 mb-1">{t('common.email')}</label>
+                <input
+                  id="modal-email"
+                  type="email"
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  value={form.email}
+                  onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                  required
+                />
+              </div>
             )}
             <div>
               <label htmlFor="modal-phone" className="block text-sm font-medium text-gray-700 mb-1">{t('common.phone')}</label>

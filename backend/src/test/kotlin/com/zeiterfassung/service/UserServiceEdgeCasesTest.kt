@@ -1,6 +1,7 @@
 package com.zeiterfassung.service
 
 import com.zeiterfassung.audit.AuditService
+import com.zeiterfassung.exception.DuplicateResourceException
 import com.zeiterfassung.exception.ResourceNotFoundException
 import com.zeiterfassung.exception.UnauthorizedException
 import com.zeiterfassung.model.dto.AssignRolesRequest
@@ -100,6 +101,28 @@ class UserServiceEdgeCasesTest {
 
         val result = userService.updateUser(user.id, UpdateUserRequest(substituteId = ""), actorId)
         assertThat(result.substituteId).isNull()
+    }
+
+    @Test
+    fun `updateUser updates email`() {
+        val user = createUser()
+        `when`(userRepository.findById(user.id)).thenReturn(Optional.of(user))
+        `when`(userRepository.existsByEmailAndIdNot("new@test.com", user.id)).thenReturn(false)
+        `when`(userRepository.save(any(UserEntity::class.java) ?: user)).thenAnswer { it.arguments[0] }
+
+        val result = userService.updateUser(user.id, UpdateUserRequest(email = "new@test.com"), actorId)
+        assertThat(result.email).isEqualTo("new@test.com")
+    }
+
+    @Test
+    fun `updateUser throws when email already exists`() {
+        val user = createUser()
+        `when`(userRepository.findById(user.id)).thenReturn(Optional.of(user))
+        `when`(userRepository.existsByEmailAndIdNot("taken@test.com", user.id)).thenReturn(true)
+
+        assertThrows<DuplicateResourceException> {
+            userService.updateUser(user.id, UpdateUserRequest(email = "taken@test.com"), actorId)
+        }
     }
 
     @Test

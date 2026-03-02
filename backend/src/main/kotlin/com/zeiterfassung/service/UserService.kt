@@ -103,6 +103,13 @@ class UserService(
         request.dateFormat?.let { user.dateFormat = it }
         request.timeFormat?.let { user.timeFormat = it }
         request.employeeNumber?.let { user.employeeNumber = it }
+        request.email?.let { rawEmail ->
+            val newEmail = rawEmail.lowercase()
+            if (newEmail != user.email && userRepository.existsByEmailAndIdNot(newEmail, id)) {
+                throw DuplicateResourceException("Email already exists: $newEmail")
+            }
+            user.email = newEmail
+        }
         request.managerId?.let { managerIdStr ->
             val manager =
                 userRepository
