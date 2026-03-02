@@ -1,6 +1,6 @@
 # Current Project State
 
-> Last updated: 2026-03-01
+> Last updated: 2026-03-02
 
 ## Quick Summary
 
@@ -67,7 +67,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Admin ResetPasswordModal: confirm password field
 - ✅ Forgot password link on login page
 - ✅ Settings nav link in sidebar
-- ✅ Unit tests: 59 tests total (LoginPage, AuthContext, ProtectedRoute, AdminPage, dateUtils)
+- ✅ Unit tests: 76 tests total (LoginPage, AuthContext, ProtectedRoute, AdminPage, dateUtils, TrackingStatusBar)
 - ✅ E2E tests: 62+ Playwright tests covering all 7 pages (login, navigation, dashboard, time-tracking, vacation, vacation-approval, admin)
 - ✅ CI: E2E testing with Playwright (Chromium) integrated into GitHub Actions workflow
 - ✅ TOTP 2FA setup with QR code in UserSettingsPage

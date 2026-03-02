@@ -3,6 +3,22 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — UI & Workflow Fixes
+
+### Fixed
+- **`build-deploy.yml`**: Replaced invalid `secrets.` context references in step-level `if` conditions with `env.` context (secrets context is unavailable in step `if` expressions)
+- **End Break button**: Changed from blue (`bg-blue-600`) to green (`bg-green-600`) to correctly indicate resuming work status
+- **TimeTrackingPage status bar**: Now shows colored background (green for CLOCKED_IN, yellow for ON_BREAK) and "clocked in since" / "on break since" timestamps, matching Dashboard behavior
+
+### Added
+- **`TrackingStatusBar` shared component**: Unified status bar used by both DashboardPage and TimeTrackingPage with consistent styling, colored backgrounds, timestamp info, and disabled button states
+- **`TrackingStatusBar` unit tests**: 15 tests covering all status states, button visibility, background colors, callbacks, loading/error states, and green End Break button
+
+### Changed
+- **DashboardPage**: Refactored to use shared `TrackingStatusBar` component
+- **TimeTrackingPage**: Refactored to use shared `TrackingStatusBar` component; added `actionLoading` state for consistent button disabling during async actions
+- Frontend test count increased from 61 to 76 tests
+
 ## [Unreleased] — Unit Tests & Code Quality
 
 ### Added
