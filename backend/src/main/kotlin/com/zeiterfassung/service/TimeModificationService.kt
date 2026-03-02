@@ -27,6 +27,7 @@ class TimeModificationService(
     private val userRepository: UserRepository,
     private val auditService: AuditService,
     private val timeTrackingService: TimeTrackingService,
+    private val notificationService: NotificationService,
 ) {
     @Transactional
     fun createRequest(
@@ -72,6 +73,9 @@ class TimeModificationService(
             null,
             saved.toResponse(),
         )
+        user.manager?.let { manager ->
+            notificationService.notifyTimeModificationRequested(saved, manager)
+        }
         return saved.toResponse()
     }
 
@@ -136,6 +140,7 @@ class TimeModificationService(
             oldResponse,
             saved.toResponse(),
         )
+        notificationService.notifyTimeModificationApproved(saved, "${approver.firstName} ${approver.lastName}")
         return saved.toResponse()
     }
 
@@ -172,6 +177,7 @@ class TimeModificationService(
             oldResponse,
             saved.toResponse(),
         )
+        notificationService.notifyTimeModificationRejected(saved, dto.rejectionReason)
         return saved.toResponse()
     }
 
