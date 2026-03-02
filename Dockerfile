@@ -31,7 +31,7 @@ RUN addgroup --system zeiterfassung && adduser --system --ingroup zeiterfassung 
 COPY --from=backend-build /app/backend/build/libs/*.jar app.jar
 COPY --from=frontend-build /app/frontend/dist ./static
 
-RUN mkdir -p /var/lib/zeiterfassung/backups \
+RUN mkdir -p /var/lib/zeiterfassung/backups /var/lib/zeiterfassung/branding \
     && chown -R zeiterfassung:zeiterfassung /app /var/lib/zeiterfassung
 USER zeiterfassung
 

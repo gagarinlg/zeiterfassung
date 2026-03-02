@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import { useAuth } from '../hooks/useAuth'
 import { authService } from '../services/authService'
+import { useBranding } from '../hooks/useBranding'
 
 const loginSchema = z.object({
   email: z.string().email('auth.validation.email_invalid').min(1, 'auth.validation.email_required'),
@@ -17,6 +18,7 @@ export default function LoginPage() {
   const { t, i18n } = useTranslation()
   const { login } = useAuth()
   const navigate = useNavigate()
+  const branding = useBranding()
   const [formData, setFormData] = useState<LoginFormData>({ email: '', password: '' })
   const [errors, setErrors] = useState<FormErrors>({})
   const [serverError, setServerError] = useState('')
@@ -94,7 +96,14 @@ export default function LoginPage() {
       </div>
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-primary-700">{t('app.name')}</h1>
+          {branding.hasLogo && (
+            <img
+              src="/api/branding/logo"
+              alt={branding.companyName || t('app.name')}
+              className="mx-auto mb-4 max-h-16 object-contain"
+            />
+          )}
+          <h1 className="text-3xl font-bold text-primary-700">{branding.companyName || t('app.name')}</h1>
           <p className="mt-2 text-gray-600">{t('app.tagline')}</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6" noValidate>
