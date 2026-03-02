@@ -123,7 +123,10 @@ class TimeModificationController(
         @PathVariable id: UUID,
         @Valid @RequestBody dto: RejectTimeModificationRequest,
         @AuthenticationPrincipal approverId: String,
-    ): ResponseEntity<TimeModificationResponse> = ResponseEntity.ok(timeModificationService.rejectRequest(id, UUID.fromString(approverId), dto))
+    ): ResponseEntity<TimeModificationResponse> =
+        ResponseEntity.ok(
+            timeModificationService.rejectRequest(id, UUID.fromString(approverId), dto),
+        )
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('time.edit.own')")

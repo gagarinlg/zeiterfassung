@@ -48,10 +48,11 @@ class TimeModificationService(
             throw ForbiddenException("Cannot request modification for another user's time entry")
         }
 
-        val pending = timeModificationRequestRepository.findByTimeEntryIdAndStatus(
-            dto.timeEntryId,
-            TimeModificationStatus.PENDING,
-        )
+        val pending =
+            timeModificationRequestRepository.findByTimeEntryIdAndStatus(
+                dto.timeEntryId,
+                TimeModificationStatus.PENDING,
+            )
         if (pending.isNotEmpty()) {
             throw ConflictException("A pending modification request already exists for this time entry")
         }
