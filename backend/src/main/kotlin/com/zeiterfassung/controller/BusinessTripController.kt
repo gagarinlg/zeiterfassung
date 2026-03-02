@@ -51,6 +51,22 @@ class BusinessTripController(
             .status(HttpStatus.CREATED)
             .body(businessTripService.createTrip(UUID.fromString(userId), dto))
 
+    @PostMapping("/user/{userId}")
+    @PreAuthorize("hasAuthority('time.edit.team')")
+    @Operation(
+        summary = "Create business trip for employee",
+        description = "Manager creates a business trip on behalf of an employee. Past dates are allowed.",
+    )
+    @ApiResponse(responseCode = "201", description = "Business trip created")
+    fun createTripForUser(
+        @PathVariable userId: UUID,
+        @Valid @RequestBody dto: CreateBusinessTripRequest,
+        @AuthenticationPrincipal managerId: String,
+    ): ResponseEntity<BusinessTripResponse> =
+        ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(businessTripService.createTrip(userId, dto))
+
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('time.edit.own')")
     @Operation(summary = "Update business trip", description = "Updates a pending business trip request.")

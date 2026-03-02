@@ -105,6 +105,8 @@
       "cancel": "Cancel",
       "cancel_confirm": "Are you sure you want to cancel this request?",
       "submit": "Submit Request",
+      "on_behalf_of": "On Behalf Of",
+      "for_myself": "For Myself",
       "start_date": "Start Date",
       "end_date": "End Date",
       "half_day_start": "Half day on start date",

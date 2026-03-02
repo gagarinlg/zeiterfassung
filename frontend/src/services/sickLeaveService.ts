@@ -35,6 +35,11 @@ export const sickLeaveService = {
     return response.data
   },
 
+  async reportSickLeaveForUser(userId: string, data: CreateSickLeaveRequest): Promise<SickLeaveResponse> {
+    const response = await apiClient.post<SickLeaveResponse>(`/sick-leave/${userId}`, data)
+    return response.data
+  },
+
   async updateSickLeave(id: string, data: UpdateSickLeaveRequest): Promise<SickLeaveResponse> {
     const response = await apiClient.put<SickLeaveResponse>(`/sick-leave/${id}`, data)
     return response.data

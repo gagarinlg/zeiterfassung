@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { vacationService, type CreateVacationRequestData, type PublicHoliday } from '../services/vacationService'
-import type { VacationRequest, VacationBalance } from '../types'
+import adminService from '../services/adminService'
+import type { VacationRequest, VacationBalance, User } from '../types'
 import { formatDate, formatMonthYear } from '../utils/dateUtils'
 import { useDateFormat } from '../context/DateFormatContext'
 
@@ -52,6 +53,9 @@ export default function VacationPage() {
   const [formError, setFormError] = useState<string | null>(null)
   const [formLoading, setFormLoading] = useState(false)
   const [calculatedDays, setCalculatedDays] = useState<number | null>(null)
+  const [selectedUserId, setSelectedUserId] = useState('')
+  const [teamMembers, setTeamMembers] = useState<User[]>([])
+  const isManager = hasPermission('time.edit.team')
 
   // Calendar state
   const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth() + 1)
@@ -84,6 +88,12 @@ export default function VacationPage() {
   useEffect(() => {
     loadData()
   }, [loadData])
+
+  useEffect(() => {
+    if (isManager) {
+      adminService.getUsers(0, 100).then((data) => setTeamMembers(data.content)).catch(() => {})
+    }
+  }, [isManager])
 
   useEffect(() => {
     if (activeTab === 'calendar') {
@@ -152,8 +162,13 @@ export default function VacationPage() {
     setFormError(null)
     setFormLoading(true)
     try {
-      await vacationService.createRequest(formData)
+      if (selectedUserId) {
+        await vacationService.createRequestForUser(selectedUserId, formData)
+      } else {
+        await vacationService.createRequest(formData)
+      }
       setFormData({ startDate: '', endDate: '', isHalfDayStart: false, isHalfDayEnd: false, notes: '' })
+      setSelectedUserId('')
       setActiveTab('requests')
       await loadData()
     } catch (err: unknown) {
@@ -302,6 +317,23 @@ export default function VacationPage() {
           )}
 
           <div className="space-y-4">
+            {isManager && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('vacation.request.on_behalf_of')}
+                </label>
+                <select
+                  value={selectedUserId}
+                  onChange={(e) => setSelectedUserId(e.target.value)}
+                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                >
+                  <option value="">{t('vacation.request.for_myself')}</option>
+                  {teamMembers.map((u) => (
+                    <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t('vacation.request.start_date')}
@@ -310,7 +342,7 @@ export default function VacationPage() {
                 type="date"
                 required
                 value={formData.startDate}
-                min={new Date().toISOString().split('T')[0]}
+                min={isManager ? undefined : new Date().toISOString().split('T')[0]}
                 onChange={(e) => setFormData((p) => ({ ...p, startDate: e.target.value }))}
                 className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               />
@@ -332,7 +364,7 @@ export default function VacationPage() {
                 type="date"
                 required
                 value={formData.endDate}
-                min={formData.startDate || new Date().toISOString().split('T')[0]}
+                min={formData.startDate || (isManager ? undefined : new Date().toISOString().split('T')[0])}
                 onChange={(e) => setFormData((p) => ({ ...p, endDate: e.target.value }))}
                 className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
               />

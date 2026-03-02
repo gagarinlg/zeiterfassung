@@ -56,6 +56,22 @@ class VacationController(
             .status(HttpStatus.CREATED)
             .body(vacationService.createRequest(UUID.fromString(userId), dto))
 
+    @PostMapping("/requests/user/{userId}")
+    @PreAuthorize("hasAuthority('time.edit.team')")
+    @Operation(
+        summary = "Create vacation request for employee",
+        description = "Manager creates a vacation request on behalf of an employee. Past dates are allowed.",
+    )
+    @ApiResponse(responseCode = "201", description = "Vacation request created")
+    fun createRequestForUser(
+        @PathVariable userId: UUID,
+        @Valid @RequestBody dto: CreateVacationRequest,
+        @AuthenticationPrincipal managerId: String,
+    ): ResponseEntity<VacationRequestResponse> =
+        ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(vacationService.createRequest(userId, dto, allowPastDates = true))
+
     @GetMapping("/requests")
     @PreAuthorize("hasAuthority('vacation.request.own')")
     @Operation(

@@ -105,6 +105,8 @@
       "cancel": "Stornieren",
       "cancel_confirm": "Möchten Sie diesen Antrag wirklich stornieren?",
       "submit": "Antrag einreichen",
+      "on_behalf_of": "Im Auftrag von",
+      "for_myself": "Für mich selbst",
       "start_date": "Startdatum",
       "end_date": "Enddatum",
       "half_day_start": "Halber Tag am Startdatum",
