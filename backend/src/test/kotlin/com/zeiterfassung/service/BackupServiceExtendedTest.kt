@@ -1,7 +1,6 @@
 package com.zeiterfassung.service
 
 import com.zeiterfassung.audit.AuditService
-import com.zeiterfassung.model.dto.BackupInfo
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,14 +26,15 @@ class BackupServiceExtendedTest {
 
     @BeforeEach
     fun setUp() {
-        service = BackupService(
-            auditService = auditService,
-            backupDirectory = tempDir.toString(),
-            maxBackupCount = 3,
-            datasourceUrl = "jdbc:postgresql://localhost:5432/zeiterfassung",
-            datasourceUsername = "testuser",
-            datasourcePassword = "testpass",
-        )
+        service =
+            BackupService(
+                auditService = auditService,
+                backupDirectory = tempDir.toString(),
+                maxBackupCount = 3,
+                datasourceUrl = "jdbc:postgresql://localhost:5432/zeiterfassung",
+                datasourceUsername = "testuser",
+                datasourcePassword = "testpass",
+            )
     }
 
     // ---- parseDatasourceUrl via reflection ----
@@ -51,14 +51,15 @@ class BackupServiceExtendedTest {
 
     @Test
     fun `parseDatasourceUrl parses URL with custom port`() {
-        val customService = BackupService(
-            auditService = auditService,
-            backupDirectory = tempDir.toString(),
-            maxBackupCount = 3,
-            datasourceUrl = "jdbc:postgresql://dbhost:5433/mydb",
-            datasourceUsername = "user",
-            datasourcePassword = "pass",
-        )
+        val customService =
+            BackupService(
+                auditService = auditService,
+                backupDirectory = tempDir.toString(),
+                maxBackupCount = 3,
+                datasourceUrl = "jdbc:postgresql://dbhost:5433/mydb",
+                datasourceUsername = "user",
+                datasourcePassword = "pass",
+            )
         val method = BackupService::class.java.getDeclaredMethod("parseDatasourceUrl")
         method.isAccessible = true
         val result = method.invoke(customService) as Triple<*, *, *>
@@ -69,14 +70,15 @@ class BackupServiceExtendedTest {
 
     @Test
     fun `parseDatasourceUrl defaults port to 5432 when not specified`() {
-        val noPortService = BackupService(
-            auditService = auditService,
-            backupDirectory = tempDir.toString(),
-            maxBackupCount = 3,
-            datasourceUrl = "jdbc:postgresql://dbhost/testdb",
-            datasourceUsername = "user",
-            datasourcePassword = "pass",
-        )
+        val noPortService =
+            BackupService(
+                auditService = auditService,
+                backupDirectory = tempDir.toString(),
+                maxBackupCount = 3,
+                datasourceUrl = "jdbc:postgresql://dbhost/testdb",
+                datasourceUsername = "user",
+                datasourcePassword = "pass",
+            )
         val method = BackupService::class.java.getDeclaredMethod("parseDatasourceUrl")
         method.isAccessible = true
         val result = method.invoke(noPortService) as Triple<*, *, *>
@@ -118,14 +120,15 @@ class BackupServiceExtendedTest {
     @Test
     fun `ensureBackupDirectory creates new directory`() {
         val newDir = tempDir.resolve("sub/nested/backups").toString()
-        val newService = BackupService(
-            auditService = auditService,
-            backupDirectory = newDir,
-            maxBackupCount = 3,
-            datasourceUrl = "jdbc:postgresql://localhost:5432/zeiterfassung",
-            datasourceUsername = "testuser",
-            datasourcePassword = "testpass",
-        )
+        val newService =
+            BackupService(
+                auditService = auditService,
+                backupDirectory = newDir,
+                maxBackupCount = 3,
+                datasourceUrl = "jdbc:postgresql://localhost:5432/zeiterfassung",
+                datasourceUsername = "testuser",
+                datasourcePassword = "testpass",
+            )
         val method = BackupService::class.java.getDeclaredMethod("ensureBackupDirectory")
         method.isAccessible = true
         val result = method.invoke(newService) as File
@@ -181,14 +184,15 @@ class BackupServiceExtendedTest {
 
     @Test
     fun `cleanupOldBackups handles non-existent directory`() {
-        val noDir = BackupService(
-            auditService = auditService,
-            backupDirectory = "/tmp/non-existent-${UUID.randomUUID()}",
-            maxBackupCount = 3,
-            datasourceUrl = "jdbc:postgresql://localhost:5432/zeiterfassung",
-            datasourceUsername = "testuser",
-            datasourcePassword = "testpass",
-        )
+        val noDir =
+            BackupService(
+                auditService = auditService,
+                backupDirectory = "/tmp/non-existent-${UUID.randomUUID()}",
+                maxBackupCount = 3,
+                datasourceUrl = "jdbc:postgresql://localhost:5432/zeiterfassung",
+                datasourceUsername = "testuser",
+                datasourcePassword = "testpass",
+            )
         val method = BackupService::class.java.getDeclaredMethod("cleanupOldBackups")
         method.isAccessible = true
         // Should not throw
@@ -214,9 +218,10 @@ class BackupServiceExtendedTest {
         // The method sanitizes then validates; exercise the path with special characters
         // It will fail on executeRestore (no psql), but we verify it gets past validation
         val stream = ByteArrayInputStream("fake backup data".toByteArray())
-        val ex = assertThrows<IllegalStateException> {
-            service.restoreFromUpload(stream, "backup (copy).sql.gz", UUID.randomUUID())
-        }
+        val ex =
+            assertThrows<IllegalStateException> {
+                service.restoreFromUpload(stream, "backup (copy).sql.gz", UUID.randomUUID())
+            }
         // Should reach executeRestore and fail there, not on filename validation
         assertThat(ex.message).contains("Restore failed")
     }
@@ -250,9 +255,10 @@ class BackupServiceExtendedTest {
 
     @Test
     fun `getBackupFile rejects symlink-based path traversal`() {
-        val ex = assertThrows<IllegalArgumentException> {
-            service.getBackupFile("..%2F..%2Fetc%2Fpasswd")
-        }
+        val ex =
+            assertThrows<IllegalArgumentException> {
+                service.getBackupFile("..%2F..%2Fetc%2Fpasswd")
+            }
         assertThat(ex.message).contains("Invalid filename")
     }
 

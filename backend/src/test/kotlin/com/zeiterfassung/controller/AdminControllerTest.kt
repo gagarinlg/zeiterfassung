@@ -202,7 +202,8 @@ class AdminControllerTest {
     fun `sendTestMail should return bad request when mail not configured`() {
         val request = TestMailRequest(recipientEmail = "test@example.com")
         doThrow(IllegalStateException("Mail is not configured"))
-            .`when`(emailService).sendTestMail("test@example.com")
+            .`when`(emailService)
+            .sendTestMail("test@example.com")
 
         val response = controller.sendTestMail(request)
 
@@ -215,7 +216,8 @@ class AdminControllerTest {
     fun `sendTestMail should return 500 on unexpected error`() {
         val request = TestMailRequest(recipientEmail = "test@example.com")
         doThrow(RuntimeException("SMTP connection failed"))
-            .`when`(emailService).sendTestMail("test@example.com")
+            .`when`(emailService)
+            .sendTestMail("test@example.com")
 
         val response = controller.sendTestMail(request)
 
@@ -228,7 +230,8 @@ class AdminControllerTest {
     fun `sendTestMail should handle exception with null message`() {
         val request = TestMailRequest(recipientEmail = "test@example.com")
         doThrow(RuntimeException())
-            .`when`(emailService).sendTestMail("test@example.com")
+            .`when`(emailService)
+            .sendTestMail("test@example.com")
 
         val response = controller.sendTestMail(request)
 
@@ -240,7 +243,8 @@ class AdminControllerTest {
     fun `sendTestMail should handle IllegalStateException with null message`() {
         val request = TestMailRequest(recipientEmail = "test@example.com")
         doThrow(IllegalStateException())
-            .`when`(emailService).sendTestMail("test@example.com")
+            .`when`(emailService)
+            .sendTestMail("test@example.com")
 
         val response = controller.sendTestMail(request)
 

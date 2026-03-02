@@ -2,7 +2,6 @@ package com.zeiterfassung.controller
 
 import com.zeiterfassung.model.dto.ApproveVacationRequest
 import com.zeiterfassung.model.dto.CreateVacationRequest
-import com.zeiterfassung.model.dto.PageResponse
 import com.zeiterfassung.model.dto.PublicHolidayResponse
 import com.zeiterfassung.model.dto.RejectVacationRequest
 import com.zeiterfassung.model.dto.SetVacationBalanceRequest

@@ -141,13 +141,15 @@ class NotificationServiceTest {
         )
 
     private fun stubMessages() {
-        org.mockito.Mockito.lenient().`when`(
-            messageSource.getMessage(
-                anyString(),
-                org.mockito.ArgumentMatchers.any(),
-                org.mockito.ArgumentMatchers.any(Locale::class.java) ?: Locale.GERMAN,
-            ),
-        ).thenReturn("Test message")
+        org.mockito.Mockito
+            .lenient()
+            .`when`(
+                messageSource.getMessage(
+                    anyString(),
+                    org.mockito.ArgumentMatchers.any(),
+                    org.mockito.ArgumentMatchers.any(Locale::class.java) ?: Locale.GERMAN,
+                ),
+            ).thenReturn("Test message")
     }
 
     @Test

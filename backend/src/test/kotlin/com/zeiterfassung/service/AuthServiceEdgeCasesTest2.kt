@@ -31,10 +31,15 @@ import java.util.UUID
 @ExtendWith(MockitoExtension::class)
 class AuthServiceEdgeCasesTest2 {
     @Mock private lateinit var userRepository: UserRepository
+
     @Mock private lateinit var refreshTokenRepository: RefreshTokenRepository
+
     @Mock private lateinit var jwtService: JwtService
+
     @Mock private lateinit var auditService: AuditService
+
     @Mock private lateinit var totpService: TotpService
+
     @Mock private lateinit var httpRequest: HttpServletRequest
 
     private val passwordEncoder = BCryptPasswordEncoder()
@@ -42,10 +47,17 @@ class AuthServiceEdgeCasesTest2 {
 
     @BeforeEach
     fun setUp() {
-        authService = AuthService(
-            userRepository, refreshTokenRepository, jwtService, passwordEncoder,
-            auditService, totpService, 604800000L, 900000L,
-        )
+        authService =
+            AuthService(
+                userRepository,
+                refreshTokenRepository,
+                jwtService,
+                passwordEncoder,
+                auditService,
+                totpService,
+                604800000L,
+                900000L,
+            )
     }
 
     // ---- Login success path ----
@@ -214,7 +226,11 @@ class AuthServiceEdgeCasesTest2 {
     private fun createDummyToken(user: UserEntity) =
         RefreshTokenEntity(user = user, tokenHash = "dummy", expiresAt = Instant.now().plusSeconds(3600))
 
-    private fun createStoredToken(user: UserEntity, isRevoked: Boolean, expiresAt: Instant): RefreshTokenEntity {
+    private fun createStoredToken(
+        user: UserEntity,
+        isRevoked: Boolean,
+        expiresAt: Instant,
+    ): RefreshTokenEntity {
         val token = RefreshTokenEntity(user = user, tokenHash = "hash", expiresAt = expiresAt)
         token.isRevoked = isRevoked
         return token

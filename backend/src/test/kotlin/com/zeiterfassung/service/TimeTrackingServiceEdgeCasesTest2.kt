@@ -12,7 +12,6 @@ import com.zeiterfassung.model.entity.PermissionEntity
 import com.zeiterfassung.model.entity.RoleEntity
 import com.zeiterfassung.model.entity.TimeEntryEntity
 import com.zeiterfassung.model.entity.UserEntity
-import com.zeiterfassung.model.enums.TimeEntrySource
 import com.zeiterfassung.model.enums.TimeEntryType
 import com.zeiterfassung.repository.DailySummaryRepository
 import com.zeiterfassung.repository.EmployeeConfigRepository
@@ -39,9 +38,13 @@ import java.util.UUID
 @ExtendWith(MockitoExtension::class)
 class TimeTrackingServiceEdgeCasesTest2 {
     @Mock private lateinit var timeEntryRepository: TimeEntryRepository
+
     @Mock private lateinit var dailySummaryRepository: DailySummaryRepository
+
     @Mock private lateinit var employeeConfigRepository: EmployeeConfigRepository
+
     @Mock private lateinit var userRepository: UserRepository
+
     @Mock private lateinit var auditService: AuditService
 
     private val complianceService = ArbZGComplianceService()
@@ -55,10 +58,16 @@ class TimeTrackingServiceEdgeCasesTest2 {
 
     @BeforeEach
     fun setUp() {
-        service = TimeTrackingService(
-            timeEntryRepository, dailySummaryRepository, employeeConfigRepository,
-            userRepository, complianceService, auditService, objectMapper,
-        )
+        service =
+            TimeTrackingService(
+                timeEntryRepository,
+                dailySummaryRepository,
+                employeeConfigRepository,
+                userRepository,
+                complianceService,
+                auditService,
+                objectMapper,
+            )
         user = UserEntity(id = userId, email = "user@test.com", passwordHash = "h", firstName = "Test", lastName = "User")
         manager = UserEntity(id = managerId, email = "mgr@test.com", passwordHash = "h", firstName = "Manager", lastName = "One")
         manager.subordinates.add(user)
@@ -170,11 +179,13 @@ class TimeTrackingServiceEdgeCasesTest2 {
         `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
         `when`(dailySummaryRepository.findByUserIdAndDateBetweenOrderByDateAsc(userId, startDate, endDate))
             .thenReturn(listOf(summary))
-        `when`(timeEntryRepository.findByUserIdAndTimestampBetweenOrderByTimestampAsc(
-            any(UUID::class.java) ?: userId,
-            any(Instant::class.java) ?: Instant.now(),
-            any(Instant::class.java) ?: Instant.now(),
-        )).thenReturn(listOf(entry))
+        `when`(
+            timeEntryRepository.findByUserIdAndTimestampBetweenOrderByTimestampAsc(
+                any(UUID::class.java) ?: userId,
+                any(Instant::class.java) ?: Instant.now(),
+                any(Instant::class.java) ?: Instant.now(),
+            ),
+        ).thenReturn(listOf(entry))
 
         val result = service.getTimeSheet(userId, startDate, endDate)
         assertThat(result.userId).isEqualTo(userId)
@@ -191,11 +202,13 @@ class TimeTrackingServiceEdgeCasesTest2 {
         `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
         `when`(dailySummaryRepository.findByUserIdAndDateBetweenOrderByDateAsc(userId, startDate, endDate))
             .thenReturn(emptyList())
-        `when`(timeEntryRepository.findByUserIdAndTimestampBetweenOrderByTimestampAsc(
-            any(UUID::class.java) ?: userId,
-            any(Instant::class.java) ?: Instant.now(),
-            any(Instant::class.java) ?: Instant.now(),
-        )).thenReturn(emptyList())
+        `when`(
+            timeEntryRepository.findByUserIdAndTimestampBetweenOrderByTimestampAsc(
+                any(UUID::class.java) ?: userId,
+                any(Instant::class.java) ?: Instant.now(),
+                any(Instant::class.java) ?: Instant.now(),
+            ),
+        ).thenReturn(emptyList())
 
         val result = service.getTimeSheet(userId, startDate, endDate)
         assertThat(result.dailySummaries).isEmpty()
@@ -207,11 +220,12 @@ class TimeTrackingServiceEdgeCasesTest2 {
     @Test
     fun `addManualEntry creates entry and recalculates`() {
         val timestamp = Instant.now().minusSeconds(3600)
-        val request = ManualTimeEntryRequest(
-            reason = "Forgot to clock in",
-            entryType = TimeEntryType.CLOCK_IN,
-            timestamp = timestamp,
-        )
+        val request =
+            ManualTimeEntryRequest(
+                reason = "Forgot to clock in",
+                entryType = TimeEntryType.CLOCK_IN,
+                timestamp = timestamp,
+            )
         val date = timestamp.atZone(ZoneOffset.UTC).toLocalDate()
         val startOfDay = date.atStartOfDay(ZoneOffset.UTC).toInstant()
         val endOfDay = date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant()
@@ -232,9 +246,12 @@ class TimeTrackingServiceEdgeCasesTest2 {
 
     @Test
     fun `addManualEntry throws when manager not found`() {
-        val request = ManualTimeEntryRequest(
-            reason = "Test", entryType = TimeEntryType.CLOCK_IN, timestamp = Instant.now(),
-        )
+        val request =
+            ManualTimeEntryRequest(
+                reason = "Test",
+                entryType = TimeEntryType.CLOCK_IN,
+                timestamp = Instant.now(),
+            )
         `when`(userRepository.findById(managerId)).thenReturn(Optional.empty())
 
         assertThrows<ResourceNotFoundException> { service.addManualEntry(managerId, userId, request) }
@@ -242,9 +259,12 @@ class TimeTrackingServiceEdgeCasesTest2 {
 
     @Test
     fun `addManualEntry throws when user not found`() {
-        val request = ManualTimeEntryRequest(
-            reason = "Test", entryType = TimeEntryType.CLOCK_IN, timestamp = Instant.now(),
-        )
+        val request =
+            ManualTimeEntryRequest(
+                reason = "Test",
+                entryType = TimeEntryType.CLOCK_IN,
+                timestamp = Instant.now(),
+            )
         `when`(userRepository.findById(managerId)).thenReturn(Optional.of(manager))
         `when`(userRepository.findById(userId)).thenReturn(Optional.empty())
 
@@ -330,11 +350,13 @@ class TimeTrackingServiceEdgeCasesTest2 {
         `when`(userRepository.findBySubstituteId(managerId)).thenReturn(emptyList())
         `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
         `when`(timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)).thenReturn(null)
-        `when`(timeEntryRepository.findByUserIdAndDateRange(
-            any(UUID::class.java) ?: userId,
-            any(Instant::class.java) ?: Instant.now(),
-            any(Instant::class.java) ?: Instant.now(),
-        )).thenReturn(emptyList())
+        `when`(
+            timeEntryRepository.findByUserIdAndDateRange(
+                any(UUID::class.java) ?: userId,
+                any(Instant::class.java) ?: Instant.now(),
+                any(Instant::class.java) ?: Instant.now(),
+            ),
+        ).thenReturn(emptyList())
 
         val result = service.getTeamCurrentStatus(managerId)
         assertThat(result).containsKey(userId)
@@ -355,11 +377,13 @@ class TimeTrackingServiceEdgeCasesTest2 {
         // For otherEmpId (substitute subordinate)
         `when`(userRepository.findById(otherEmpId)).thenReturn(Optional.of(otherEmp))
         `when`(timeEntryRepository.findTopByUserIdOrderByTimestampDesc(otherEmpId)).thenReturn(null)
-        `when`(timeEntryRepository.findByUserIdAndDateRange(
-            any(UUID::class.java) ?: userId,
-            any(Instant::class.java) ?: Instant.now(),
-            any(Instant::class.java) ?: Instant.now(),
-        )).thenReturn(emptyList())
+        `when`(
+            timeEntryRepository.findByUserIdAndDateRange(
+                any(UUID::class.java) ?: userId,
+                any(Instant::class.java) ?: Instant.now(),
+                any(Instant::class.java) ?: Instant.now(),
+            ),
+        ).thenReturn(emptyList())
 
         val result = service.getTeamCurrentStatus(managerId)
         assertThat(result).containsKey(userId)
@@ -464,6 +488,8 @@ class TimeTrackingServiceEdgeCasesTest2 {
 
     // ---- helpers ----
 
-    private fun makeEntry(type: TimeEntryType, timestamp: Instant) =
-        TimeEntryEntity(user = user, entryType = type, timestamp = timestamp)
+    private fun makeEntry(
+        type: TimeEntryType,
+        timestamp: Instant,
+    ) = TimeEntryEntity(user = user, entryType = type, timestamp = timestamp)
 }

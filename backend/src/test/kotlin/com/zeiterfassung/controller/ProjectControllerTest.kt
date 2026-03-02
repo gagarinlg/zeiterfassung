@@ -2,7 +2,6 @@ package com.zeiterfassung.controller
 
 import com.zeiterfassung.model.dto.CreateProjectRequest
 import com.zeiterfassung.model.dto.CreateTimeAllocationRequest
-import com.zeiterfassung.model.dto.PageResponse
 import com.zeiterfassung.model.dto.ProjectResponse
 import com.zeiterfassung.model.dto.TimeAllocationResponse
 import com.zeiterfassung.model.dto.UpdateProjectRequest

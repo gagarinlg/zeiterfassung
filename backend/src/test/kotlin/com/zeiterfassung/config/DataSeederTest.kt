@@ -22,6 +22,7 @@ import java.util.Optional
 @ExtendWith(MockitoExtension::class)
 class DataSeederTest {
     @Mock private lateinit var userRepository: UserRepository
+
     @Mock private lateinit var roleRepository: RoleRepository
 
     private val passwordEncoder = BCryptPasswordEncoder()
@@ -29,12 +30,13 @@ class DataSeederTest {
 
     @BeforeEach
     fun setUp() {
-        dataSeeder = DataSeeder(
-            userRepository = userRepository,
-            roleRepository = roleRepository,
-            passwordEncoder = passwordEncoder,
-            adminPassword = "TestAdmin@123!",
-        )
+        dataSeeder =
+            DataSeeder(
+                userRepository = userRepository,
+                roleRepository = roleRepository,
+                passwordEncoder = passwordEncoder,
+                adminPassword = "TestAdmin@123!",
+            )
     }
 
     @Test
@@ -62,9 +64,16 @@ class DataSeederTest {
         val superAdminRole = RoleEntity(name = "SUPER_ADMIN")
         `when`(userRepository.existsByEmail("admin@zeiterfassung.local")).thenReturn(false)
         `when`(roleRepository.findByName("SUPER_ADMIN")).thenReturn(Optional.of(superAdminRole))
-        `when`(userRepository.save(any(UserEntity::class.java) ?: UserEntity(
-            email = "", passwordHash = "", firstName = "", lastName = "",
-        ))).thenAnswer { it.arguments[0] }
+        `when`(
+            userRepository.save(
+                any(UserEntity::class.java) ?: UserEntity(
+                    email = "",
+                    passwordHash = "",
+                    firstName = "",
+                    lastName = "",
+                ),
+            ),
+        ).thenAnswer { it.arguments[0] }
 
         dataSeeder.run(DefaultApplicationArguments())
 

@@ -40,11 +40,17 @@ import java.util.UUID
 @ExtendWith(MockitoExtension::class)
 class VacationServiceEdgeCasesTest {
     @Mock private lateinit var vacationRequestRepository: VacationRequestRepository
+
     @Mock private lateinit var vacationBalanceRepository: VacationBalanceRepository
+
     @Mock private lateinit var publicHolidayRepository: PublicHolidayRepository
+
     @Mock private lateinit var employeeConfigRepository: EmployeeConfigRepository
+
     @Mock private lateinit var userRepository: UserRepository
+
     @Mock private lateinit var auditService: AuditService
+
     @Mock private lateinit var notificationService: NotificationService
 
     private val objectMapper = ObjectMapper()
@@ -61,10 +67,17 @@ class VacationServiceEdgeCasesTest {
 
     @BeforeEach
     fun setUp() {
-        service = VacationService(
-            vacationRequestRepository, vacationBalanceRepository, publicHolidayRepository,
-            employeeConfigRepository, userRepository, auditService, objectMapper, notificationService,
-        )
+        service =
+            VacationService(
+                vacationRequestRepository,
+                vacationBalanceRepository,
+                publicHolidayRepository,
+                employeeConfigRepository,
+                userRepository,
+                auditService,
+                objectMapper,
+                notificationService,
+            )
         user = UserEntity(id = userId, email = "user@test.com", passwordHash = "h", firstName = "User", lastName = "One")
         manager = UserEntity(id = managerId, email = "mgr@test.com", passwordHash = "h", firstName = "Manager", lastName = "One")
         manager.subordinates.add(user)
@@ -147,9 +160,13 @@ class VacationServiceEdgeCasesTest {
     fun `getUserRequests with year filter`() {
         val pageable = PageRequest.of(0, 10)
         val request = makeRequest(userId, VacationStatus.APPROVED)
-        `when`(vacationRequestRepository.findByUserIdAndStartDateBetween(
-            userId, LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31),
-        )).thenReturn(listOf(request))
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                userId,
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 12, 31),
+            ),
+        ).thenReturn(listOf(request))
 
         val result = service.getUserRequests(userId, 2025, null, pageable)
         assertThat(result.totalElements).isEqualTo(1)
@@ -160,9 +177,13 @@ class VacationServiceEdgeCasesTest {
         val pageable = PageRequest.of(0, 10)
         val approved = makeRequest(userId, VacationStatus.APPROVED)
         val pending = makeRequest(userId, VacationStatus.PENDING)
-        `when`(vacationRequestRepository.findByUserIdAndStartDateBetween(
-            userId, LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31),
-        )).thenReturn(listOf(approved, pending))
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                userId,
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 12, 31),
+            ),
+        ).thenReturn(listOf(approved, pending))
 
         val result = service.getUserRequests(userId, 2025, VacationStatus.PENDING, pageable)
         assertThat(result.totalElements).isEqualTo(1)
@@ -199,9 +220,13 @@ class VacationServiceEdgeCasesTest {
         val request = makeRequest(userId, VacationStatus.PENDING)
         `when`(userRepository.findById(managerId)).thenReturn(Optional.of(manager))
         `when`(userRepository.findBySubstituteId(managerId)).thenReturn(emptyList())
-        `when`(vacationRequestRepository.findByStatusAndUserIdIn(
-            VacationStatus.PENDING, mutableListOf(userId), pageable,
-        )).thenReturn(PageImpl(listOf(request), pageable, 1))
+        `when`(
+            vacationRequestRepository.findByStatusAndUserIdIn(
+                VacationStatus.PENDING,
+                mutableListOf(userId),
+                pageable,
+            ),
+        ).thenReturn(PageImpl(listOf(request), pageable, 1))
 
         val result = service.getPendingRequests(managerId, pageable)
         assertThat(result.totalElements).isEqualTo(1)
@@ -218,11 +243,13 @@ class VacationServiceEdgeCasesTest {
         val sub2 = UserEntity(id = substituteId, email = "sub@t.com", passwordHash = "h", firstName = "S", lastName = "T")
         `when`(userRepository.findById(substituteId)).thenReturn(Optional.of(sub2))
         `when`(userRepository.findBySubstituteId(substituteId)).thenReturn(listOf(otherManager))
-        `when`(vacationRequestRepository.findByStatusAndUserIdIn(
-            any(VacationStatus::class.java) ?: VacationStatus.PENDING,
-            any() ?: mutableListOf(),
-            any() ?: pageable,
-        )).thenReturn(PageImpl(emptyList(), pageable, 0))
+        `when`(
+            vacationRequestRepository.findByStatusAndUserIdIn(
+                any(VacationStatus::class.java) ?: VacationStatus.PENDING,
+                any() ?: mutableListOf(),
+                any() ?: pageable,
+            ),
+        ).thenReturn(PageImpl(emptyList(), pageable, 0))
 
         val result = service.getPendingRequests(substituteId, pageable)
         assertThat(result).isNotNull
@@ -259,11 +286,13 @@ class VacationServiceEdgeCasesTest {
         val balance = makeBalance(30, 5, 0)
         `when`(userRepository.findById(adminId)).thenReturn(Optional.of(admin))
         `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2025)).thenReturn(balance)
-        `when`(vacationRequestRepository.findByUserIdAndStartDateBetween(
-            any(UUID::class.java) ?: userId,
-            any(LocalDate::class.java) ?: LocalDate.now(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-        )).thenReturn(emptyList())
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: userId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
 
         val result = service.getBalanceForManager(adminId, userId, 2025)
         assertThat(result.totalDays).isEqualByComparingTo(BigDecimal("30"))
@@ -274,11 +303,13 @@ class VacationServiceEdgeCasesTest {
         val balance = makeBalance(30, 10, 0)
         `when`(userRepository.findById(managerId)).thenReturn(Optional.of(manager))
         `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2025)).thenReturn(balance)
-        `when`(vacationRequestRepository.findByUserIdAndStartDateBetween(
-            any(UUID::class.java) ?: userId,
-            any(LocalDate::class.java) ?: LocalDate.now(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-        )).thenReturn(emptyList())
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: userId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
 
         val result = service.getBalanceForManager(managerId, userId, 2025)
         assertThat(result.usedDays).isEqualByComparingTo(BigDecimal("10"))
@@ -290,11 +321,13 @@ class VacationServiceEdgeCasesTest {
         `when`(userRepository.findById(substituteId)).thenReturn(Optional.of(substitute))
         `when`(userRepository.findBySubstituteId(substituteId)).thenReturn(listOf(manager))
         `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2025)).thenReturn(balance)
-        `when`(vacationRequestRepository.findByUserIdAndStartDateBetween(
-            any(UUID::class.java) ?: userId,
-            any(LocalDate::class.java) ?: LocalDate.now(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-        )).thenReturn(emptyList())
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: userId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
 
         val result = service.getBalanceForManager(substituteId, userId, 2025)
         assertThat(result).isNotNull
@@ -350,16 +383,20 @@ class VacationServiceEdgeCasesTest {
         val ownRequest = makeRequest(managerId, VacationStatus.PENDING)
         `when`(userRepository.findById(managerId)).thenReturn(Optional.of(manager))
         `when`(userRepository.findBySubstituteId(managerId)).thenReturn(emptyList())
-        `when`(vacationRequestRepository.findApprovedByUserIdsAndDateRange(
-            any() ?: mutableListOf(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-        )).thenReturn(listOf(request))
-        `when`(vacationRequestRepository.findByUserIdAndStartDateBetween(
-            any(UUID::class.java) ?: managerId,
-            any(LocalDate::class.java) ?: LocalDate.now(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-        )).thenReturn(listOf(ownRequest))
+        `when`(
+            vacationRequestRepository.findApprovedByUserIdsAndDateRange(
+                any() ?: mutableListOf(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(listOf(request))
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: managerId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(listOf(ownRequest))
         `when`(publicHolidayRepository.findApplicableForYear(anyInt())).thenReturn(emptyList())
 
         val result = service.getTeamCalendar(managerId, 2025, 6)
@@ -374,11 +411,13 @@ class VacationServiceEdgeCasesTest {
         val noSubMgr = UserEntity(id = UUID.randomUUID(), email = "ns2@t.com", passwordHash = "h", firstName = "N", lastName = "S")
         `when`(userRepository.findById(noSubMgr.id)).thenReturn(Optional.of(noSubMgr))
         `when`(userRepository.findBySubstituteId(noSubMgr.id)).thenReturn(emptyList())
-        `when`(vacationRequestRepository.findByUserIdAndStartDateBetween(
-            any(UUID::class.java) ?: noSubMgr.id,
-            any(LocalDate::class.java) ?: LocalDate.now(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-        )).thenReturn(emptyList())
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: noSubMgr.id,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
         `when`(publicHolidayRepository.findApplicableForYear(anyInt())).thenReturn(emptyList())
 
         val result = service.getTeamCalendar(noSubMgr.id, 2025, 1)
@@ -394,16 +433,20 @@ class VacationServiceEdgeCasesTest {
 
         `when`(userRepository.findById(substituteId)).thenReturn(Optional.of(substitute))
         `when`(userRepository.findBySubstituteId(substituteId)).thenReturn(listOf(otherMgr))
-        `when`(vacationRequestRepository.findApprovedByUserIdsAndDateRange(
-            any() ?: mutableListOf(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-        )).thenReturn(emptyList())
-        `when`(vacationRequestRepository.findByUserIdAndStartDateBetween(
-            any(UUID::class.java) ?: substituteId,
-            any(LocalDate::class.java) ?: LocalDate.now(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-        )).thenReturn(emptyList())
+        `when`(
+            vacationRequestRepository.findApprovedByUserIdsAndDateRange(
+                any() ?: mutableListOf(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: substituteId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
         `when`(publicHolidayRepository.findApplicableForYear(anyInt())).thenReturn(emptyList())
 
         val result = service.getTeamCalendar(substituteId, 2025, 3)
@@ -470,10 +513,11 @@ class VacationServiceEdgeCasesTest {
     @Test
     fun `updateRequest throws when start after end`() {
         val request = makeRequest(userId, VacationStatus.PENDING)
-        val dto = UpdateVacationRequest(
-            startDate = LocalDate.now().plusDays(30),
-            endDate = LocalDate.now().plusDays(20),
-        )
+        val dto =
+            UpdateVacationRequest(
+                startDate = LocalDate.now().plusDays(30),
+                endDate = LocalDate.now().plusDays(20),
+            )
         `when`(vacationRequestRepository.findById(request.id)).thenReturn(Optional.of(request))
 
         assertThrows<BadRequestException> { service.updateRequest(request.id, userId, dto) }
@@ -544,11 +588,13 @@ class VacationServiceEdgeCasesTest {
         val balance = makeBalance(30, 5, 2)
         `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2025)).thenReturn(balance)
         `when`(vacationBalanceRepository.save(any())).thenAnswer { it.arguments[0] as VacationBalanceEntity }
-        `when`(vacationRequestRepository.findByUserIdAndStartDateBetween(
-            any(UUID::class.java) ?: userId,
-            any(LocalDate::class.java) ?: LocalDate.now(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-        )).thenReturn(emptyList())
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: userId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
 
         val result = service.setBalance(userId, 2025, null, BigDecimal("10"), null, actorId)
         assertThat(result.totalDays).isEqualByComparingTo(BigDecimal("30"))
@@ -562,11 +608,13 @@ class VacationServiceEdgeCasesTest {
         val balance = makeBalance(30, 0, 0)
         `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2025)).thenReturn(balance)
         `when`(vacationBalanceRepository.save(any())).thenAnswer { it.arguments[0] as VacationBalanceEntity }
-        `when`(vacationRequestRepository.findByUserIdAndStartDateBetween(
-            any(UUID::class.java) ?: userId,
-            any(LocalDate::class.java) ?: LocalDate.now(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-        )).thenReturn(emptyList())
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: userId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
 
         val result = service.setBalance(userId, 2025, BigDecimal("28"), BigDecimal("5"), BigDecimal("3"), actorId)
         assertThat(result.totalDays).isEqualByComparingTo(BigDecimal("28"))
@@ -586,11 +634,13 @@ class VacationServiceEdgeCasesTest {
         `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2024)).thenReturn(prevBalance)
         `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2025)).thenReturn(curBalance)
         `when`(vacationBalanceRepository.save(any())).thenAnswer { it.arguments[0] as VacationBalanceEntity }
-        `when`(vacationRequestRepository.findByUserIdAndStartDateBetween(
-            any(UUID::class.java) ?: userId,
-            any(LocalDate::class.java) ?: LocalDate.now(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-        )).thenReturn(emptyList())
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: userId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
 
         val result = service.triggerCarryOver(userId, 2025, actorId)
         // 30 - 15 = 15 remaining, max default carry-over = 10
@@ -606,11 +656,13 @@ class VacationServiceEdgeCasesTest {
         `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2024)).thenReturn(null)
         `when`(vacationBalanceRepository.findByUserIdAndYear(userId, 2025)).thenReturn(curBalance)
         `when`(vacationBalanceRepository.save(any())).thenAnswer { it.arguments[0] as VacationBalanceEntity }
-        `when`(vacationRequestRepository.findByUserIdAndStartDateBetween(
-            any(UUID::class.java) ?: userId,
-            any(LocalDate::class.java) ?: LocalDate.now(),
-            any(LocalDate::class.java) ?: LocalDate.now(),
-        )).thenReturn(emptyList())
+        `when`(
+            vacationRequestRepository.findByUserIdAndStartDateBetween(
+                any(UUID::class.java) ?: userId,
+                any(LocalDate::class.java) ?: LocalDate.now(),
+                any(LocalDate::class.java) ?: LocalDate.now(),
+            ),
+        ).thenReturn(emptyList())
 
         val result = service.triggerCarryOver(userId, 2025, actorId)
         assertThat(result.carriedOverDays).isEqualByComparingTo(BigDecimal.ZERO)
@@ -628,20 +680,36 @@ class VacationServiceEdgeCasesTest {
 
     // ---- helpers ----
 
-    private fun makeRequest(userId: UUID, status: VacationStatus): VacationRequestEntity {
-        val reqUser = if (userId == this.userId) user
-        else if (userId == managerId) manager
-        else UserEntity(id = userId, email = "u$userId@t.com", passwordHash = "h", firstName = "F", lastName = "L")
+    private fun makeRequest(
+        userId: UUID,
+        status: VacationStatus,
+    ): VacationRequestEntity {
+        val reqUser =
+            if (userId == this.userId) {
+                user
+            } else if (userId == managerId) {
+                manager
+            } else {
+                UserEntity(id = userId, email = "u$userId@t.com", passwordHash = "h", firstName = "F", lastName = "L")
+            }
         return VacationRequestEntity(
-            user = reqUser, startDate = LocalDate.now().plusDays(10), endDate = LocalDate.now().plusDays(14),
-            totalDays = BigDecimal("5"), status = status,
+            user = reqUser,
+            startDate = LocalDate.now().plusDays(10),
+            endDate = LocalDate.now().plusDays(14),
+            totalDays = BigDecimal("5"),
+            status = status,
         )
     }
 
-    private fun makeBalance(totalDays: Int, usedDays: Int, carriedOverDays: Int) =
-        VacationBalanceEntity(
-            user = user, year = 2025,
-            totalDays = BigDecimal(totalDays), usedDays = BigDecimal(usedDays),
-            carriedOverDays = BigDecimal(carriedOverDays),
-        )
+    private fun makeBalance(
+        totalDays: Int,
+        usedDays: Int,
+        carriedOverDays: Int,
+    ) = VacationBalanceEntity(
+        user = user,
+        year = 2025,
+        totalDays = BigDecimal(totalDays),
+        usedDays = BigDecimal(usedDays),
+        carriedOverDays = BigDecimal(carriedOverDays),
+    )
 }
