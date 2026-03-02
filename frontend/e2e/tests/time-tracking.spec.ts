@@ -53,7 +53,7 @@ test.describe('Time Tracking Page', () => {
     test('should show Clocked In status', async ({ page }) => {
       await page.goto('/time-tracking')
 
-      await expect(page.getByText(/Eingestempelt/i)).toBeVisible()
+      await expect(page.getByText('Eingestempelt', { exact: true })).toBeVisible()
     })
 
     test('should show Break and Clock Out buttons when clocked in', async ({ page }) => {
