@@ -1,6 +1,6 @@
 # Current Project State
 
-> Last updated: 2026-03-02
+> Last updated: 2026-03-02 (Phase 15 — Work Hour Change Requests)
 
 ## Quick Summary
 
@@ -44,6 +44,7 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Project/cost center time allocation: project CRUD (admin), time allocation CRUD (employees), date/range queries, project-level reporting
 - ✅ GDPR data export: `GET /gdpr/export` (own data), `GET /gdpr/export/{userId}` (admin); returns all personal info, time entries, vacation requests, sick leaves, business trips, and audit log
 - ✅ GDPR account deletion: `POST /gdpr/delete` (own account), `POST /gdpr/delete/{userId}` (admin); soft delete with data anonymization and token revocation
+- ✅ Work hour change requests: create, approve, reject, cancel workflow at `/work-hour-changes`; on approval updates EmployeeConfig work hours
 
 ### Frontend (Fully Implemented)
 - ✅ Login page with validation and error handling

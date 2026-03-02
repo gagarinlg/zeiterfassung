@@ -3,6 +3,24 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Work Hour Change Requests
+
+### Added
+- **Work hour change request workflow**: Employees can request changes to their weekly/daily work hours; managers approve/reject
+  - `POST /work-hour-changes` — create request (captures current hours from EmployeeConfig)
+  - `GET /work-hour-changes` — list own requests (paginated)
+  - `GET /work-hour-changes/pending` — list pending requests for manager approval
+  - `POST /work-hour-changes/{id}/approve` — approve and update EmployeeConfig
+  - `POST /work-hour-changes/{id}/reject` — reject with reason
+  - `DELETE /work-hour-changes/{id}` — cancel own pending request
+- **Database migration V11**: `work_hour_change_requests` table with user/status indexes
+- **Enum**: `WorkHourChangeStatus` (PENDING, APPROVED, REJECTED, CANCELLED)
+- **DTOs**: `CreateWorkHourChangeRequest`, `RejectWorkHourChangeRequest`, `WorkHourChangeResponse`
+- **Entity**: `WorkHourChangeRequestEntity` with `@ManyToOne` user/approver, `toResponse()` method
+- **Repository**: `WorkHourChangeRequestRepository` with user/status queries
+- **Service**: `WorkHourChangeService` with validation, audit logging, EmployeeConfig update on approval
+- **Controller**: `WorkHourChangeController` with Swagger annotations and `@PreAuthorize` permission checks
+
 ## [Unreleased] — Bug Fixes & Employee Configuration UI
 
 ### Fixed
