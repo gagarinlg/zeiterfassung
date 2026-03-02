@@ -3,6 +3,7 @@ package com.zeiterfassung.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.zeiterfassung.audit.AuditService
 import com.zeiterfassung.exception.ConflictException
+import com.zeiterfassung.model.dto.TrackingStatus
 import com.zeiterfassung.model.entity.DailySummaryEntity
 import com.zeiterfassung.model.entity.TimeEntryEntity
 import com.zeiterfassung.model.entity.UserEntity
@@ -201,7 +202,7 @@ class TimeTrackingServiceTest {
         ).thenReturn(entries)
 
         val result = service.getCurrentStatus(userId)
-        assertThat(result.status.name).isEqualTo("CLOCKED_IN")
+        assertThat(result.status).isEqualTo(TrackingStatus.CLOCKED_IN)
     }
 
     @Test

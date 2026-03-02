@@ -3,6 +3,27 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased] — Bug Fixes & Employee Configuration UI
+
+### Fixed
+- **Break end clock-out bug**: Ending a break no longer incorrectly shows the user as clocked out. Added `BREAK_END -> CLOCKED_IN` mapping in `TimeTrackingService.getCurrentStatus()`.
+- **TrackingStatusBar**: Removed Clock Out button from ON_BREAK state. Users must end their break before clocking out, preventing accidental clock-outs.
+
+### Added
+- **Employee Configuration modal**: New modal in admin User Management tab (Sliders icon) to configure per-user work settings:
+  - Weekly work hours
+  - Daily work hours
+  - Work days (Mon–Sun checkboxes)
+  - Vacation days per year
+  - Vacation carry-over maximum
+- **`adminService` employee config methods**: `getEmployeeConfig(userId)`, `updateEmployeeConfig(userId, payload)` calling `GET/PUT /employee-config/{userId}`
+- **i18n translations**: Added `admin.employee_config.*` keys for both English and German
+- **Backend unit test**: `getCurrentStatus should return CLOCKED_IN after break end` in `TimeTrackingServiceTest`
+
+### Changed
+- **TrackingStatusBar test**: Updated to verify Clock Out button is NOT shown when ON_BREAK
+- Backend test count increased from 260 to 261 tests
+
 ## [Unreleased] — UI & Workflow Fixes
 
 ### Fixed
