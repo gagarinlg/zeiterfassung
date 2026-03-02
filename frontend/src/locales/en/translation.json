@@ -258,6 +258,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "loading": "Loading...",
+    "optional": "optional",
     "error": "Error",
     "success": "Success",
     "confirm": "Confirm",

@@ -497,15 +497,20 @@ class TimeTrackingService(
         for (entry in entries) {
             when (entry.entryType) {
                 TimeEntryType.CLOCK_IN -> {
-                    // When clocking in again after a previous clock-out on the same day,
-                    // the gap is treated as a break if it is >= 15 minutes.
+                    // When clocking in again after a previous clock-out, the gap is
+                    // treated as a break only if it is shorter than the mandatory rest
+                    // period (11 h / 660 min per §5 ArbZG). Gaps >= 11 h indicate
+                    // separate work days and are NOT counted as break time.
                     if (lastClockOutTime != null) {
                         val gapMinutes = ChronoUnit.MINUTES.between(lastClockOutTime, entry.timestamp)
-                        if (gapMinutes >= minQualifyingBreak) {
-                            qualifyingBreakMinutes += gapMinutes
-                        } else if (gapMinutes > 0) {
-                            shortBreakMinutes += gapMinutes
+                        if (gapMinutes < ArbZGComplianceService.MIN_REST_MINUTES) {
+                            if (gapMinutes >= minQualifyingBreak) {
+                                qualifyingBreakMinutes += gapMinutes
+                            } else if (gapMinutes > 0) {
+                                shortBreakMinutes += gapMinutes
+                            }
                         }
+                        // gaps >= MIN_REST_MINUTES are separate work sessions — ignored
                         lastClockOutTime = null
                     }
                     clockInTime = entry.timestamp

@@ -34,11 +34,12 @@ describe('LoginPage', () => {
     vi.clearAllMocks()
   })
 
-  it('should render login form', () => {
+  it('should render login form with TOTP field always visible', () => {
     renderLoginPage()
     expect(screen.getByRole('heading', { name: 'app.name' })).toBeInTheDocument()
-    expect(screen.getByLabelText('auth.email')).toBeInTheDocument()
+    expect(screen.getByLabelText(/auth.email/)).toBeInTheDocument()
     expect(screen.getByLabelText('auth.password')).toBeInTheDocument()
+    expect(screen.getByLabelText(/auth.totp_code/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'auth.login_button' })).toBeInTheDocument()
   })
 
@@ -78,35 +79,35 @@ describe('LoginPage', () => {
     })
   })
 
-  it('should show TOTP input when server responds with TOTP required in detail field', async () => {
+  it('should show TOTP error message when server responds with TOTP required in detail field', async () => {
     const { authService } = await import('../services/authService')
     vi.mocked(authService.login).mockRejectedValue({
       response: { status: 401, data: { detail: 'TOTP code required' } },
     })
 
     renderLoginPage()
-    fireEvent.change(screen.getByLabelText('auth.email'), { target: { value: 'test@test.com' } })
+    fireEvent.change(screen.getByLabelText(/auth.email/), { target: { value: 'test@test.com' } })
     fireEvent.change(screen.getByLabelText('auth.password'), { target: { value: 'password' } })
     fireEvent.click(screen.getByRole('button', { name: 'auth.login_button' }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText('auth.totp_code')).toBeInTheDocument()
+      expect(screen.getByRole('alert')).toHaveTextContent('auth.totp_required')
     })
   })
 
-  it('should show TOTP input when server responds with TOTP required in message field', async () => {
+  it('should show TOTP error message when server responds with TOTP required in message field', async () => {
     const { authService } = await import('../services/authService')
     vi.mocked(authService.login).mockRejectedValue({
       response: { status: 401, data: { message: 'TOTP code required' } },
     })
 
     renderLoginPage()
-    fireEvent.change(screen.getByLabelText('auth.email'), { target: { value: 'test@test.com' } })
+    fireEvent.change(screen.getByLabelText(/auth.email/), { target: { value: 'test@test.com' } })
     fireEvent.change(screen.getByLabelText('auth.password'), { target: { value: 'password' } })
     fireEvent.click(screen.getByRole('button', { name: 'auth.login_button' }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText('auth.totp_code')).toBeInTheDocument()
+      expect(screen.getByRole('alert')).toHaveTextContent('auth.totp_required')
     })
   })
 

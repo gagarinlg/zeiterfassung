@@ -237,6 +237,52 @@ class TimeTrackingServiceTest {
         assertThat(result.todayBreakMinutes).isGreaterThanOrEqualTo(10)
     }
 
+    @Test
+    fun `getCurrentStatus should not count gap of 11h or more as break`() {
+        val now = Instant.now()
+        val entries =
+            listOf(
+                // First session: 2 hours of work
+                TimeEntryEntity(
+                    user = user,
+                    entryType = TimeEntryType.CLOCK_IN,
+                    timestamp = now.minus(15, ChronoUnit.HOURS),
+                ),
+                TimeEntryEntity(
+                    user = user,
+                    entryType = TimeEntryType.CLOCK_OUT,
+                    timestamp = now.minus(13, ChronoUnit.HOURS),
+                ),
+                // 12-hour gap (>= 11h, should be treated as separate work day, NOT break)
+                TimeEntryEntity(
+                    user = user,
+                    entryType = TimeEntryType.CLOCK_IN,
+                    timestamp = now.minus(1, ChronoUnit.HOURS),
+                ),
+                TimeEntryEntity(
+                    user = user,
+                    entryType = TimeEntryType.CLOCK_OUT,
+                    timestamp = now,
+                ),
+            )
+        `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
+        `when`(timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)).thenReturn(entries.last())
+        `when`(
+            timeEntryRepository.findByUserIdAndDateRange(
+                any(UUID::class.java) ?: userId,
+                any(Instant::class.java) ?: now,
+                any(Instant::class.java) ?: now,
+            ),
+        ).thenReturn(entries)
+
+        val result = service.getCurrentStatus(userId)
+
+        // 12-hour gap should NOT be counted as break time
+        // Total work = 120 + 60 = 180 min, break = 0
+        assertThat(result.todayBreakMinutes).isEqualTo(0)
+        assertThat(result.todayWorkMinutes).isEqualTo(180)
+    }
+
     private fun makeClockIn() =
         TimeEntryEntity(
             user = user,

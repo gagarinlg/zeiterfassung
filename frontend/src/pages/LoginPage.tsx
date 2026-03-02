@@ -21,7 +21,6 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<FormErrors>({})
   const [serverError, setServerError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [totpRequired, setTotpRequired] = useState(false)
   const [totpCode, setTotpCode] = useState('')
 
   const validateForm = (): boolean => {
@@ -46,7 +45,7 @@ export default function LoginPage() {
 
     setIsLoading(true)
     try {
-      const request = totpRequired ? { ...formData, totpCode } : formData
+      const request = totpCode ? { ...formData, totpCode } : formData
       const response = await authService.login(request)
       const tokens = {
         accessToken: response.accessToken,
@@ -68,7 +67,6 @@ export default function LoginPage() {
         (axiosError.response?.data?.detail?.toLowerCase().includes('totp') ||
           axiosError.response?.data?.message?.toLowerCase().includes('totp'))
       ) {
-        setTotpRequired(true)
         setServerError(t('auth.totp_required'))
       } else {
         setServerError(t('auth.login_error'))
@@ -150,23 +148,22 @@ export default function LoginPage() {
               </p>
             )}
           </div>
-          {totpRequired && (
-            <div>
-              <label htmlFor="totpCode" className="block text-sm font-medium text-gray-700 mb-1">
-                {t('auth.totp_code')}
-              </label>
-              <input
-                id="totpCode"
-                type="text"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                value={totpCode}
-                onChange={(e) => setTotpCode(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="000000"
-              />
-            </div>
-          )}
+          <div>
+            <label htmlFor="totpCode" className="block text-sm font-medium text-gray-700 mb-1">
+              {t('auth.totp_code')}
+              <span className="ml-1 text-xs text-gray-400 font-normal">({t('common.optional')})</span>
+            </label>
+            <input
+              id="totpCode"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              value={totpCode}
+              onChange={(e) => setTotpCode(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              placeholder="000000"
+            />
+          </div>
           <button
             type="submit"
             disabled={isLoading}
