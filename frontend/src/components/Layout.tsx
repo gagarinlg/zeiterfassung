@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { useBranding } from '../hooks/useBranding'
-import { Clock, Calendar, LayoutDashboard, Settings, LogOut, User, CheckCircle, UserCog, Thermometer, Plane, FolderKanban } from 'lucide-react'
+import { Clock, Calendar, LayoutDashboard, Settings, LogOut, User, CheckCircle, UserCog, Thermometer, Plane, FolderKanban, Timer } from 'lucide-react'
 
 export default function Layout() {
   const { t } = useTranslation()
@@ -130,6 +130,31 @@ export default function Layout() {
             <FolderKanban size={18} />
             {t('nav.projects')}
           </NavLink>
+          <NavLink
+            to="/work-hour-changes"
+            end
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+              }`
+            }
+          >
+            <Timer size={18} />
+            {t('nav.work_hour_changes')}
+          </NavLink>
+          {hasPermission('time.edit.team') && (
+            <NavLink
+              to="/work-hour-changes/approvals"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+                }`
+              }
+            >
+              <CheckCircle size={18} />
+              {t('nav.work_hour_change_approvals')}
+            </NavLink>
+          )}
           {hasPermission('admin.users.manage') && (
             <NavLink
               to="/admin"

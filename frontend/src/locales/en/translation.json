@@ -12,6 +12,8 @@
     "business_trips": "Business Trips",
     "business_trip_approvals": "Trip Approvals",
     "projects": "Projects",
+    "work_hour_changes": "Work Hours",
+    "work_hour_change_approvals": "Hours Approvals",
     "admin": "Administration",
     "profile": "Profile",
     "logout": "Logout",
@@ -516,6 +518,52 @@
       "allocation_created": "Time allocation created successfully",
       "allocation_deleted": "Time allocation deleted",
       "project_created": "Project created successfully"
+    }
+  },
+  "work_hour_change": {
+    "title": "Work Hour Changes",
+    "approvals_title": "Work Hour Change Approvals",
+    "tabs": {
+      "list": "My Requests",
+      "new_request": "New Request"
+    },
+    "requested_weekly_hours": "Requested Weekly Hours",
+    "requested_daily_hours": "Requested Daily Hours",
+    "effective_date": "Effective Date",
+    "reason": "Reason",
+    "submit": "Submit Request",
+    "no_entries": "No work hour change requests found",
+    "no_pending": "No pending work hour change requests",
+    "see_reason": "See rejection reason",
+    "reject_title": "Reject Work Hour Change Request",
+    "reject_reason_placeholder": "Enter rejection reason...",
+    "columns": {
+      "employee": "Employee",
+      "current_hours": "Current Hours",
+      "requested_hours": "Requested Hours",
+      "effective_date": "Effective Date",
+      "reason": "Reason",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "errors": {
+      "load_failed": "Failed to load requests",
+      "create_failed": "Failed to create request",
+      "cancel_failed": "Failed to cancel request",
+      "approve_failed": "Failed to approve request",
+      "reject_failed": "Failed to reject request"
+    },
+    "success": {
+      "created": "Work hour change request submitted",
+      "cancelled": "Request cancelled",
+      "approved": "Request approved",
+      "rejected": "Request rejected"
     }
   },
   "backup": {

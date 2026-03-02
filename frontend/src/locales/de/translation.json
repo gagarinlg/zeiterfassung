@@ -12,6 +12,8 @@
     "business_trips": "Dienstreisen",
     "business_trip_approvals": "Reisegenehmigungen",
     "projects": "Projekte",
+    "work_hour_changes": "Arbeitszeit",
+    "work_hour_change_approvals": "AZ-Genehmigungen",
     "admin": "Administration",
     "profile": "Profil",
     "logout": "Abmelden",
@@ -516,6 +518,52 @@
       "allocation_created": "Zeitzuweisung erfolgreich erstellt",
       "allocation_deleted": "Zeitzuweisung gelöscht",
       "project_created": "Projekt erfolgreich erstellt"
+    }
+  },
+  "work_hour_change": {
+    "title": "Arbeitszeitänderungen",
+    "approvals_title": "Arbeitszeitänderungs-Genehmigungen",
+    "tabs": {
+      "list": "Meine Anträge",
+      "new_request": "Neuer Antrag"
+    },
+    "requested_weekly_hours": "Gewünschte Wochenstunden",
+    "requested_daily_hours": "Gewünschte Tagesstunden",
+    "effective_date": "Gültig ab",
+    "reason": "Begründung",
+    "submit": "Antrag einreichen",
+    "no_entries": "Keine Arbeitszeitänderungsanträge gefunden",
+    "no_pending": "Keine offenen Arbeitszeitänderungsanträge",
+    "see_reason": "Ablehnungsgrund anzeigen",
+    "reject_title": "Arbeitszeitänderungsantrag ablehnen",
+    "reject_reason_placeholder": "Ablehnungsgrund eingeben...",
+    "columns": {
+      "employee": "Mitarbeiter",
+      "current_hours": "Aktuelle Stunden",
+      "requested_hours": "Gewünschte Stunden",
+      "effective_date": "Gültig ab",
+      "reason": "Begründung",
+      "status": "Status",
+      "actions": "Aktionen"
+    },
+    "status": {
+      "pending": "Ausstehend",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "cancelled": "Storniert"
+    },
+    "errors": {
+      "load_failed": "Fehler beim Laden der Anträge",
+      "create_failed": "Fehler beim Erstellen des Antrags",
+      "cancel_failed": "Fehler beim Stornieren des Antrags",
+      "approve_failed": "Fehler beim Genehmigen des Antrags",
+      "reject_failed": "Fehler beim Ablehnen des Antrags"
+    },
+    "success": {
+      "created": "Arbeitszeitänderungsantrag eingereicht",
+      "cancelled": "Antrag storniert",
+      "approved": "Antrag genehmigt",
+      "rejected": "Antrag abgelehnt"
     }
   },
   "backup": {

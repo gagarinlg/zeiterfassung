@@ -11,6 +11,8 @@ import SickLeavePage from './pages/SickLeavePage'
 import BusinessTripPage from './pages/BusinessTripPage'
 import BusinessTripApprovalPage from './pages/BusinessTripApprovalPage'
 import ProjectsPage from './pages/ProjectsPage'
+import WorkHourChangePage from './pages/WorkHourChangePage'
+import WorkHourChangeApprovalPage from './pages/WorkHourChangeApprovalPage'
 import AdminPage from './pages/AdminPage'
 import UserSettingsPage from './pages/UserSettingsPage'
 import PasswordResetRequestPage from './pages/PasswordResetRequestPage'
@@ -55,6 +57,15 @@ function App() {
             }
           />
           <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/work-hour-changes" element={<WorkHourChangePage />} />
+          <Route
+            path="/work-hour-changes/approvals"
+            element={
+              <ProtectedRoute requiredPermission="time.edit.team">
+                <WorkHourChangeApprovalPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/admin"
             element={
