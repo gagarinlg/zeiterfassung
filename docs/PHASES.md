@@ -2,12 +2,48 @@
 
 > Last updated: 2026-03-02
 >
-> **Current phase:** Phase 15 — Work Hour Change Requests 🚧
+> **Current phase:** Phase 16 — Time Modification Requests 🚧
 
 ---
 
-## Phase 15: Work Hour Change Requests 🚧
+## Phase 16: Time Modification Requests 🚧
 - **Status**: IN PROGRESS
+
+### What was delivered
+- **Time Modification Request Workflow**: Full backend with entity, repository, service, controller at `/time-modifications`
+  - Status workflow: PENDING → APPROVED / REJECTED / CANCELLED
+  - Employee requests modification to a specific time entry (new timestamp and/or notes)
+  - Mandatory reason for the change
+  - Manager approval/rejection workflow (same pattern as work hour changes)
+  - On approval, the time entry's timestamp and notes are updated, entry marked as modified
+  - Daily summaries recalculated for both old and new dates when timestamp changes
+  - Duplicate pending request prevention (one pending request per time entry)
+  - Self-approval prevention
+  - Audit logging for all state changes
+
+### Key files created
+- `backend/src/main/resources/db/migration/V12__create_time_modification_requests.sql`
+- `backend/src/main/kotlin/com/zeiterfassung/model/enums/TimeModificationStatus.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/dto/TimeModificationDtos.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/model/entity/TimeModificationRequestEntity.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/repository/TimeModificationRequestRepository.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/service/TimeModificationService.kt`
+- `backend/src/main/kotlin/com/zeiterfassung/controller/TimeModificationController.kt`
+
+### API Endpoints
+| Method | Path | Permission | Description |
+|--------|------|------------|-------------|
+| POST | `/time-modifications` | `time.edit.own` | Create time modification request |
+| GET | `/time-modifications` | `time.edit.own` | Get own requests (paginated) |
+| GET | `/time-modifications/pending` | `time.edit.team` | Get pending requests for approval |
+| POST | `/time-modifications/{id}/approve` | `time.edit.team` | Approve request |
+| POST | `/time-modifications/{id}/reject` | `time.edit.team` | Reject request |
+| DELETE | `/time-modifications/{id}` | `time.edit.own` | Cancel own request |
+
+---
+
+## Phase 15: Work Hour Change Requests ✅
+- **Status**: COMPLETE
 
 ### What was delivered
 - **Work Hour Change Request Workflow**: Full backend with entity, repository, service, controller at `/work-hour-changes`
