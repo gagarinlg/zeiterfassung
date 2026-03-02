@@ -74,6 +74,8 @@ jobs:
     defaults:
       run:
         working-directory: mobile/android
+    env:
+      HAS_SIGNING_KEY: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
 
     steps:
       - uses: actions/checkout@v6
@@ -89,13 +91,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Decode signing keystore
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        if: env.HAS_SIGNING_KEY == 'true'
         run: echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > app/release-keystore.jks
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
       - name: Build signed release APK/AAB
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        if: env.HAS_SIGNING_KEY == 'true'
         run: ./gradlew assembleRelease bundleRelease --no-daemon
         env:
           GRADLE_OPTS: -Xmx4g
@@ -104,7 +106,7 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
       - name: Build unsigned release APK/AAB
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 == '' }}
+        if: env.HAS_SIGNING_KEY != 'true'
         run: ./gradlew assembleRelease bundleRelease --no-daemon
         env:
           GRADLE_OPTS: -Xmx4g

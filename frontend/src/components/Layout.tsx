@@ -1,11 +1,13 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
+import { useBranding } from '../hooks/useBranding'
 import { Clock, Calendar, LayoutDashboard, Settings, LogOut, User, CheckCircle, UserCog, Thermometer, Plane, FolderKanban } from 'lucide-react'
 
 export default function Layout() {
   const { t } = useTranslation()
   const { user, logout, hasPermission } = useAuth()
+  const branding = useBranding()
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -23,7 +25,14 @@ export default function Layout() {
       </a>
       <aside className="w-64 bg-white shadow-md flex flex-col" aria-label={t('nav.sidebar')}>
         <div className="p-6 border-b">
-          <h1 className="text-xl font-bold text-primary-700">{t('app.name')}</h1>
+          {branding.hasLogo && (
+            <img
+              src="/api/branding/logo"
+              alt={branding.companyName || t('app.name')}
+              className="mb-2 max-h-10 object-contain"
+            />
+          )}
+          <h1 className="text-xl font-bold text-primary-700">{branding.companyName || t('app.name')}</h1>
           <p className="text-sm text-gray-500">{t('app.tagline')}</p>
         </div>
         <nav className="flex-1 p-4 space-y-1">

@@ -64,7 +64,7 @@ class BackupService(
             ProcessBuilder(
                 "bash",
                 "-c",
-                "pg_dump -h $host -p $port -U $safeUsername -d $dbName | gzip > ${backupFile.absolutePath}",
+                "set -o pipefail; pg_dump -h $host -p $port -U $safeUsername -d $dbName --clean --if-exists | gzip > ${backupFile.absolutePath}",
             ).apply {
                 environment()["PGPASSWORD"] = datasourcePassword
                 redirectErrorStream(false)
@@ -196,7 +196,7 @@ class BackupService(
             ProcessBuilder(
                 "bash",
                 "-c",
-                "gunzip -c ${backupFile.absolutePath} | psql -h $host -p $port -U $safeUsername -d $dbName",
+                "gunzip -c ${backupFile.absolutePath} | psql -h $host -p $port -U $safeUsername -d $dbName --single-transaction",
             ).apply {
                 environment()["PGPASSWORD"] = datasourcePassword
                 redirectErrorStream(false)

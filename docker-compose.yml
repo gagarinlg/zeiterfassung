@@ -54,6 +54,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - backup_data:/var/lib/zeiterfassung/backups
+      - branding_data:/var/lib/zeiterfassung/branding
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/api/actuator/health || exit 1"]
       interval: 30s
@@ -84,6 +87,10 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
+  backup_data:
+    driver: local
+  branding_data:
     driver: local
 
 networks:

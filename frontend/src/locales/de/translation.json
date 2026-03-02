@@ -211,7 +211,12 @@
       "description": "Beschreibung",
       "test_mail": "E-Mail-Test",
       "test_mail_description": "Senden Sie eine Test-E-Mail, um zu überprüfen, ob die E-Mail-Konfiguration korrekt funktioniert.",
-      "send_test": "Test-E-Mail senden"
+      "send_test": "Test-E-Mail senden",
+      "company_logo": "Firmenlogo",
+      "company_logo_description": "Laden Sie ein Firmenlogo hoch, das auf der Anmeldeseite und in der Seitenleiste angezeigt wird. Erlaubte Formate: PNG, JPEG, SVG, WebP (max. 2 MB).",
+      "upload_logo": "Logo hochladen",
+      "logo_uploaded": "Logo erfolgreich hochgeladen",
+      "logo_deleted": "Logo entfernt"
     },
     "reports": "Berichte",
     "audit": {
@@ -258,6 +263,7 @@
     "delete": "Löschen",
     "edit": "Bearbeiten",
     "loading": "Laden...",
+    "optional": "optional",
     "error": "Fehler",
     "success": "Erfolgreich",
     "confirm": "Bestätigen",

@@ -5,13 +5,13 @@ import com.zeiterfassung.model.entity.SickLeaveEntity
 import com.zeiterfassung.model.entity.UserEntity
 import com.zeiterfassung.model.entity.VacationRequestEntity
 import org.springframework.context.MessageSource
-import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import java.util.Locale
 
 /**
  * Sends notification emails for vacation request lifecycle events.
- * All methods are @Async so they never block the calling thread.
+ * Methods run synchronously to access JPA entities within the caller's transaction,
+ * while the actual email sending is delegated to EmailService.sendAsync (async).
  *
  * Email language: German (primary) — Locale.GERMAN is the application default.
  */
@@ -35,7 +35,6 @@ class NotificationService(
      * Notify all managers of the requesting employee when a new vacation request
      * is submitted. Called after the request is persisted.
      */
-    @Async
     fun notifyVacationRequestCreated(
         request: VacationRequestEntity,
         managers: List<UserEntity>,
@@ -60,7 +59,6 @@ class NotificationService(
     /**
      * Notify the employee that their vacation request was approved.
      */
-    @Async
     fun notifyVacationApproved(
         request: VacationRequestEntity,
         approverName: String,
@@ -83,7 +81,6 @@ class NotificationService(
     /**
      * Notify the employee that their vacation request was rejected.
      */
-    @Async
     fun notifyVacationRejected(
         request: VacationRequestEntity,
         rejectionReason: String,
@@ -106,7 +103,6 @@ class NotificationService(
      * Notify the approver that a previously-approved vacation was cancelled by the employee.
      * This allows the manager to update team planning.
      */
-    @Async
     fun notifyVacationCancelledByEmployee(
         request: VacationRequestEntity,
         notifyUser: UserEntity,
@@ -127,7 +123,6 @@ class NotificationService(
 
     // ---- Sick leave events --------------------------------------------------
 
-    @Async
     fun notifySickLeaveReported(
         sickLeave: SickLeaveEntity,
         manager: UserEntity,
@@ -148,7 +143,6 @@ class NotificationService(
 
     // ---- Business trip events -----------------------------------------------
 
-    @Async
     fun notifyBusinessTripRequested(
         trip: BusinessTripEntity,
         manager: UserEntity,
@@ -168,7 +162,6 @@ class NotificationService(
         emailService.sendAsync(manager.email, subject, body)
     }
 
-    @Async
     fun notifyBusinessTripApproved(
         trip: BusinessTripEntity,
         approverName: String,
@@ -188,7 +181,6 @@ class NotificationService(
         emailService.sendAsync(employee.email, subject, body)
     }
 
-    @Async
     fun notifyBusinessTripRejected(
         trip: BusinessTripEntity,
         rejectionReason: String,

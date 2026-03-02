@@ -211,7 +211,12 @@
       "description": "Description",
       "test_mail": "Email Test",
       "test_mail_description": "Send a test email to verify that the email configuration is working correctly.",
-      "send_test": "Send Test Email"
+      "send_test": "Send Test Email",
+      "company_logo": "Company Logo",
+      "company_logo_description": "Upload a company logo to display on the login page and sidebar. Accepted formats: PNG, JPEG, SVG, WebP (max 2 MB).",
+      "upload_logo": "Upload Logo",
+      "logo_uploaded": "Logo uploaded successfully",
+      "logo_deleted": "Logo removed"
     },
     "reports": "Reports",
     "audit": {
@@ -258,6 +263,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "loading": "Loading...",
+    "optional": "optional",
     "error": "Error",
     "success": "Success",
     "confirm": "Confirm",

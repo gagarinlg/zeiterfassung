@@ -19,12 +19,20 @@ RUN npm run build
 FROM eclipse-temurin:21-jre-jammy AS runtime
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y --no-install-recommends curl gnupg lsb-release \
+    && echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg \
+    && apt-get update && apt-get install -y --no-install-recommends postgresql-client-16 \
+    && apt-get purge -y gnupg lsb-release && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN addgroup --system zeiterfassung && adduser --system --ingroup zeiterfassung zeiterfassung
 
 COPY --from=backend-build /app/backend/build/libs/*.jar app.jar
 COPY --from=frontend-build /app/frontend/dist ./static
 
-RUN chown -R zeiterfassung:zeiterfassung /app
+RUN mkdir -p /var/lib/zeiterfassung/backups /var/lib/zeiterfassung/branding \
+    && chown -R zeiterfassung:zeiterfassung /app /var/lib/zeiterfassung
 USER zeiterfassung
 
 EXPOSE 8080

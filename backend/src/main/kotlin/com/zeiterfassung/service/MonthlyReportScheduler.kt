@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.MessageSource
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.time.YearMonth
 import java.util.Locale
@@ -37,6 +38,7 @@ class MonthlyReportScheduler(
 
     /** Cron: minute hour day-of-month month day-of-week */
     @Scheduled(cron = "0 0 7 1 * *")
+    @Transactional(readOnly = true)
     fun sendMonthlyReports() {
         val previousMonth = YearMonth.now().minusMonths(1)
         logger.info("Sending monthly reports for {}", previousMonth)

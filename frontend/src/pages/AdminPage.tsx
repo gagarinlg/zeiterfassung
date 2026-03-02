@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, ClipboardList, Settings, Plus, Edit, Trash2, Key, Wifi, Mail, FolderTree, Database, Download, Upload, RefreshCw } from 'lucide-react'
+import { Users, ClipboardList, Settings, Plus, Edit, Trash2, Key, Wifi, Mail, FolderTree, Database, Download, Upload, RefreshCw, ImageIcon } from 'lucide-react'
 import adminService from '../services/adminService'
 import type { AuditLogEntry, SystemSetting, CreateUserPayload, UpdateUserPayload, BackupInfo } from '../services/adminService'
 import type { User } from '../types'
+import { invalidateBrandingCache } from '../hooks/useBranding'
 
 type Tab = 'users' | 'audit' | 'settings' | 'ldap' | 'backups'
 
@@ -98,6 +99,7 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
         await adminService.createUser(payload)
       } else {
         const payload: UpdateUserPayload = {
+          email: form.email,
           firstName: form.firstName,
           lastName: form.lastName,
           phone: form.phone || undefined,
@@ -185,6 +187,19 @@ function UserModal({ user, onClose, onSave }: UserModalProps) {
                   />
                 </div>
               </>
+            )}
+            {!isNew && (
+              <div>
+                <label htmlFor="modal-email" className="block text-sm font-medium text-gray-700 mb-1">{t('common.email')}</label>
+                <input
+                  id="modal-email"
+                  type="email"
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                  value={form.email}
+                  onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                  required
+                />
+              </div>
             )}
             <div>
               <label htmlFor="modal-phone" className="block text-sm font-medium text-gray-700 mb-1">{t('common.phone')}</label>
@@ -706,6 +721,11 @@ function SettingsTab() {
   const [testMailEmail, setTestMailEmail] = useState('')
   const [testMailSending, setTestMailSending] = useState(false)
   const [testMailResult, setTestMailResult] = useState<{ status: 'ok' | 'error'; message: string } | null>(null)
+  const [logoUploading, setLogoUploading] = useState(false)
+  const [logoResult, setLogoResult] = useState<{ status: 'ok' | 'error'; message: string } | null>(null)
+  const [logoKey, setLogoKey] = useState(0)
+  const logoInputRef = useRef<HTMLInputElement>(null)
+  const [logoVisible, setLogoVisible] = useState(false)
 
   const loadSettings = useCallback(async () => {
     setLoading(true)
@@ -758,6 +778,46 @@ function SettingsTab() {
       setTestMailResult({ status: 'error', message: msg })
     } finally {
       setTestMailSending(false)
+    }
+  }
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLogoUploading(true)
+    setLogoResult(null)
+    try {
+      await adminService.uploadLogo(file)
+      setLogoResult({ status: 'ok', message: t('admin.settings.logo_uploaded') })
+      setLogoKey((k) => k + 1)
+      invalidateBrandingCache()
+    } catch (err: unknown) {
+      let msg = t('admin.errors.save_failed')
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosErr = err as { response?: { data?: { error?: string } } }
+        if (axiosErr.response?.data?.error) {
+          msg = axiosErr.response.data.error
+        }
+      }
+      setLogoResult({ status: 'error', message: msg })
+    } finally {
+      setLogoUploading(false)
+      if (logoInputRef.current) logoInputRef.current.value = ''
+    }
+  }
+
+  const handleLogoDelete = async () => {
+    setLogoUploading(true)
+    setLogoResult(null)
+    try {
+      await adminService.deleteLogo()
+      setLogoResult({ status: 'ok', message: t('admin.settings.logo_deleted') })
+      setLogoKey((k) => k + 1)
+      invalidateBrandingCache()
+    } catch {
+      setLogoResult({ status: 'error', message: t('admin.errors.save_failed') })
+    } finally {
+      setLogoUploading(false)
     }
   }
 
@@ -855,6 +915,56 @@ function SettingsTab() {
               : 'bg-red-50 border border-red-200 text-red-700'
           }`}>
             {testMailResult.message}
+          </div>
+        )}
+      </div>
+
+      {/* Company Logo */}
+      <div className="bg-white rounded-xl border p-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <ImageIcon size={16} />
+          {t('admin.settings.company_logo')}
+        </h3>
+        <p className="text-xs text-gray-500 mb-4">{t('admin.settings.company_logo_description')}</p>
+        <div className="flex items-center gap-4 mb-4">
+          <img
+            key={logoKey}
+            src={`/api/branding/logo?v=${logoKey}`}
+            alt="Logo"
+            className={`h-12 object-contain border rounded p-1 ${logoVisible ? '' : 'hidden'}`}
+            onError={() => setLogoVisible(false)}
+            onLoad={() => setLogoVisible(true)}
+          />
+          <div className="flex items-center gap-2">
+            <label className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 cursor-pointer disabled:opacity-50">
+              <Upload size={14} />
+              {logoUploading ? t('common.loading') : t('admin.settings.upload_logo')}
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                onChange={handleLogoUpload}
+                className="hidden"
+                disabled={logoUploading}
+              />
+            </label>
+            <button
+              onClick={handleLogoDelete}
+              disabled={logoUploading}
+              className="flex items-center gap-2 px-4 py-2 text-red-600 border border-red-200 text-sm rounded-lg hover:bg-red-50 disabled:opacity-50"
+            >
+              <Trash2 size={14} />
+              {t('common.delete')}
+            </button>
+          </div>
+        </div>
+        {logoResult && (
+          <div className={`p-3 rounded-lg text-sm ${
+            logoResult.status === 'ok'
+              ? 'bg-green-50 border border-green-200 text-green-700'
+              : 'bg-red-50 border border-red-200 text-red-700'
+          }`}>
+            {logoResult.message}
           </div>
         )}
       </div>

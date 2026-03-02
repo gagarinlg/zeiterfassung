@@ -33,6 +33,7 @@ export interface CreateUserPayload {
 }
 
 export interface UpdateUserPayload {
+  email?: string
   firstName?: string
   lastName?: string
   phone?: string
@@ -140,6 +141,18 @@ const adminService = {
 
   deleteBackup: (filename: string) =>
     apiClient.delete(`/admin/backups/${encodeURIComponent(filename)}`).then((r) => r.data),
+
+  // Logo / branding
+  uploadLogo: (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return apiClient.post<{ status: string; filename: string }>('/admin/branding/logo', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((r) => r.data)
+  },
+
+  deleteLogo: () =>
+    apiClient.delete<{ status: string }>('/admin/branding/logo').then((r) => r.data),
 
   // Self-service profile update
   updateOwnProfile: (payload: UpdateUserPayload) =>
