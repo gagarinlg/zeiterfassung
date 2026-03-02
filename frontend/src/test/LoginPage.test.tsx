@@ -78,6 +78,38 @@ describe('LoginPage', () => {
     })
   })
 
+  it('should show TOTP input when server responds with TOTP required in detail field', async () => {
+    const { authService } = await import('../services/authService')
+    vi.mocked(authService.login).mockRejectedValue({
+      response: { status: 401, data: { detail: 'TOTP code required' } },
+    })
+
+    renderLoginPage()
+    fireEvent.change(screen.getByLabelText('auth.email'), { target: { value: 'test@test.com' } })
+    fireEvent.change(screen.getByLabelText('auth.password'), { target: { value: 'password' } })
+    fireEvent.click(screen.getByRole('button', { name: 'auth.login_button' }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('auth.totp_code')).toBeInTheDocument()
+    })
+  })
+
+  it('should show TOTP input when server responds with TOTP required in message field', async () => {
+    const { authService } = await import('../services/authService')
+    vi.mocked(authService.login).mockRejectedValue({
+      response: { status: 401, data: { message: 'TOTP code required' } },
+    })
+
+    renderLoginPage()
+    fireEvent.change(screen.getByLabelText('auth.email'), { target: { value: 'test@test.com' } })
+    fireEvent.change(screen.getByLabelText('auth.password'), { target: { value: 'password' } })
+    fireEvent.click(screen.getByRole('button', { name: 'auth.login_button' }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('auth.totp_code')).toBeInTheDocument()
+    })
+  })
+
   it('should show language switcher button', () => {
     renderLoginPage()
     expect(screen.getByLabelText('auth.switch_language')).toBeInTheDocument()

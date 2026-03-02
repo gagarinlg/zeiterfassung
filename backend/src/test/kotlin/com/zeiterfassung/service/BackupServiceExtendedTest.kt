@@ -202,13 +202,14 @@ class BackupServiceExtendedTest {
     // ---- performBackup with failing connection ----
 
     @Test
-    fun `performBackup creates backup file even when pg_dump connects to nothing`() {
-        // pg_dump will fail to connect but shell pipe to gzip returns exit 0,
-        // so performBackup completes. Verify it produces a BackupInfo.
+    fun `performBackup throws when pg_dump fails to connect`() {
+        // With set -o pipefail, pg_dump connection failure should propagate as an exception
         val actorId = UUID.randomUUID()
-        val result = service.performBackup(actorId)
-        assertThat(result.filename).startsWith("zeiterfassung_backup_")
-        assertThat(result.filename).endsWith(".sql.gz")
+        val ex =
+            assertThrows<IllegalStateException> {
+                service.performBackup(actorId)
+            }
+        assertThat(ex.message).contains("Backup failed")
     }
 
     // ---- restoreFromUpload validates filename ----

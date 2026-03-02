@@ -56,14 +56,17 @@ export default function LoginPage() {
       login(tokens, response.user)
       navigate('/dashboard')
     } catch (err: unknown) {
-      const axiosError = err as { response?: { status?: number; data?: { message?: string } } }
+      const axiosError = err as {
+        response?: { status?: number; data?: { message?: string; detail?: string } }
+      }
       if (axiosError.response?.status === 423) {
         setServerError(t('auth.account_locked'))
       } else if (axiosError.response?.status === 429) {
         setServerError(t('auth.rate_limit_exceeded'))
       } else if (
         axiosError.response?.status === 401 &&
-        axiosError.response?.data?.message?.toLowerCase().includes('totp')
+        (axiosError.response?.data?.detail?.toLowerCase().includes('totp') ||
+          axiosError.response?.data?.message?.toLowerCase().includes('totp'))
       ) {
         setTotpRequired(true)
         setServerError(t('auth.totp_required'))
