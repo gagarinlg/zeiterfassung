@@ -74,7 +74,7 @@ test.describe('Time Tracking Page', () => {
   })
 
   test.describe('On Break State', () => {
-    test('should show End Break and Clock Out buttons when on break', async ({ page }) => {
+    test('should show End Break button but not Clock Out when on break', async ({ page }) => {
       await mockAuthenticatedUser(page)
       await mockTimeTrackingApis(page, {
         status: 'ON_BREAK',
@@ -90,7 +90,8 @@ test.describe('Time Tracking Page', () => {
 
       await expect(page.getByText(/In der Pause/i)).toBeVisible()
       await expect(page.getByRole('button', { name: /Pause beenden/i })).toBeVisible()
-      await expect(page.getByRole('button', { name: /Ausstempeln/i })).toBeVisible()
+      // Clock Out button should NOT be visible during break — user must end break first
+      await expect(page.getByRole('button', { name: /Ausstempeln/i })).not.toBeVisible()
     })
   })
 
