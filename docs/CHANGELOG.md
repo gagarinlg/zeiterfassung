@@ -3,23 +3,33 @@
 All notable changes to the Zeiterfassung project are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased] — Work Hour Change Requests
+## [Unreleased] — Time Modification Requests
 
 ### Added
-- **Work hour change request workflow**: Employees can request changes to their weekly/daily work hours; managers approve/reject
-  - `POST /work-hour-changes` — create request (captures current hours from EmployeeConfig)
-  - `GET /work-hour-changes` — list own requests (paginated)
-  - `GET /work-hour-changes/pending` — list pending requests for manager approval
-  - `POST /work-hour-changes/{id}/approve` — approve and update EmployeeConfig
-  - `POST /work-hour-changes/{id}/reject` — reject with reason
-  - `DELETE /work-hour-changes/{id}` — cancel own pending request
-- **Database migration V11**: `work_hour_change_requests` table with user/status indexes
-- **Enum**: `WorkHourChangeStatus` (PENDING, APPROVED, REJECTED, CANCELLED)
-- **DTOs**: `CreateWorkHourChangeRequest`, `RejectWorkHourChangeRequest`, `WorkHourChangeResponse`
-- **Entity**: `WorkHourChangeRequestEntity` with `@ManyToOne` user/approver, `toResponse()` method
-- **Repository**: `WorkHourChangeRequestRepository` with user/status queries
-- **Service**: `WorkHourChangeService` with validation, audit logging, EmployeeConfig update on approval
-- **Controller**: `WorkHourChangeController` with Swagger annotations and `@PreAuthorize` permission checks
+- **Time modification request workflow**: Employees can request modifications to their logged time entries; managers approve/reject
+  - `POST /time-modifications` — create request (specify new timestamp and optional notes)
+  - `GET /time-modifications` — list own requests (paginated)
+  - `GET /time-modifications/pending` — list pending requests for manager approval
+  - `POST /time-modifications/{id}/approve` — approve and apply changes to time entry
+  - `POST /time-modifications/{id}/reject` — reject with reason
+  - `DELETE /time-modifications/{id}` — cancel own pending request
+- **Database migration V12**: `time_modification_requests` table with user/status/time_entry indexes
+- **Enum**: `TimeModificationStatus` (PENDING, APPROVED, REJECTED, CANCELLED)
+- **DTOs**: `CreateTimeModificationRequest`, `RejectTimeModificationRequest`, `TimeModificationResponse`
+- **Entity**: `TimeModificationRequestEntity` with `@ManyToOne` user/timeEntry/reviewedBy, `toResponse()` method
+- **Repository**: `TimeModificationRequestRepository` with user/status/timeEntry queries
+- **Service**: `TimeModificationService` with validation, audit logging, time entry update and daily summary recalculation on approval
+- **Controller**: `TimeModificationController` with Swagger annotations and `@PreAuthorize` permission checks
+- **Notification emails**: Manager notified on new request; employee notified on approval/rejection
+- **Frontend**: Time Modification page (request list + new request form) and Time Modification Approval page (manager queue)
+- **i18n**: English and German translation keys for time modification feature
+
+### Removed
+- **Work hour change request feature**: Removed the weekly/daily work hour change request workflow
+  - Removed `WorkHourChangeController`, `WorkHourChangeService`, `WorkHourChangeRequestEntity`, `WorkHourChangeDtos`, `WorkHourChangeStatus`, `WorkHourChangeRequestRepository`
+  - Removed frontend pages: `WorkHourChangePage`, `WorkHourChangeApprovalPage`, `workHourChangeService`
+  - Removed navigation items and routes for work hour changes
+  - **Database migration V13**: Drops `work_hour_change_requests` table
 
 ## [Unreleased] — Bug Fixes & Employee Configuration UI
 

@@ -570,47 +570,47 @@ test.describe('Documentation Screenshots', () => {
     await page.screenshot({ path: `${SCREENSHOT_DIR}/projects.png`, fullPage: true })
   })
 
-  test('Work Hour Changes page', async ({ page }) => {
+  test('Time Modifications page', async ({ page }) => {
     await mockAuthenticatedUser(page)
-    await page.route('**/api/work-hour-changes?**', (route) =>
+    await page.route('**/api/time-modifications?**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
           content: [
             {
-              id: 'whc1',
+              id: 'tm1',
               userId: MOCK_USER.id,
               userName: 'Admin User',
-              currentWeeklyHours: 40,
-              requestedWeeklyHours: 32,
-              currentDailyHours: 8,
-              requestedDailyHours: 6.4,
-              effectiveDate: '2026-04-01',
-              reason: 'Transition to part-time',
+              timeEntryId: '00000000-0000-0000-0000-000000000099',
+              entryType: 'CLOCK_IN',
+              originalTimestamp: '2026-02-20T08:15:00Z',
+              requestedTimestamp: '2026-02-20T08:00:00Z',
+              requestedNotes: null,
+              reason: 'Forgot to clock in on time',
               status: 'PENDING',
-              approvedById: null,
-              approvedByName: null,
+              reviewedById: null,
+              reviewedByName: null,
               rejectionReason: null,
               createdAt: '2026-02-20T10:00:00Z',
               updatedAt: '2026-02-20T10:00:00Z',
             },
             {
-              id: 'whc2',
+              id: 'tm2',
               userId: MOCK_USER.id,
               userName: 'Admin User',
-              currentWeeklyHours: 30,
-              requestedWeeklyHours: 40,
-              currentDailyHours: 6,
-              requestedDailyHours: 8,
-              effectiveDate: '2025-10-01',
-              reason: 'Return to full-time',
+              timeEntryId: '00000000-0000-0000-0000-000000000098',
+              entryType: 'CLOCK_OUT',
+              originalTimestamp: '2026-02-19T17:00:00Z',
+              requestedTimestamp: '2026-02-19T17:30:00Z',
+              requestedNotes: 'Worked late on project',
+              reason: 'Clock-out time was incorrect',
               status: 'APPROVED',
-              approvedById: '00000000-0000-0000-0000-000000000003',
-              approvedByName: 'Maria Schmidt',
+              reviewedById: '00000000-0000-0000-0000-000000000003',
+              reviewedByName: 'Maria Schmidt',
               rejectionReason: null,
-              createdAt: '2025-09-15T10:00:00Z',
-              updatedAt: '2025-09-20T14:00:00Z',
+              createdAt: '2026-02-19T18:00:00Z',
+              updatedAt: '2026-02-20T09:00:00Z',
             },
           ],
           totalElements: 2,
@@ -620,36 +620,36 @@ test.describe('Documentation Screenshots', () => {
         }),
       }),
     )
-    await page.goto('/work-hour-changes')
+    await page.goto('/time-modifications')
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(500)
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/work-hour-changes.png`, fullPage: true })
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/time-modifications.png`, fullPage: true })
   })
 
-  test('Work Hour Change Approvals page', async ({ page }) => {
+  test('Time Modification Approvals page', async ({ page }) => {
     await mockAuthenticatedUser(page)
-    await page.route('**/api/work-hour-changes/pending**', (route) =>
+    await page.route('**/api/time-modifications/pending**', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
           content: [
             {
-              id: 'whc3',
+              id: 'tm3',
               userId: '00000000-0000-0000-0000-000000000002',
               userName: 'Max Mustermann',
-              currentWeeklyHours: 40,
-              requestedWeeklyHours: 30,
-              currentDailyHours: 8,
-              requestedDailyHours: 6,
-              effectiveDate: '2026-05-01',
-              reason: 'Family care — reduce to 30h/week',
+              timeEntryId: '00000000-0000-0000-0000-000000000097',
+              entryType: 'CLOCK_IN',
+              originalTimestamp: '2026-02-25T09:30:00Z',
+              requestedTimestamp: '2026-02-25T09:00:00Z',
+              requestedNotes: null,
+              reason: 'Badge reader was not working — clocked in 30 min late',
               status: 'PENDING',
-              approvedById: null,
-              approvedByName: null,
+              reviewedById: null,
+              reviewedByName: null,
               rejectionReason: null,
-              createdAt: '2026-02-25T09:00:00Z',
-              updatedAt: '2026-02-25T09:00:00Z',
+              createdAt: '2026-02-25T10:00:00Z',
+              updatedAt: '2026-02-25T10:00:00Z',
             },
           ],
           totalElements: 1,
@@ -659,10 +659,10 @@ test.describe('Documentation Screenshots', () => {
         }),
       }),
     )
-    await page.goto('/work-hour-changes/approvals')
+    await page.goto('/time-modifications/approvals')
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(500)
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/work-hour-change-approvals.png`, fullPage: true })
+    await page.screenshot({ path: `${SCREENSHOT_DIR}/time-modification-approvals.png`, fullPage: true })
   })
 
   test('Admin page - Employee Config modal', async ({ page }) => {

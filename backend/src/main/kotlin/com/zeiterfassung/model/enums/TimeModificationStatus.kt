@@ -1,6 +1,6 @@
 package com.zeiterfassung.model.enums
 
-enum class WorkHourChangeStatus {
+enum class TimeModificationStatus {
     PENDING,
     APPROVED,
     REJECTED,

@@ -1,7 +1,7 @@
 package com.zeiterfassung.model.entity
 
-import com.zeiterfassung.model.dto.WorkHourChangeResponse
-import com.zeiterfassung.model.enums.WorkHourChangeStatus
+import com.zeiterfassung.model.dto.TimeModificationResponse
+import com.zeiterfassung.model.enums.TimeModificationStatus
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -14,37 +14,33 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
-import java.math.BigDecimal
 import java.time.Instant
-import java.time.LocalDate
 import java.util.UUID
 
 @Entity
-@Table(name = "work_hour_change_requests")
-class WorkHourChangeRequestEntity(
+@Table(name = "time_modification_requests")
+class TimeModificationRequestEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID = UUID.randomUUID(),
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     val user: UserEntity,
-    @Column(name = "current_weekly_hours", nullable = false)
-    val currentWeeklyHours: BigDecimal,
-    @Column(name = "requested_weekly_hours", nullable = false)
-    val requestedWeeklyHours: BigDecimal,
-    @Column(name = "current_daily_hours")
-    val currentDailyHours: BigDecimal? = null,
-    @Column(name = "requested_daily_hours")
-    val requestedDailyHours: BigDecimal? = null,
-    @Column(name = "effective_date", nullable = false)
-    val effectiveDate: LocalDate,
-    val reason: String? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "time_entry_id", nullable = false)
+    val timeEntry: TimeEntryEntity,
+    @Column(name = "requested_timestamp", nullable = false)
+    val requestedTimestamp: Instant,
+    @Column(name = "requested_notes")
+    val requestedNotes: String? = null,
+    @Column(nullable = false)
+    val reason: String,
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var status: WorkHourChangeStatus = WorkHourChangeStatus.PENDING,
+    var status: TimeModificationStatus = TimeModificationStatus.PENDING,
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approved_by")
-    var approvedBy: UserEntity? = null,
+    @JoinColumn(name = "reviewed_by")
+    var reviewedBy: UserEntity? = null,
     @Column(name = "rejection_reason")
     var rejectionReason: String? = null,
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -58,19 +54,19 @@ class WorkHourChangeRequestEntity(
     }
 
     fun toResponse() =
-        WorkHourChangeResponse(
+        TimeModificationResponse(
             id = id,
             userId = user.id,
             userName = "${user.firstName} ${user.lastName}",
-            currentWeeklyHours = currentWeeklyHours,
-            requestedWeeklyHours = requestedWeeklyHours,
-            currentDailyHours = currentDailyHours,
-            requestedDailyHours = requestedDailyHours,
-            effectiveDate = effectiveDate,
+            timeEntryId = timeEntry.id,
+            entryType = timeEntry.entryType.name,
+            originalTimestamp = timeEntry.timestamp,
+            requestedTimestamp = requestedTimestamp,
+            requestedNotes = requestedNotes,
             reason = reason,
             status = status,
-            approvedById = approvedBy?.id,
-            approvedByName = approvedBy?.let { "${it.firstName} ${it.lastName}" },
+            reviewedById = reviewedBy?.id,
+            reviewedByName = reviewedBy?.let { "${it.firstName} ${it.lastName}" },
             rejectionReason = rejectionReason,
             createdAt = createdAt,
             updatedAt = updatedAt,

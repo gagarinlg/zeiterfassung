@@ -12,8 +12,8 @@
     "business_trips": "Dienstreisen",
     "business_trip_approvals": "Reisegenehmigungen",
     "projects": "Projekte",
-    "work_hour_changes": "Arbeitszeit",
-    "work_hour_change_approvals": "AZ-Genehmigungen",
+    "time_modifications": "Zeitänderungen",
+    "time_modification_approvals": "Zeitänderungs-Genehmigungen",
     "admin": "Administration",
     "profile": "Profil",
     "logout": "Abmelden",
@@ -520,28 +520,31 @@
       "project_created": "Projekt erfolgreich erstellt"
     }
   },
-  "work_hour_change": {
-    "title": "Arbeitszeitänderungen",
-    "approvals_title": "Arbeitszeitänderungs-Genehmigungen",
+  "time_modification": {
+    "title": "Zeitänderungsanträge",
+    "approvals_title": "Zeitänderungs-Genehmigungen",
     "tabs": {
       "list": "Meine Anträge",
       "new_request": "Neuer Antrag"
     },
-    "requested_weekly_hours": "Gewünschte Wochenstunden",
-    "requested_daily_hours": "Gewünschte Tagesstunden",
-    "effective_date": "Gültig ab",
+    "time_entry": "Zeiteintrag",
+    "entry_type": "Eintragstyp",
+    "original_timestamp": "Ursprünglicher Zeitpunkt",
+    "requested_timestamp": "Gewünschter Zeitpunkt",
+    "requested_notes": "Neue Anmerkungen",
     "reason": "Begründung",
     "submit": "Antrag einreichen",
-    "no_entries": "Keine Arbeitszeitänderungsanträge gefunden",
-    "no_pending": "Keine offenen Arbeitszeitänderungsanträge",
+    "no_entries": "Keine Zeitänderungsanträge gefunden",
+    "no_pending": "Keine offenen Zeitänderungsanträge",
     "see_reason": "Ablehnungsgrund anzeigen",
-    "reject_title": "Arbeitszeitänderungsantrag ablehnen",
+    "reject_title": "Zeitänderungsantrag ablehnen",
     "reject_reason_placeholder": "Ablehnungsgrund eingeben...",
+    "select_entry": "Zeiteintrag zum Ändern auswählen...",
     "columns": {
       "employee": "Mitarbeiter",
-      "current_hours": "Aktuelle Stunden",
-      "requested_hours": "Gewünschte Stunden",
-      "effective_date": "Gültig ab",
+      "entry_type": "Eintragstyp",
+      "original_timestamp": "Ursprüngliche Zeit",
+      "requested_timestamp": "Gewünschte Zeit",
       "reason": "Begründung",
       "status": "Status",
       "actions": "Aktionen"
@@ -560,7 +563,7 @@
       "reject_failed": "Fehler beim Ablehnen des Antrags"
     },
     "success": {
-      "created": "Arbeitszeitänderungsantrag eingereicht",
+      "created": "Zeitänderungsantrag eingereicht",
       "cancelled": "Antrag storniert",
       "approved": "Antrag genehmigt",
       "rejected": "Antrag abgelehnt"

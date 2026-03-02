@@ -1,6 +1,6 @@
 # Current Project State
 
-> Last updated: 2026-03-02 (Phase 15 — Work Hour Change Requests)
+> Last updated: 2026-03-02 (Phase 16 — Time Modification Requests)
 
 ## Quick Summary
 
@@ -44,7 +44,8 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Project/cost center time allocation: project CRUD (admin), time allocation CRUD (employees), date/range queries, project-level reporting
 - ✅ GDPR data export: `GET /gdpr/export` (own data), `GET /gdpr/export/{userId}` (admin); returns all personal info, time entries, vacation requests, sick leaves, business trips, and audit log
 - ✅ GDPR account deletion: `POST /gdpr/delete` (own account), `POST /gdpr/delete/{userId}` (admin); soft delete with data anonymization and token revocation
-- ✅ Work hour change requests: create, approve, reject, cancel workflow at `/work-hour-changes`; on approval updates EmployeeConfig work hours
+- ✅ Work hour change requests: create, approve, reject, cancel workflow at `/work-hour-changes`; on approval updates EmployeeConfig work hours (REMOVED in Phase 16)
+- ✅ Time modification requests: create, approve, reject, cancel workflow at `/time-modifications`; on approval updates time entry timestamp/notes and recalculates daily summaries
 - ✅ Manager on-behalf-of: `POST /vacation/requests/user/{userId}`, `POST /business-trips/user/{userId}` with past dates allowed
 - ✅ Break end status fix: `BREAK_END` entry type correctly maps to `CLOCKED_IN` status
 
@@ -64,8 +65,8 @@ Zeiterfassung is a German labor law (ArbZG) compliant time tracking system. **Ph
 - ✅ Admin page: 5-tab UI (User Management, Audit Log, System Settings, LDAP, Backups) with full CRUD, search, modals
 - ✅ Admin Employee Configuration modal: set work days, weekly/daily work hours, vacation days per year, vacation carry-over max per user
 - ✅ Admin vacation balance management: set total, used, carried over days for current year (migration support)
-- ✅ Work Hour Change page: request list, new request form
-- ✅ Work Hour Change Approval page: pending requests with approve/reject-with-reason
+- ✅ Time Modification page: request list, new request form
+- ✅ Time Modification Approval page: pending requests with approve/reject-with-reason
 - ✅ Manager on-behalf-of: subordinate selector in vacation, business trip, and sick leave forms
 - ✅ TrackingStatusBar: break end no longer causes clock-out; Clock Out button hidden during ON_BREAK
 - ✅ Date/calendar localization: `dateUtils.ts` utility with `formatDate`, `formatTime`, `formatDateTime`, `formatMonthYear` using date-fns locales; `DateFormatContext` for per-user date/time format preferences; all pages (Dashboard, TimeTracking, Vacation) use localized date formatting
