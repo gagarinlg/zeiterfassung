@@ -176,6 +176,35 @@ class TimeTrackingServiceTest {
     }
 
     @Test
+    fun `getCurrentStatus should return CLOCKED_IN after break end`() {
+        val now = Instant.now()
+        val breakEndEntry =
+            TimeEntryEntity(
+                user = user,
+                entryType = TimeEntryType.BREAK_END,
+                timestamp = now.minusSeconds(60),
+            )
+        val entries =
+            listOf(
+                TimeEntryEntity(user = user, entryType = TimeEntryType.CLOCK_IN, timestamp = now.minus(2, ChronoUnit.HOURS)),
+                TimeEntryEntity(user = user, entryType = TimeEntryType.BREAK_START, timestamp = now.minus(1, ChronoUnit.HOURS)),
+                breakEndEntry,
+            )
+        `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
+        `when`(timeEntryRepository.findTopByUserIdOrderByTimestampDesc(userId)).thenReturn(breakEndEntry)
+        `when`(
+            timeEntryRepository.findByUserIdAndDateRange(
+                any(UUID::class.java) ?: userId,
+                any(Instant::class.java) ?: now,
+                any(Instant::class.java) ?: now,
+            ),
+        ).thenReturn(entries)
+
+        val result = service.getCurrentStatus(userId)
+        assertThat(result.status.name).isEqualTo("CLOCKED_IN")
+    }
+
+    @Test
     fun `getCurrentStatus should count gap between clock out and clock in as qualifying break`() {
         val now = Instant.now()
         val entries =
