@@ -729,7 +729,6 @@ test.describe('Documentation Screenshots', () => {
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(500)
     // Click the employee config (Sliders) button for the first user
-    const configButton = page.locator('button[title]').filter({ hasText: '' }).first()
     const slidersButton = page.locator('table tbody tr').first().locator('button').nth(0)
     if (await slidersButton.isVisible()) {
       await slidersButton.click()
