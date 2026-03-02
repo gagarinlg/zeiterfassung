@@ -2,6 +2,7 @@ package com.zeiterfassung.service
 
 import com.zeiterfassung.model.entity.BusinessTripEntity
 import com.zeiterfassung.model.entity.SickLeaveEntity
+import com.zeiterfassung.model.entity.TimeModificationRequestEntity
 import com.zeiterfassung.model.entity.UserEntity
 import com.zeiterfassung.model.entity.VacationRequestEntity
 import org.springframework.context.MessageSource
@@ -195,6 +196,65 @@ class NotificationService(
                 trip.startDate,
                 trip.endDate,
                 trip.destination,
+                rejectionReason,
+            )
+        emailService.sendAsync(employee.email, subject, body)
+    }
+
+    // ---- Time modification request events ------------------------------------
+
+    fun notifyTimeModificationRequested(
+        request: TimeModificationRequestEntity,
+        manager: UserEntity,
+    ) {
+        val employee = request.user
+        val subject = msg("email.time_modification.requested.subject", employee.firstName, employee.lastName)
+        val body =
+            msg(
+                "email.time_modification.requested.body",
+                employee.firstName,
+                employee.lastName,
+                request.timeEntry.entryType,
+                request.timeEntry.timestamp,
+                request.requestedTimestamp,
+                request.reason,
+            )
+        emailService.sendAsync(manager.email, subject, body)
+    }
+
+    fun notifyTimeModificationApproved(
+        request: TimeModificationRequestEntity,
+        approverName: String,
+    ) {
+        val employee = request.user
+        if (employee.email.isBlank()) return
+        val subject = msg("email.time_modification.approved.subject")
+        val body =
+            msg(
+                "email.time_modification.approved.body",
+                employee.firstName,
+                request.timeEntry.entryType,
+                request.timeEntry.timestamp,
+                request.requestedTimestamp,
+                approverName,
+            )
+        emailService.sendAsync(employee.email, subject, body)
+    }
+
+    fun notifyTimeModificationRejected(
+        request: TimeModificationRequestEntity,
+        rejectionReason: String,
+    ) {
+        val employee = request.user
+        if (employee.email.isBlank()) return
+        val subject = msg("email.time_modification.rejected.subject")
+        val body =
+            msg(
+                "email.time_modification.rejected.body",
+                employee.firstName,
+                request.timeEntry.entryType,
+                request.timeEntry.timestamp,
+                request.requestedTimestamp,
                 rejectionReason,
             )
         emailService.sendAsync(employee.email, subject, body)
