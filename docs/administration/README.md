@@ -201,26 +201,24 @@ Managers see pending trip requests in the **Trip Approvals** page and can:
 
 ---
 
-## Work Hour Change Management
+## Time Modification Request Management
 
-Employees can request changes to their weekly and daily work hours through the **Work Hours** page. Managers approve or reject these requests.
+Employees can request modifications to their logged time entries through the **Time Modifications** page. Managers approve or reject these requests.
 
 ### Workflow
-1. Employee submits a work hour change request (requested weekly hours, optional daily hours, effective date, reason)
-2. Manager reviews the request in the **Hours Approvals** page
+1. Employee submits a time modification request (selects a time entry, specifies the corrected timestamp, provides a reason)
+2. Manager reviews the request in the **Modification Approvals** page
 3. Manager approves or rejects with a reason
-4. On approval, the employee's work hours in their Employee Configuration are automatically updated
+4. On approval, the time entry is automatically updated with the new timestamp, and daily summaries are recalculated
 
 ### Manager Approval
 
-![Work Hour Change Approvals](../screenshots/work-hour-change-approvals.png)
-
-Managers see pending work hour change requests and can:
-- **Approve**: Updates the employee's configured weekly/daily work hours
+Managers see pending time modification requests and can:
+- **Approve**: Updates the time entry with the requested timestamp and marks it as modified
 - **Reject**: With a mandatory reason explaining the rejection
 
 ### Duplicate Prevention
-Only one pending work hour change request per employee is allowed at a time. Employees must wait for the current request to be processed before submitting a new one.
+Only one pending modification request per time entry is allowed at a time. Employees must wait for the current request to be processed before submitting a new one.
 
 ---
 

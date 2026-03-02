@@ -2,33 +2,42 @@
 
 > Last updated: 2026-03-02
 >
-> **Current phase:** Phase 16 — Time Modification Requests 🚧
+> **Current phase:** Phase 16 — Time Modification Requests ✅
 
 ---
 
-## Phase 16: Time Modification Requests 🚧
-- **Status**: IN PROGRESS
+## Phase 16: Time Modification Requests ✅
+- **Status**: COMPLETE
 
 ### What was delivered
 - **Time Modification Request Workflow**: Full backend with entity, repository, service, controller at `/time-modifications`
   - Status workflow: PENDING → APPROVED / REJECTED / CANCELLED
   - Employee requests modification to a specific time entry (new timestamp and/or notes)
   - Mandatory reason for the change
-  - Manager approval/rejection workflow (same pattern as work hour changes)
+  - Manager approval/rejection workflow
   - On approval, the time entry's timestamp and notes are updated, entry marked as modified
   - Daily summaries recalculated for both old and new dates when timestamp changes
   - Duplicate pending request prevention (one pending request per time entry)
   - Self-approval prevention
   - Audit logging for all state changes
+- **Email notifications**: Manager notified on new request; employee notified on approval/rejection
+- **Frontend**: Time Modification page (request list + new request form) and Time Modification Approval page (manager queue with approve/reject-with-reason modal)
+- **i18n**: English and German translation keys for time modification feature
+- **Removed**: Work hour change request feature (Phase 15) — all backend files, frontend pages, routes, nav items, and i18n keys removed; DB migration V13 drops the table
+- **Documentation**: Updated user guide, admin guide, PHASES.md, CURRENT_STATE.md, CHANGELOG.md
 
 ### Key files created
 - `backend/src/main/resources/db/migration/V12__create_time_modification_requests.sql`
+- `backend/src/main/resources/db/migration/V13__drop_work_hour_change_requests.sql`
 - `backend/src/main/kotlin/com/zeiterfassung/model/enums/TimeModificationStatus.kt`
 - `backend/src/main/kotlin/com/zeiterfassung/model/dto/TimeModificationDtos.kt`
 - `backend/src/main/kotlin/com/zeiterfassung/model/entity/TimeModificationRequestEntity.kt`
 - `backend/src/main/kotlin/com/zeiterfassung/repository/TimeModificationRequestRepository.kt`
 - `backend/src/main/kotlin/com/zeiterfassung/service/TimeModificationService.kt`
 - `backend/src/main/kotlin/com/zeiterfassung/controller/TimeModificationController.kt`
+- `frontend/src/services/timeModificationService.ts`
+- `frontend/src/pages/TimeModificationPage.tsx`
+- `frontend/src/pages/TimeModificationApprovalPage.tsx`
 
 ### API Endpoints
 | Method | Path | Permission | Description |
@@ -42,37 +51,10 @@
 
 ---
 
-## Phase 15: Work Hour Change Requests ✅
-- **Status**: COMPLETE
-
-### What was delivered
-- **Work Hour Change Request Workflow**: Full backend with entity, repository, service, controller at `/work-hour-changes`
-  - Status workflow: PENDING → APPROVED / REJECTED / CANCELLED
-  - Employee creates request specifying desired weekly (and optionally daily) hours
-  - Current hours automatically captured from EmployeeConfig
-  - Manager approval/rejection workflow (same pattern as vacation)
-  - On approval, employee's `weeklyWorkHours` and `dailyWorkHours` in EmployeeConfig are updated
-  - Duplicate pending request prevention (one pending request per user)
-  - Audit logging for all state changes
-
-### Key files created
-- `backend/src/main/resources/db/migration/V11__create_work_hour_change_requests.sql`
-- `backend/src/main/kotlin/com/zeiterfassung/model/enums/WorkHourChangeStatus.kt`
-- `backend/src/main/kotlin/com/zeiterfassung/model/dto/WorkHourChangeDtos.kt`
-- `backend/src/main/kotlin/com/zeiterfassung/model/entity/WorkHourChangeRequestEntity.kt`
-- `backend/src/main/kotlin/com/zeiterfassung/repository/WorkHourChangeRequestRepository.kt`
-- `backend/src/main/kotlin/com/zeiterfassung/service/WorkHourChangeService.kt`
-- `backend/src/main/kotlin/com/zeiterfassung/controller/WorkHourChangeController.kt`
-
-### API Endpoints
-| Method | Path | Permission | Description |
-|--------|------|------------|-------------|
-| POST | `/work-hour-changes` | `time.edit.own` | Create work hour change request |
-| GET | `/work-hour-changes` | `time.edit.own` | Get own requests (paginated) |
-| GET | `/work-hour-changes/pending` | `time.edit.team` | Get pending requests for approval |
-| POST | `/work-hour-changes/{id}/approve` | `time.edit.team` | Approve request |
-| POST | `/work-hour-changes/{id}/reject` | `time.edit.team` | Reject request |
-| DELETE | `/work-hour-changes/{id}` | `time.edit.own` | Cancel own request |
+## Phase 15: Work Hour Change Requests ❌ REMOVED
+- **Status**: REMOVED (superseded by Phase 16 — Time Modification Requests)
+- **Note**: This feature was removed in Phase 16. The work hour change request workflow was replaced by time modification requests, which allow employees to request changes to individual time entries instead of weekly/daily work hour configuration.
+- **Database migration V13**: Drops `work_hour_change_requests` table
 
 ---
 

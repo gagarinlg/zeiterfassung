@@ -199,46 +199,42 @@ Here you can:
 
 ---
 
-## Work Hour Changes
+## Time Modification Requests
 
-The **Work Hours** page lets you request changes to your weekly and daily work hours (e.g., switching from full-time to part-time).
-
-![Work Hour Changes](../screenshots/work-hour-changes.png)
+The **Time Modifications** page lets you request changes to your logged time entries (e.g., if you forgot to log a break or need to correct a clock-in/out time).
 
 ### Viewing Your Requests
 
-The **My Requests** tab shows all your work hour change requests with current hours, requested hours, effective date, status, and reason.
+The **My Requests** tab shows all your time modification requests with entry type, original timestamp, requested timestamp, status, and reason.
 
 ### Creating a Request
 
 1. Click the **New Request** tab
-2. Enter the **Requested Weekly Hours** (e.g., 32 for part-time)
-3. Optionally enter **Requested Daily Hours**
-4. Select the **Effective Date** (when the change should take effect)
-5. Add a **Reason** explaining the change
+2. Enter the **Time Entry ID** of the entry you want to modify
+3. Select the **Requested Timestamp** (the corrected time)
+4. Optionally add **New Notes** for the entry
+5. Enter a **Reason** explaining why the change is needed (required)
 6. Click **Submit Request**
 
-Your manager will review and approve or reject the request. Only one pending request is allowed at a time.
+Your manager will review and approve or reject the request. Only one pending request per time entry is allowed at a time.
 
 ### Request Status
 
 - 🟡 **Pending**: Awaiting manager approval
-- 🟢 **Approved**: Request approved — your work hours have been updated
+- 🟢 **Approved**: Request approved — the time entry has been updated
 - 🔴 **Rejected**: Request rejected (reason shown)
 - ⚪ **Cancelled**: Request cancelled by you
 
 ---
 
-## Work Hour Change Approvals (Managers)
+## Time Modification Approvals (Managers)
 
-If you are a manager, you will see the **Hours Approvals** page.
-
-![Work Hour Change Approvals](../screenshots/work-hour-change-approvals.png)
+If you are a manager, you will see the **Modification Approvals** page.
 
 Here you can:
-- View pending work hour change requests from your team
-- See the employee's current and requested hours, effective date, and reason
-- **Approve**: Automatically updates the employee's configured work hours
+- View pending time modification requests from your team
+- See the employee's name, entry type, original and requested timestamps, and reason
+- **Approve**: Automatically updates the time entry with the requested timestamp
 - **Reject**: With a mandatory reason
 
 ---

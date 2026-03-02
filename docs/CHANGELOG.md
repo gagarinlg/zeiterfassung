@@ -20,24 +20,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - **Repository**: `TimeModificationRequestRepository` with user/status/timeEntry queries
 - **Service**: `TimeModificationService` with validation, audit logging, time entry update and daily summary recalculation on approval
 - **Controller**: `TimeModificationController` with Swagger annotations and `@PreAuthorize` permission checks
+- **Notification emails**: Manager notified on new request; employee notified on approval/rejection
+- **Frontend**: Time Modification page (request list + new request form) and Time Modification Approval page (manager queue)
+- **i18n**: English and German translation keys for time modification feature
 
-## [Unreleased] — Work Hour Change Requests
-
-### Added
-- **Work hour change request workflow**: Employees can request changes to their weekly/daily work hours; managers approve/reject
-  - `POST /work-hour-changes` — create request (captures current hours from EmployeeConfig)
-  - `GET /work-hour-changes` — list own requests (paginated)
-  - `GET /work-hour-changes/pending` — list pending requests for manager approval
-  - `POST /work-hour-changes/{id}/approve` — approve and update EmployeeConfig
-  - `POST /work-hour-changes/{id}/reject` — reject with reason
-  - `DELETE /work-hour-changes/{id}` — cancel own pending request
-- **Database migration V11**: `work_hour_change_requests` table with user/status indexes
-- **Enum**: `WorkHourChangeStatus` (PENDING, APPROVED, REJECTED, CANCELLED)
-- **DTOs**: `CreateWorkHourChangeRequest`, `RejectWorkHourChangeRequest`, `WorkHourChangeResponse`
-- **Entity**: `WorkHourChangeRequestEntity` with `@ManyToOne` user/approver, `toResponse()` method
-- **Repository**: `WorkHourChangeRequestRepository` with user/status queries
-- **Service**: `WorkHourChangeService` with validation, audit logging, EmployeeConfig update on approval
-- **Controller**: `WorkHourChangeController` with Swagger annotations and `@PreAuthorize` permission checks
+### Removed
+- **Work hour change request feature**: Removed the weekly/daily work hour change request workflow
+  - Removed `WorkHourChangeController`, `WorkHourChangeService`, `WorkHourChangeRequestEntity`, `WorkHourChangeDtos`, `WorkHourChangeStatus`, `WorkHourChangeRequestRepository`
+  - Removed frontend pages: `WorkHourChangePage`, `WorkHourChangeApprovalPage`, `workHourChangeService`
+  - Removed navigation items and routes for work hour changes
+  - **Database migration V13**: Drops `work_hour_change_requests` table
 
 ## [Unreleased] — Bug Fixes & Employee Configuration UI
 
