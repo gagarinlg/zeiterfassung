@@ -103,24 +103,26 @@ jobs:
         run: chmod +x gradlew
 
       - name: Decode signing keystore
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
         run: echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > app/release-keystore.jks
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
       - name: Build signed release APK/AAB
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        if: ${{ env.ANDROID_KEYSTORE_BASE64 != '' }}
         run: ./gradlew assembleRelease bundleRelease --no-daemon
         env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           GRADLE_OPTS: -Xmx4g
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
       - name: Build unsigned release APK/AAB
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 == '' }}
+        if: ${{ env.ANDROID_KEYSTORE_BASE64 == '' }}
         run: ./gradlew assembleRelease bundleRelease --no-daemon
         env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           GRADLE_OPTS: -Xmx4g
 
       - name: Upload release APK

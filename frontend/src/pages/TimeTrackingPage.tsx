@@ -4,6 +4,7 @@ import { timeService } from '../services/timeService'
 import type { TrackingStatusResponse, TimeEntry, TimeSheetResponse } from '../types'
 import { formatTime, formatDate } from '../utils/dateUtils'
 import { useDateFormat } from '../context/DateFormatContext'
+import TrackingStatusBar from '../components/TrackingStatusBar'
 
 function formatMinutes(minutes: number): string {
   const h = Math.floor(minutes / 60)
@@ -52,6 +53,7 @@ export default function TimeTrackingPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+  const [actionLoading, setActionLoading] = useState(false)
   const [elapsed, setElapsed] = useState<number>(0)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -98,41 +100,53 @@ export default function TimeTrackingPage() {
 
   const handleClockIn = async () => {
     setActionError(null)
+    setActionLoading(true)
     try {
       await timeService.clockIn(undefined, 'WEB')
       await loadData()
     } catch {
       setActionError(t('time_tracking.errors.clock_in_failed'))
+    } finally {
+      setActionLoading(false)
     }
   }
 
   const handleClockOut = async () => {
     setActionError(null)
+    setActionLoading(true)
     try {
       await timeService.clockOut(undefined, 'WEB')
       await loadData()
     } catch {
       setActionError(t('time_tracking.errors.clock_out_failed'))
+    } finally {
+      setActionLoading(false)
     }
   }
 
   const handleStartBreak = async () => {
     setActionError(null)
+    setActionLoading(true)
     try {
       await timeService.startBreak(undefined, 'WEB')
       await loadData()
     } catch {
       setActionError(t('time_tracking.errors.break_start_failed'))
+    } finally {
+      setActionLoading(false)
     }
   }
 
   const handleEndBreak = async () => {
     setActionError(null)
+    setActionLoading(true)
     try {
       await timeService.endBreak(undefined, 'WEB')
       await loadData()
     } catch {
       setActionError(t('time_tracking.errors.break_end_failed'))
+    } finally {
+      setActionLoading(false)
     }
   }
 
@@ -152,13 +166,6 @@ export default function TimeTrackingPage() {
       setActionError(t('time_tracking.errors.load_failed'))
     }
   }
-
-  const statusColor =
-    status?.status === 'CLOCKED_IN'
-      ? 'bg-green-100 text-green-800'
-      : status?.status === 'ON_BREAK'
-        ? 'bg-yellow-100 text-yellow-800'
-        : 'bg-gray-100 text-gray-700'
 
   const entryTypeLabel = (type: TimeEntry['entryType']) => {
     const map: Record<TimeEntry['entryType'], string> = {
@@ -189,64 +196,18 @@ export default function TimeTrackingPage() {
       )}
 
       {/* Current Status Card */}
-      <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-6">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <p className="text-sm text-gray-500 mb-1">{t('time_tracking.current_status')}</p>
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${statusColor}`}>
-              {status ? t(`time_tracking.status.${status.status.toLowerCase()}`) : '—'}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {status?.status === 'CLOCKED_OUT' && (
-              <button
-                onClick={handleClockIn}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors"
-              >
-                {t('time_tracking.clock_in')}
-              </button>
-            )}
-            {status?.status === 'CLOCKED_IN' && (
-              <>
-                <button
-                  onClick={handleStartBreak}
-                  className="bg-yellow-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-yellow-600 transition-colors"
-                >
-                  {t('time_tracking.break_start')}
-                </button>
-                <button
-                  onClick={handleClockOut}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors"
-                >
-                  {t('time_tracking.clock_out')}
-                </button>
-              </>
-            )}
-            {status?.status === 'ON_BREAK' && (
-              <>
-                <button
-                  onClick={handleEndBreak}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-                >
-                  {t('time_tracking.break_end')}
-                </button>
-                <button
-                  onClick={handleClockOut}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors"
-                >
-                  {t('time_tracking.clock_out')}
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-
-        {actionError && (
-          <div role="alert" className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
-            {actionError}
-          </div>
-        )}
-      </div>
+      {status && (
+        <TrackingStatusBar
+          status={status}
+          timeFormat={timeFormat}
+          actionLoading={actionLoading}
+          actionError={actionError}
+          onClockIn={handleClockIn}
+          onClockOut={handleClockOut}
+          onStartBreak={handleStartBreak}
+          onEndBreak={handleEndBreak}
+        />
+      )}
 
       {/* Today Summary */}
       {status && (
