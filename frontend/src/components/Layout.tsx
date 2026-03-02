@@ -2,7 +2,7 @@ import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { useBranding } from '../hooks/useBranding'
-import { Clock, Calendar, LayoutDashboard, Settings, LogOut, User, CheckCircle, UserCog, Thermometer, Plane, FolderKanban, Timer } from 'lucide-react'
+import { Clock, Calendar, LayoutDashboard, Settings, LogOut, User, CheckCircle, UserCog, Thermometer, Plane, FolderKanban, FileClock } from 'lucide-react'
 
 export default function Layout() {
   const { t } = useTranslation()
@@ -131,7 +131,7 @@ export default function Layout() {
             {t('nav.projects')}
           </NavLink>
           <NavLink
-            to="/work-hour-changes"
+            to="/time-modifications"
             end
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -139,12 +139,12 @@ export default function Layout() {
               }`
             }
           >
-            <Timer size={18} />
-            {t('nav.work_hour_changes')}
+            <FileClock size={18} />
+            {t('nav.time_modifications')}
           </NavLink>
           {hasPermission('time.edit.team') && (
             <NavLink
-              to="/work-hour-changes/approvals"
+              to="/time-modifications/approvals"
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive ? 'bg-primary-50 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
@@ -152,7 +152,7 @@ export default function Layout() {
               }
             >
               <CheckCircle size={18} />
-              {t('nav.work_hour_change_approvals')}
+              {t('nav.time_modification_approvals')}
             </NavLink>
           )}
           {hasPermission('admin.users.manage') && (

@@ -1,14 +1,16 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { workHourChangeService } from '../services/workHourChangeService'
-import type { WorkHourChangeResponse } from '../services/workHourChangeService'
+import { timeModificationService } from '../services/timeModificationService'
+import type { TimeModificationResponse } from '../services/timeModificationService'
 import { CheckCircle, XCircle } from 'lucide-react'
+import { useDateFormat } from '../context/DateFormatContext'
+import { formatDateTime } from '../utils/dateUtils'
 
-type WHCStatus = WorkHourChangeResponse['status']
+type TMStatus = TimeModificationResponse['status']
 
-function StatusBadge({ status }: { status: WHCStatus }) {
+function StatusBadge({ status }: { status: TMStatus }) {
   const { t } = useTranslation()
-  const styles: Record<WHCStatus, string> = {
+  const styles: Record<TMStatus, string> = {
     PENDING: 'bg-yellow-100 text-yellow-800',
     APPROVED: 'bg-green-100 text-green-800',
     REJECTED: 'bg-red-100 text-red-800',
@@ -16,14 +18,15 @@ function StatusBadge({ status }: { status: WHCStatus }) {
   }
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status]}`}>
-      {t(`work_hour_change.status.${status.toLowerCase()}`)}
+      {t(`time_modification.status.${status.toLowerCase()}`)}
     </span>
   )
 }
 
-export default function WorkHourChangeApprovalPage() {
+export default function TimeModificationApprovalPage() {
   const { t } = useTranslation()
-  const [requests, setRequests] = useState<WorkHourChangeResponse[]>([])
+  const { dateFormat, timeFormat } = useDateFormat()
+  const [requests, setRequests] = useState<TimeModificationResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -34,10 +37,10 @@ export default function WorkHourChangeApprovalPage() {
     setLoading(true)
     setError(null)
     try {
-      const result = await workHourChangeService.getPendingRequests()
+      const result = await timeModificationService.getPendingRequests()
       setRequests(result.content)
     } catch {
-      setError(t('work_hour_change.errors.load_failed'))
+      setError(t('time_modification.errors.load_failed'))
     } finally {
       setLoading(false)
     }
@@ -51,11 +54,11 @@ export default function WorkHourChangeApprovalPage() {
     setActionLoading(id)
     setError(null)
     try {
-      await workHourChangeService.approveRequest(id)
-      setSuccess(t('work_hour_change.success.approved'))
+      await timeModificationService.approveRequest(id)
+      setSuccess(t('time_modification.success.approved'))
       await loadRequests()
     } catch {
-      setError(t('work_hour_change.errors.approve_failed'))
+      setError(t('time_modification.errors.approve_failed'))
     } finally {
       setActionLoading(null)
     }
@@ -66,12 +69,12 @@ export default function WorkHourChangeApprovalPage() {
     setActionLoading(rejectModal.id)
     setError(null)
     try {
-      await workHourChangeService.rejectRequest(rejectModal.id, rejectModal.reason)
+      await timeModificationService.rejectRequest(rejectModal.id, rejectModal.reason)
       setRejectModal(null)
-      setSuccess(t('work_hour_change.success.rejected'))
+      setSuccess(t('time_modification.success.rejected'))
       await loadRequests()
     } catch {
-      setError(t('work_hour_change.errors.reject_failed'))
+      setError(t('time_modification.errors.reject_failed'))
     } finally {
       setActionLoading(null)
     }
@@ -79,7 +82,7 @@ export default function WorkHourChangeApprovalPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">{t('work_hour_change.approvals_title')}</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">{t('time_modification.approvals_title')}</h1>
 
       {error && (
         <div role="alert" className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
@@ -95,15 +98,15 @@ export default function WorkHourChangeApprovalPage() {
       {loading ? (
         <p aria-live="polite" className="text-gray-500">{t('common.loading')}</p>
       ) : requests.length === 0 ? (
-        <p className="text-gray-500">{t('work_hour_change.no_pending')}</p>
+        <p className="text-gray-500">{t('time_modification.no_pending')}</p>
       ) : (
         <div className="bg-white shadow rounded-lg overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                {['employee', 'current_hours', 'requested_hours', 'effective_date', 'reason', 'status', 'actions'].map((col) => (
+                {['employee', 'entry_type', 'original_timestamp', 'requested_timestamp', 'reason', 'status', 'actions'].map((col) => (
                   <th key={col} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t(`work_hour_change.columns.${col}`)}
+                    {t(`time_modification.columns.${col}`)}
                   </th>
                 ))}
               </tr>
@@ -112,10 +115,10 @@ export default function WorkHourChangeApprovalPage() {
               {requests.map((req) => (
                 <tr key={req.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">{req.userName}</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{req.currentWeeklyHours}h</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{req.requestedWeeklyHours}h</td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{req.effectiveDate}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">{req.reason ?? '—'}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{req.entryType}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{formatDateTime(req.originalTimestamp, dateFormat, timeFormat)}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{formatDateTime(req.requestedTimestamp, dateFormat, timeFormat)}</td>
+                  <td className="px-4 py-3 text-sm text-gray-500">{req.reason}</td>
                   <td className="px-4 py-3"><StatusBadge status={req.status} /></td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -149,13 +152,13 @@ export default function WorkHourChangeApprovalPage() {
       {rejectModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('work_hour_change.reject_title')}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('time_modification.reject_title')}</h2>
             <textarea
               value={rejectModal.reason}
               onChange={(e) => setRejectModal({ ...rejectModal, reason: e.target.value })}
               rows={3}
               className="w-full border border-gray-300 rounded px-3 py-2 text-sm mb-4"
-              placeholder={t('work_hour_change.reject_reason_placeholder')}
+              placeholder={t('time_modification.reject_reason_placeholder')}
               autoFocus
             />
             <div className="flex justify-end gap-3">

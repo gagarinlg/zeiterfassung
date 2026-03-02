@@ -12,8 +12,8 @@
     "business_trips": "Business Trips",
     "business_trip_approvals": "Trip Approvals",
     "projects": "Projects",
-    "work_hour_changes": "Work Hours",
-    "work_hour_change_approvals": "Hours Approvals",
+    "time_modifications": "Time Modifications",
+    "time_modification_approvals": "Modification Approvals",
     "admin": "Administration",
     "profile": "Profile",
     "logout": "Logout",
@@ -520,28 +520,31 @@
       "project_created": "Project created successfully"
     }
   },
-  "work_hour_change": {
-    "title": "Work Hour Changes",
-    "approvals_title": "Work Hour Change Approvals",
+  "time_modification": {
+    "title": "Time Modification Requests",
+    "approvals_title": "Time Modification Approvals",
     "tabs": {
       "list": "My Requests",
       "new_request": "New Request"
     },
-    "requested_weekly_hours": "Requested Weekly Hours",
-    "requested_daily_hours": "Requested Daily Hours",
-    "effective_date": "Effective Date",
+    "time_entry": "Time Entry",
+    "entry_type": "Entry Type",
+    "original_timestamp": "Original Timestamp",
+    "requested_timestamp": "Requested Timestamp",
+    "requested_notes": "New Notes",
     "reason": "Reason",
     "submit": "Submit Request",
-    "no_entries": "No work hour change requests found",
-    "no_pending": "No pending work hour change requests",
+    "no_entries": "No time modification requests found",
+    "no_pending": "No pending time modification requests",
     "see_reason": "See rejection reason",
-    "reject_title": "Reject Work Hour Change Request",
+    "reject_title": "Reject Time Modification Request",
     "reject_reason_placeholder": "Enter rejection reason...",
+    "select_entry": "Select a time entry to modify...",
     "columns": {
       "employee": "Employee",
-      "current_hours": "Current Hours",
-      "requested_hours": "Requested Hours",
-      "effective_date": "Effective Date",
+      "entry_type": "Entry Type",
+      "original_timestamp": "Original Time",
+      "requested_timestamp": "Requested Time",
       "reason": "Reason",
       "status": "Status",
       "actions": "Actions"
@@ -560,7 +563,7 @@
       "reject_failed": "Failed to reject request"
     },
     "success": {
-      "created": "Work hour change request submitted",
+      "created": "Time modification request submitted",
       "cancelled": "Request cancelled",
       "approved": "Request approved",
       "rejected": "Request rejected"
