@@ -144,8 +144,8 @@ class BrandingController(
 
     private fun ensureBrandingDirectory(): File {
         val dir = File(brandingDirectory)
-        if (!dir.exists()) {
-            dir.mkdirs()
+        if (!dir.exists() && !dir.mkdirs()) {
+            throw IllegalStateException("Failed to create branding directory: ${dir.absolutePath}")
         }
         return dir
     }

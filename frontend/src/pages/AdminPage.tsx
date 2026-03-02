@@ -711,6 +711,7 @@ function SettingsTab() {
   const [logoResult, setLogoResult] = useState<{ status: 'ok' | 'error'; message: string } | null>(null)
   const [logoKey, setLogoKey] = useState(0)
   const logoInputRef = useRef<HTMLInputElement>(null)
+  const [logoVisible, setLogoVisible] = useState(false)
 
   const loadSettings = useCallback(async () => {
     setLoading(true)
@@ -916,9 +917,9 @@ function SettingsTab() {
             key={logoKey}
             src={`/api/branding/logo?v=${logoKey}`}
             alt="Logo"
-            className="h-12 object-contain border rounded p-1"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-            onLoad={(e) => { (e.target as HTMLImageElement).style.display = 'block' }}
+            className={`h-12 object-contain border rounded p-1 ${logoVisible ? '' : 'hidden'}`}
+            onError={() => setLogoVisible(false)}
+            onLoad={() => setLogoVisible(true)}
           />
           <div className="flex items-center gap-2">
             <label className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 cursor-pointer disabled:opacity-50">

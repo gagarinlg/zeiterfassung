@@ -47,7 +47,7 @@ export default function LoginPage() {
 
     setIsLoading(true)
     try {
-      const request = totpCode ? { ...formData, totpCode } : formData
+      const request = totpCode.length > 0 ? { ...formData, totpCode } : formData
       const response = await authService.login(request)
       const tokens = {
         accessToken: response.accessToken,
